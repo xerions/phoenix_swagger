@@ -197,7 +197,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   @doc false
   defp get_api(app_mod, route_map) do
-    controller = Module.concat([:Elixir, app_mod, Module.split(route_map.plug) |> List.last])
+    controller = Module.concat([:Elixir | Module.split(route_map.plug)])
     swagger_fun = ("swagger_" <> to_string(route_map.opts)) |> String.to_atom
     if Code.ensure_loaded?(controller) == false do
       raise "Error: #{controller} module didn't load."
