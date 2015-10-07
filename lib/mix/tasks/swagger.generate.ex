@@ -141,11 +141,11 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
         # :title and :version are mandatory fields,
         # so we need to check and add default values
         # if they are not exists
-        info = if title == nil do
-          Map.put_new(info, :title, @default_title)
+        if title == nil do
+          info = Map.put_new(info, :title, @default_title)
         end
-        info = if version == nil do
-          Map.put_new(info, :version, @default_version)
+        if version == nil do
+          info = Map.put_new(info, :version, @default_version)
         end
         # resulted :info swagger field
         Map.put_new(swagger_map, :info, info)
