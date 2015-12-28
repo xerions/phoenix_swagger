@@ -93,14 +93,15 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
                            end
             # make response map - #{http_code: .....}
             response = Map.put_new(%{}, response_code |> to_string, response_map)
-            # make rest_method map (get:, update: ....)
-            rest_method  = Map.put_new(%{}, route_map.verb, request_map)
-            # finish path map
-            body  = Map.put_new(rest_method[route_map.verb], :responses, response)
-            # add http method to the tree
-            path_map  = Map.put_new(%{}, route_map.verb, body)
-            # finish paths
-            Map.put_new(acc, path, path_map)
+
+            if acc[path][route_map.verb] do
+              IO.puts "Warning: Double definition for #{route_map.verb} #{path}"
+            end
+
+            path_map = (acc[path] || %{})
+                       |> Map.put(route_map.verb, Map.put(request_map, :responses, response))
+
+            Map.put(acc, path, path_map)
           _ ->
             # A controller has no swagger_[action] function, so
             # we ust miss this API
