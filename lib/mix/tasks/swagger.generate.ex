@@ -76,12 +76,12 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
         # check that give controller haev swagger_.* function and call it
         case function_exported?(controller, swagger_fun, 0) do
           true ->
-            {[description], parameters, response_code,
-             response_description, meta} = apply(controller, swagger_fun, [])
+            {[description], parameters, tags, response_code, response_description, meta} = apply(controller, swagger_fun, [])
             # convert list of parameters to maps
             parameters = get_parameters(parameters)
             # make 'description' and 'parameters' maps
             request_map = Map.put_new(%{}, :description, description)
+            request_map = Map.put_new(request_map, :tags, tags)
             request_map = Map.put_new(request_map, :parameters,  parameters)
             # make internals of 'responses' map
             response_map = Map.put_new(%{}, :description, response_description)
@@ -131,22 +131,19 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     case function_exported?(Mix.Project.get, :swagger_info, 0) do
       true ->
         info = Mix.Project.get.swagger_info
-        title = Keyword.get(info, :title, nil)
-        version = Keyword.get(info, :version, nil)
+
+        # :title and :version are mandatory fields,
+        # so we need to add default values
+        # if they are not exists
+        title = Keyword.get(info, :title, @default_title)
+        version = Keyword.get(info, :version, @default_version)
+
         # collect :info swagger fields to the map
         info = List.foldl(info, %{},
           fn ({info_key, info_val}, map) ->
             Map.put_new(map, info_key, info_val)
           end)
-        # :title and :version are mandatory fields,
-        # so we need to check and add default values
-        # if they are not exists
-        info = if title == nil do
-          Map.put_new(info, :title, @default_title)
-        end
-        info = if version == nil do
-          Map.put_new(info, :version, @default_version)
-        end
+
         # resulted :info swagger field
         Map.put_new(swagger_map, :info, info)
       false ->
@@ -196,7 +193,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   @doc false
-  defp get_api(app_mod, route_map) do
+  defp get_api(_app_mod, route_map) do
     controller = Module.concat([:Elixir | Module.split(route_map.plug)])
     swagger_fun = ("swagger_" <> to_string(route_map.opts)) |> String.to_atom
     if Code.ensure_loaded?(controller) == false do
