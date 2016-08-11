@@ -192,7 +192,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     Enum.map(parameters,
       fn({:param, params_list}) ->
         Enum.into(params_list, %{})
-      end) |> :lists.flatten
+      end) |> List.flatten
   end
 
   @doc false

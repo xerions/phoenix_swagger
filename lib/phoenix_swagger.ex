@@ -65,7 +65,7 @@ defmodule PhoenixSwagger do
           _ ->
             []
         end
-      end) |> :lists.flatten
+      end) |> List.flatten
   end
 
   @doc false
