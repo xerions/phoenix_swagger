@@ -7,7 +7,9 @@ defmodule PhoenixSwagger.Mixfile do
      elixir: "~> 1.1-dev",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps,
+     description: description,
+     package: package]
   end
 
   # Configuration for the OTP application
@@ -28,5 +30,15 @@ defmodule PhoenixSwagger.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     []
+  end
+
+  defp description do
+    "PhoenixSwagger is the library that provides swagger integration to the phoenix web framework."
+  end
+
+  defp package do
+    [maintainers: ["Alexander Kuleshov"],
+     licenses: ["MPL 2.0"],
+     links: %{"Github" => "https://github.com/xerions/phoenix_swagger"}]
   end
 end
