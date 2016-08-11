@@ -1,4 +1,4 @@
-# PhoenixSwagger
+# PhoenixSwagger [![Build Status](https://travis-ci.org/xerions/phoenix_swagger.svg?branch=master)](https://travis-ci.org/xerions/phoenix_swagger)
 
 `PhoenixSwagger` is the library that provides [swagger](http://swagger.io/) integration
 to the [phoenix](http://www.phoenixframework.org/) web framework.
