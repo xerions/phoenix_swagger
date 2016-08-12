@@ -39,14 +39,16 @@ The `version` and `title` are mandatory fields. By default the `version` will be
 and the `title` will be `<enter your title>` if you will not provide `swagger_info/0`
 function.
 
-Other fields that can be in the `swagger_info`:
+Fields that can be in the `swagger_info`:
 
-Name          | Type
-------------- | -------------
-description   | string
-termsOfService| string
-contact       | [name: "...", url: "...", email:"..."]
-license       | [name: "...", url: "..."]
+Name           | Required | Type                                   | Default value
+-------------- | -------- | -------------------------------------- | -------------
+title          | true     | string                                 | `<enter your title>`
+version        | true     | string                                 | `0.0.1`
+description    | false    | string                                 |                                          
+termsOfService | false    | string                                 |                    
+contact        | false    | [name: "...", url: "...", email:"..."] |                    
+license        | false    | [name: "...", url: "..."]              |                      
 
 `PhoenixSwagger` provides `swagger_model/2` macro that generates swagger documentation
 for the certain phoenix controller.
