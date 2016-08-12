@@ -18,7 +18,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   @default_version "0.0.1"
 
   @app_path Enum.at(Mix.Project.load_paths, 0) |> String.split("_build") |> Enum.at(0)
-  @swagger_file_name "swagger.js"
+  @swagger_file_name "swagger.json"
   @swagger_file_path @app_path <> @swagger_file_name
 
   @doc false
