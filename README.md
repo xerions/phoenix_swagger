@@ -139,3 +139,51 @@ mix phoenix.swagger.generate ~/my-phoenix-api.json
 
 For more informantion, you can find `swagger` specification [here](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md).
 
+## Validator
+
+Besides generator of `swagger` schemas, the `phoenix_swagger` provides validator of input parameters of resources.
+
+Suppose you have following resource in your schema:
+
+```
+...
+...
+"/history": {
+    "get": {
+        "parameters": [
+        {
+            "name": "offset",
+            "in": "query",
+            "type": "integer",
+            "format": "int32",
+            "description": "Offset the list of returned results by this amount. Default is zero."
+        },
+        {
+            "name": "limit",
+            "in": "query",
+            "type": "integer",
+            "format": "int32",
+            "description": "Integer of items to retrieve. Default is 5, maximum is 100."
+        }]
+     }
+}
+...
+...
+```
+
+Before usage of swagger validator, add the `PhoenixSwagger.Validator.Supervisor` to the supervisor tree of
+your application.
+
+The `phoenix_swagger` provides `PhoenixSwagger.Validator.parse_swagger_schema/1` API to load a swagger schema by
+the given path. This API should be called during application startup to parse/load a swagger schema. After this, the
+`PhoenixSwagger.Validator.validate/2` can be used to validate resources.
+
+For example:
+
+```elixir
+iex(1)> Validator.validate("/history", %{"limit" => "10"})
+{:error,"Type mismatch. Expected Integer but got String.", "#/limit"}
+
+iex(2)> Validator.validate("/history", %{"limit" => 10, "offset" => 100})
+:ok
+```
