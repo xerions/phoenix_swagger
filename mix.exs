@@ -3,7 +3,7 @@ defmodule PhoenixSwagger.Mixfile do
 
   def project do
     [app: :phoenix_swagger,
-     version: "0.1.0",
+     version: "0.1.1",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -32,7 +32,8 @@ defmodule PhoenixSwagger.Mixfile do
   defp deps do
     [
         {:poison, "~> 1.5.0"},
-        {:ex_json_schema, "~> 0.5.1"}
+        {:ex_json_schema, "~> 0.5.1"},
+        {:plug, "~> 1.1"}
     ]
   end
 

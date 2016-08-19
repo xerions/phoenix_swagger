@@ -187,3 +187,20 @@ iex(1)> Validator.validate("/history", %{"limit" => "10"})
 iex(2)> Validator.validate("/history", %{"limit" => 10, "offset" => 100})
 :ok
 ```
+
+Besides `validate/2` API, the `phoenix_swagger` validator can be used via Plug to validate
+intput parameters of your controllers.
+
+Just add `PhoenixSwagger.Plug.Validate` plug to your router:
+
+```elixir
+pipeline :api do
+  plug :accepts, ["json"]
+  plug PhoenixSwagger.Plug.Validate
+end
+
+scope "/api", MyApp do
+  pipe_through :api
+  post "/users", UsersController, :send
+end
+```
