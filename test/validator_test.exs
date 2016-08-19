@@ -3,11 +3,12 @@ defmodule ValidatorTest do
 
   alias PhoenixSwagger.Validator
 
+  @table :validator_table
+
   setup do
     schema = Validator.parse_swagger_schema("test/test_spec/swagger_test_spec.json")
     on_exit fn ->
-      [child_id] = Supervisor.which_children(TableOwnerSup)
-      Supervisor.terminate_child(TableOwnerSup, child_id)
+      :ets.delete_all_objects(@table)
     end
     {:ok, schema}
   end

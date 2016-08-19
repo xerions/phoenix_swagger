@@ -1,5 +1,7 @@
 defmodule PhoenixSwagger do
 
+  use Application
+
   @shortdoc "Generate swagger_[action] function for a phoenix controller"
 
   @moduledoc """
@@ -21,9 +23,26 @@ defmodule PhoenixSwagger do
   or a function that returns map.
   """
 
+  @table :validator_table
   @swagger_data_types [:integer, :long, :float, :double, :string,
                        :byte, :binary, :boolean, :date, :dateTime,
                        :password]
+
+  def start(_type, _args) do
+    import Supervisor.Spec, warn: false
+
+    children = [
+      # Define workers and child supervisors to be supervised
+      # worker(Test.Worker, [arg1, arg2, arg3]),
+    ]
+
+    :ets.new(@table, [:public,:named_table])
+
+    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: Test.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
 
   defmacro __using__(_) do
     quote do
