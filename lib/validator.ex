@@ -23,6 +23,8 @@ defmodule PhoenixSwagger.Validator do
   For more information, see more in ./phoenix_swagger/tests/ directory.
   """
 
+  @table :validator_table
+
   @doc """
   The `parse_swagger_schema/1` takes path to a swagger schema, parses it
   into ex_json_schema format and store to the `validator_table` ets
@@ -44,9 +46,6 @@ defmodule PhoenixSwagger.Validator do
       }]
 
   """
-
-  @table_owner TableOwner
-
   def parse_swagger_schema(spec) do
     schema = File.read(spec) |> elem(1) |> Poison.decode() |> elem(1)
     # get rid from all keys besides 'paths' and 'definitions' as we
@@ -74,7 +73,7 @@ defmodule PhoenixSwagger.Validator do
           Map.merge(acc, get_property_type(schema, parameter, "", acc))
         end)
         schema_object = %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"]}
-        GenServer.cast(@table_owner, {:insert, path, ExJsonSchema.Schema.resolve(schema_object)})
+        :ets.insert(@table, {path, ExJsonSchema.Schema.resolve(schema_object)})
         {path, ExJsonSchema.Schema.resolve(schema_object)}
       end
     end) |> List.flatten
@@ -94,7 +93,7 @@ defmodule PhoenixSwagger.Validator do
       one  parameter is not valid for the given resource.
   """
   def validate(path, params) do
-    case GenServer.call(@table_owner, {:lookup, path}) do
+    case :ets.lookup(@table, path) do
       [] ->
         {:error, :path_not_exists}
       [{_, schema}] ->
