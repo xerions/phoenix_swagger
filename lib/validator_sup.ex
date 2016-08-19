@@ -1,15 +1,15 @@
 defmodule PhoenixSwagger.Validator.Supervisor do
   use Supervisor
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, [], [name: TableOwnerSup])
+  def start_link(swagger_schema_path) do
+    Supervisor.start_link(__MODULE__, [swagger_schema_path], [name: TableOwnerSup])
   end
 
-  def init([]) do
+  def init([swagger_schema_path]) do
     children = [
-      worker(PhoenixSwagger.Validator.TableOwner, [name: PhoenixSwagger.Validator.TableOwner])
+      worker(PhoenixSwagger.Validator.TableOwner, [swagger_schema_path], [name: PhoenixSwagger.Validator.TableOwner])
     ]
     # supervise/2 is imported from Supervisor.Spec
-    supervise(children, [strategy: :one_for_one, name: A])
+    supervise(children, [strategy: :one_for_one])
   end
 end
