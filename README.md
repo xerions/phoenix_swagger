@@ -172,11 +172,18 @@ Suppose you have following resource in your schema:
 ```
 
 Before usage of swagger validator, add the `PhoenixSwagger.Validator.Supervisor` to the supervisor tree of
-your application.
+your application:
 
-The `phoenix_swagger` provides `PhoenixSwagger.Validator.parse_swagger_schema/1` API to load a swagger schema by
-the given path. This API should be called during application startup to parse/load a swagger schema. After this, the
-`PhoenixSwagger.Validator.validate/2` can be used to validate resources.
+```elixir
+children = [
+  supervisor(PhoenixSwagger.Validator.Supervisor, ["my_swagger_schema.json"]),
+]
+```
+
+The `PhoenixSwagger.Validator.Supervisor` will start process which will hold ets table which stores associative key/value there.
+Where `key` is an API path of a resource and `value` is input parameters of a resource.
+
+After this, the `PhoenixSwagger.Validator.validate/2` can be used to validate resources.
 
 For example:
 

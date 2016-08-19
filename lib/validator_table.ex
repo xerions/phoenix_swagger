@@ -1,13 +1,14 @@
 defmodule PhoenixSwagger.Validator.TableOwner do
   use GenServer
+  alias PhoenixSwagger.Validator
 
   @table :validator_table
-  
-  def start_link(state, _opts \\ []) do
-    GenServer.start_link(__MODULE__, state, [name: TableOwner])
+
+  def start_link(schema_path) do
+    GenServer.start_link(__MODULE__, schema_path, [name: TableOwner])
   end
 
-  def init(_args) do
+  def init(args) do
     case :ets.info(@table) do
       :undefined ->
         :ets.new(@table, [:public,:named_table])
@@ -16,6 +17,7 @@ defmodule PhoenixSwagger.Validator.TableOwner do
         # no need to create validator table if we already have it
         @table
     end
+    Validator.parse_swagger_schema(args)
     {:ok, %{}}
   end
 
