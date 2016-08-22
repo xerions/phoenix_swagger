@@ -2,6 +2,8 @@
 
 `PhoenixSwagger` is the library that provides [swagger](http://swagger.io/) integration
 to the [phoenix](http://www.phoenixframework.org/) web framework.
+The `PhoenixSwagger` generates `Swagger` specification for `Phoenix` controllers and
+validates the requests.
 
 ## Installation
 
@@ -50,7 +52,7 @@ termsOfService | false    | string                                 |
 contact        | false    | [name: "...", url: "...", email:"..."] |                    
 license        | false    | [name: "...", url: "..."]              |                      
 
-`PhoenixSwagger` provides `swagger_model/2` macro that generates swagger documentation
+`PhoenixSwagger` provides `swagger_model/2` macro that generates swagger specification
 for the certain phoenix controller.
 
 Example:
