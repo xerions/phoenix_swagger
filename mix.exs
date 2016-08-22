@@ -31,7 +31,7 @@ defmodule PhoenixSwagger.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-        {:poison, "~> 1.5.0"},
+        {:poison, "~> 1.5 or ~> 2.0"},
         {:ex_json_schema, "~> 0.5.1"},
         {:plug, "~> 1.1"}
     ]
