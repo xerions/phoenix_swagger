@@ -28,12 +28,12 @@ Now you can use `phoenix_swagger` to generate `swagger-ui` file for you applicat
 ## Usage
 
 To generate [Info Object](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#infoObject)
-you must provide `swagger_info/0` function in your `mix.exs` file. This function must
-returns keyword list that contains `Info Object` fields:
+you must provide `swagger_info/0` function in your `mix.exs` file. This function returns
+a keyword list that contains `Info Object` fields:
 
 ```elixir
 def swagger_info do
-  [version: "0.0.0", title: "My awesome phoenx application"]
+  [version: "0.0.0", title: "My awesome phoenix application"]
 end
 ```
 
@@ -108,7 +108,7 @@ use PhoenixSwagger
 swagger_model :get_person do
   description "Get persons according to the age"
   parameter :query, :id, :integer, :required
-  responses 200, "Description", get_person_schema
+  responses 200, "Description", schema
 end
 
 def schema do
@@ -125,8 +125,8 @@ def get_person_schema(conn, _params) do
 end
 ```
 
-That's all after this run the `phoenix.swagger.generate` mix task for the `swagger-ui` json
-file generation into directory with `phoenix` application:
+That's all. Recompile your app `mix phoenix.server`, then run the `phoenix.swagger.generate`
+mix task for the `swagger-ui` json file generation into directory with `phoenix` application:
 
 ```
 mix phoenix.swagger.generate
