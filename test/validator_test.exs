@@ -14,10 +14,11 @@ defmodule ValidatorTest do
   end
 
   test "parse_swagger_schema() test", schemas do
-    price = schemas["/estimates/price"].schema["properties"]
-    time = schemas["/estimates/time"].schema["properties"]
-    history = schemas["/history"].schema["properties"]
-    products = schemas["/products"].schema["properties"]
+    price = schemas["/get/estimates/price"].schema["properties"]
+    time = schemas["/get/estimates/time"].schema["properties"]
+    history = schemas["/get/history"].schema["properties"]
+    products_post = schemas["/post/products"].schema["properties"]
+    products_get = schemas["/get/products"].schema["properties"]
 
     assert %{"end_latitude" => %{"type" => "integer"},
              "end_longitude" => %{"type" => "integer"},
@@ -30,14 +31,18 @@ defmodule ValidatorTest do
     assert %{"limit" => %{"type" => "integer"},
              "offset" => %{"type" => "integer"}} = history
     assert %{"latitude" => %{"type" => "integer"},
-             "longitude" => %{"type" => "integer"}} = products
+             "longitude" => %{"type" => "integer"}} = products_get
+    assert %{"latitude" => %{"type" => "integer"},
+             "longitude" => %{"type" => "integer"},
+             "ID" => %{"type" => "integer"}} = products_post
   end
 
   test "validate() test" do
     assert {:error,"Type mismatch. Expected Integer but got String.",
-            "#/limit"} = Validator.validate("/history", %{"limit" => "10"})
+            "#/limit"} = Validator.validate("/get/history", %{"limit" => "10"})
     assert {:error,"Type mismatch. Expected Integer but got String.",
-            "#/offset"} = Validator.validate("/history", %{"limit" => 10, "offset" => "100"})
-    assert :ok = Validator.validate("/history", %{"limit" => 10, "offset" => 100})
+            "#/offset"} = Validator.validate("/get/history", %{"limit" => 10, "offset" => "100"})
+    assert :ok = Validator.validate("/get/history", %{"limit" => 10, "offset" => 100})
+		assert {:error, :resource_not_exists} = Validator.validate("/wrong_path", %{})
   end
 end
