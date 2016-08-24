@@ -8,10 +8,15 @@ defmodule PhoenixSwagger.Plug.Validate do
 
   def call(conn, _data) do
     req_path = Enum.filter(:ets.tab2list(@table), fn({path, _}) ->
-      equal_paths(path, String.split(path, "/") |> tl, conn.path_info |> tl) != []
+      req_path = ("/" <> String.downcase(conn.method) <> "/" <> Enum.join(conn.path_info |> tl, "/"))
+                 |> String.split("/")
+                 |> tl
+      equal_paths(path, String.split(path, "/") |> tl, req_path) != []
     end)
     case req_path do
-      [] -> conn
+      [] ->
+        send_resp(conn, 404, %{"error" => %{"message" => "API does not provide resource", "path" => "/" <> (conn.path_info |> Enum.join("/"))}})
+        |> halt()
       [{path, _}] ->
         case Validator.validate(path, conn.params) do
           :ok -> conn

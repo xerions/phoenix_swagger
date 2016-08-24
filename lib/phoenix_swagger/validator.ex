@@ -49,7 +49,7 @@ defmodule PhoenixSwagger.Validator do
   def parse_swagger_schema(spec) do
     schema = File.read(spec) |> elem(1) |> Poison.decode() |> elem(1)
     # get rid from all keys besides 'paths' and 'definitions' as we
-    # need only in these fields for validation                                           
+    # need only in these fields for validation
     schema = Enum.reduce(schema, %{}, fn(map, acc) ->
       {key, val} = map
       if key in ["paths", "definitions"] do
@@ -61,21 +61,26 @@ defmodule PhoenixSwagger.Validator do
 
     # parse swagger schema
     schema = Enum.map(schema["paths"], fn({path, data}) ->
-      parameters = data[Map.keys(data) |> List.first]["parameters"]
-      # we may have a request without parameters, so nothing to validate
-      # in this case
-      if parameters == nil do
-        []
-      else
-        # Let's go through requests parameters from swagger scheme
-        # and collect it into json schema properties.
-        properties = Enum.reduce(parameters, %{}, fn(parameter, acc) ->
-          Map.merge(acc, get_property_type(schema, parameter, "", acc))
-        end)
-        schema_object = %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"]}
-        :ets.insert(@table, {path, ExJsonSchema.Schema.resolve(schema_object)})
-        {path, ExJsonSchema.Schema.resolve(schema_object)}
-      end
+      Enum.map(Map.keys(data), fn(method) ->
+        parameters = data[method]["parameters"]
+        # we may have a request without parameters, so nothing to validate
+        # in this case
+        if parameters == nil do
+          []
+        else
+          # Let's go through requests parameters from swagger scheme
+          # and collect it into json schema properties.
+          properties = Enum.reduce(parameters, %{}, fn(parameter, acc) ->
+            Map.merge(acc, get_property_type(schema, parameter, "", acc))
+          end)
+          # store path concatenated with method. This allows us
+          # to identify the same resources with different http methods.
+          path = "/" <> method <> path
+          schema_object = %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"]}
+          :ets.insert(@table, {path, ExJsonSchema.Schema.resolve(schema_object)})
+          {path, ExJsonSchema.Schema.resolve(schema_object)}
+        end
+      end)
     end) |> List.flatten
     schema
   end
@@ -87,7 +92,7 @@ defmodule PhoenixSwagger.Validator do
   Returns `:ok` in a case when parameters are valid for the
   given resource or:
 
-    * {:error, :path_not_exists} in a case when path is not
+    * {:error, :resource_not_exists} in a case when path is not
       exists in the validator table;
     * {:error, error_message, path} in a case when at least
       one  parameter is not valid for the given resource.
@@ -95,7 +100,7 @@ defmodule PhoenixSwagger.Validator do
   def validate(path, params) do
     case :ets.lookup(@table, path) do
       [] ->
-        {:error, :path_not_exists}
+        {:error, :resource_not_exists}
       [{_, schema}] ->
         case ExJsonSchema.Validator.validate(schema, params) do
           :ok ->
