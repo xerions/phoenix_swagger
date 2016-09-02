@@ -73,6 +73,14 @@ defmodule PhoenixSwagger do
     Enum.map(parameters,
       fn(metadata) ->
         case metadata do
+          {:parameter, [:body, name, schema, :required, description]} ->
+            {:param, [in: :body, name: name, schema: schema, required: true, description: description]}
+          {:parameter, [:body, name, schema, :required]} ->
+            {:param, [in: :body, name: name, schema: schema, required: true, description: ""]}
+          {:parameter, [:body, name, schema, description]} ->
+            {:param, [in: :body, name: name, schema: schema, required: false, description: description]}
+          {:parameter, [:body, name, schema]} ->
+            {:param, [in: :body, name: name, schema: schema, required: false, description: ""]}
           {:parameter, [path, name, type, :required, description]} ->
             {:param, [in: path, name: name, type: valid_type?(type), required: true, description: description]}
           {:parameter, [path, name, type, :required]} ->
