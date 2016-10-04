@@ -21,6 +21,10 @@ defmodule PhoenixSwagger.Plug.Validate do
         case Validator.validate(path, conn.params) do
           :ok -> conn
           {:error, error, path} ->
+            case is_list(error) do
+              true -> Enum.into(error, %{})
+              _ -> error
+            end
             send_resp(conn, 400, %{"error" => %{"message" => error, "path" => path}} |> Poison.encode |> elem(1))
             |> halt()
         end

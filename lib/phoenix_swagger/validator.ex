@@ -76,7 +76,35 @@ defmodule PhoenixSwagger.Validator do
           # store path concatenated with method. This allows us
           # to identify the same resources with different http methods.
           path = "/" <> method <> path
-          schema_object = %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"]}
+          # collect required feilds
+          required = Enum.map(parameters, fn(parameter) ->
+            if parameter["schema"] != nil do
+              {parameter, parameter["required"] == true}
+            else
+              if parameter["required"] == true do
+                parameter["name"]
+              else
+                false
+              end
+            end
+          end)
+          required = Enum.map(required, fn(property) ->
+            case property do
+              false ->
+                []
+              {_, true} ->
+                Enum.reduce(properties, [], fn({property, _property_opts}, acc) ->
+                  [property | acc]
+                end)
+              _ ->
+                property
+            end
+          end) |> List.flatten |> Enum.uniq
+          schema_object = if length(required) == 0 do
+                            %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"]}
+                          else
+                            %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"], "required" => required}
+                          end
           :ets.insert(@table, {path, ExJsonSchema.Schema.resolve(schema_object)})
           {path, ExJsonSchema.Schema.resolve(schema_object)}
         end
@@ -106,6 +134,8 @@ defmodule PhoenixSwagger.Validator do
           :ok ->
             :ok
           {:error, [{error, path}]} ->
+            {:error, error, path}
+          {:error, error} ->
             {:error, error, path}
         end
     end
