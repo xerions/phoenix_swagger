@@ -43,6 +43,9 @@ defmodule ValidatorTest do
     assert {:error,"Type mismatch. Expected Integer but got String.",
             "#/offset"} = Validator.validate("/get/history", %{"limit" => 10, "offset" => "100"})
     assert :ok = Validator.validate("/get/history", %{"limit" => 10, "offset" => 100})
-		assert {:error, :resource_not_exists} = Validator.validate("/wrong_path", %{})
+    assert {:error, :resource_not_exists} = Validator.validate("/wrong_path", %{})
+    assert {:error, "Required property start_longitude was not present.", "#"} =
+      Validator.validate("/get/estimates/time", %{"start_latitude" => 10})
+    assert :ok = Validator.validate("/get/estimates/time", %{"start_latitude" => 10, "start_longitude" => 20})
   end
 end
