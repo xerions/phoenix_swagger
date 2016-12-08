@@ -76,12 +76,13 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
         # check that give controller haev swagger_.* function and call it
         case function_exported?(controller, swagger_fun, 0) do
           true ->
-            {[description], parameters, response_code,
+            {[description], parameters, tags, response_code,
              response_description, meta} = apply(controller, swagger_fun, [])
             # convert list of parameters to maps
             parameters = get_parameters(parameters)
             # make 'description' and 'parameters' maps
             request_map = Map.put_new(%{}, :description, description)
+            request_map = Map.put_new(request_map, :tags, tags)
             request_map = Map.put_new(request_map, :parameters,  parameters)
             # make internals of 'responses' map
             response_map = Map.put_new(%{}, :description, response_description)
