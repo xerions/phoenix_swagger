@@ -6,7 +6,7 @@ defmodule ValidatorTest do
   @table :validator_table
 
   setup do
-    schema = Validator.parse_swagger_schema("test/test_spec/swagger_test_spec.json")
+    schema = Validator.parse_swagger_schema(["test/test_spec/swagger_test_spec.json", "test/test_spec/swagger_test_spec_2.json"])
     on_exit fn ->
       :ets.delete_all_objects(@table)
     end
@@ -35,6 +35,19 @@ defmodule ValidatorTest do
     assert %{"latitude" => %{"type" => "integer"},
              "longitude" => %{"type" => "integer"},
              "ID" => %{"type" => "integer"}} = products_post
+
+    pets_get = schemas["/get/pets"].schema["properties"]
+    pets_post =  schemas["/post/pets"].schema["properties"]
+    pet_id = schemas["/get/pets/{id}"].schema["properties"]
+    pet_delete = schemas["/delete/pets/{id}"].schema["properties"]
+
+    assert %{"tags" => %{"type" => "array"},
+             "limit" => %{"type" => "integer"}} = pets_get
+    assert %{"id" => %{"type" => "integer"},
+             "name" => %{"type" => "string"},
+             "tag" => %{"type" => "string"}} = pets_post
+    assert %{"id" => %{"type" => "integer"}} = pet_id
+    assert %{"id" => %{"type" => "integer"}} = pet_delete
   end
 
   test "validate() test" do
@@ -47,5 +60,9 @@ defmodule ValidatorTest do
     assert {:error, "Required property start_longitude was not present.", "#"} =
       Validator.validate("/get/estimates/time", %{"start_latitude" => 10})
     assert :ok = Validator.validate("/get/estimates/time", %{"start_latitude" => 10, "start_longitude" => 20})
+    assert {_, "Required property id was not present.", _} = Validator.validate("/get/pets/{id}", %{})
+    assert {:error, "Type mismatch. Expected Integer but got String.", "#/id"} = Validator.validate("/get/pets/{id}", %{"id" => "1"})
+    assert {:error, :resource_not_exists} = Validator.validate("/get/pets/id", %{"id" => "1"})
+    assert :ok = Validator.validate("/get/pets/{id}", %{"id" => 1})
   end
 end

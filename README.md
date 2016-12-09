@@ -177,8 +177,9 @@ Before usage of swagger validator, add the `PhoenixSwagger.Validator.Supervisor`
 your application.
 
 The `phoenix_swagger` provides `PhoenixSwagger.Validator.parse_swagger_schema/1` API to load a swagger schema by
-the given path. This API should be called during application startup to parse/load a swagger schema. After this, the
-`PhoenixSwagger.Validator.validate/2` can be used to validate resources.
+the given path or list of paths. This API should be called during application startup to parse/load a swagger schema.
+
+After this, the `PhoenixSwagger.Validator.validate/2` can be used to validate resources.
 
 For example:
 
