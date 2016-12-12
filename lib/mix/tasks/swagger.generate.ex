@@ -56,6 +56,10 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
              |> collect_host(app_name, app_mod)
              |> collect_paths(router_mod, app_mod)
              |> Poison.encode!
+    directory = Path.dirname(output_file)
+    unless File.exists? directory do
+      File.mkdir_p! directory
+    end
     File.write(output_file, result)
     Code.delete_path(ebin)
     IO.puts "Done."
