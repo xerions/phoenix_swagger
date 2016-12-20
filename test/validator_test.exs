@@ -43,9 +43,8 @@ defmodule ValidatorTest do
 
     assert %{"tags" => %{"type" => "array"},
              "limit" => %{"type" => "integer"}} = pets_get
-    assert %{"id" => %{"type" => "integer"},
-             "name" => %{"type" => "string"},
-             "tag" => %{"type" => "string"}} = pets_post
+    assert %{"id"  => %{"format" => "int64", "type" => "integer"},
+             "pet" => %{"$ref" => [:root, "definitions", "Pet"]}} = pets_post
     assert %{"id" => %{"type" => "integer"}} = pet_id
     assert %{"id" => %{"type" => "integer"}} = pet_delete
   end
@@ -57,12 +56,24 @@ defmodule ValidatorTest do
             "#/offset"} = Validator.validate("/get/history", %{"limit" => 10, "offset" => "100"})
     assert :ok = Validator.validate("/get/history", %{"limit" => 10, "offset" => 100})
     assert {:error, :resource_not_exists} = Validator.validate("/wrong_path", %{})
-    assert {:error, "Required property start_longitude was not present.", "#"} =
-      Validator.validate("/get/estimates/time", %{"start_latitude" => 10})
     assert :ok = Validator.validate("/get/estimates/time", %{"start_latitude" => 10, "start_longitude" => 20})
-    assert {_, "Required property id was not present.", _} = Validator.validate("/get/pets/{id}", %{})
     assert {:error, "Type mismatch. Expected Integer but got String.", "#/id"} = Validator.validate("/get/pets/{id}", %{"id" => "1"})
     assert {:error, :resource_not_exists} = Validator.validate("/get/pets/id", %{"id" => "1"})
     assert :ok = Validator.validate("/get/pets/{id}", %{"id" => 1})
+    assert {:error, :resource_not_exists} = Validator.validate("/pets", %{"id" => 1})
+    assert {:error,
+            [{"Required property id was not present.", "#"},
+             {"Required property pet was not present.", "#"}], "/post/pets"} = Validator.validate("/post/pets", %{})
+    assert {:error,
+            [{"Type mismatch. Expected Integer but got String.", "#/id"},
+             {"Required property pet was not present.", "#"}], "/post/pets"} = Validator.validate("/post/pets", %{"id" => "wrong_id"})
+    assert {:error, "Required property pet was not present.", "#"} = Validator.validate("/post/pets", %{"id" => 1})
+    assert {:error,
+            [{"Required property name was not present.", "#/pet"},
+             {"Required property tag was not present.", "#/pet"}], "/post/pets"}
+      = Validator.validate("/post/pets", %{"id" => 1, "pet" => %{}})
+    assert {:error, "Required property tag was not present.", "#/pet"}
+      = Validator.validate("/post/pets", %{"id" => 1, "pet" => %{"name" => "pet_name"}})
+    assert :ok = Validator.validate("/post/pets", %{"id" => 1, "pet" => %{"name" => "pet_name", "tag" => "pet_tag"}})
   end
 end
