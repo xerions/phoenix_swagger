@@ -194,13 +194,24 @@
         "newPet": {
             "type": "object",
             "required": [
-                "name"
+                "id", "pet"
             ],
             "properties": {
                 "id": {
                     "type": "integer",
                     "format": "int64"
                 },
+                "pet": {
+                    "$ref": "#/definitions/Pet"
+                }
+            }
+        },
+        "Pet": {
+            "type": "object",
+            "required": [
+                "name", "tag"
+            ],
+            "properties": {
                 "name": {
                     "type": "string"
                 },

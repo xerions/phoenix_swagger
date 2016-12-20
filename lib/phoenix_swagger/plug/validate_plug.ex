@@ -15,19 +15,83 @@ defmodule PhoenixSwagger.Plug.Validate do
     end)
     case req_path do
       [] ->
-        send_resp(conn, 404, %{"error" => %{"message" => "API does not provide resource", "path" => "/" <> (conn.path_info |> Enum.join("/"))}})
+        response = %{"error" => %{"message" => "API does not provide resource",
+                                  "path" => "/" <> (conn.path_info |> Enum.join("/"))}}
+        send_resp(conn, 404, response)
         |> halt()
       [{path, _}] ->
-        case Validator.validate(path, conn.params) do
-          :ok -> conn
-          {:error, error, path} ->
+        case {validate_body_params(path, conn.params),
+              validate_query_params(path, conn.params)} do
+          {:ok, :ok} ->
+            conn
+          {{:error, error, path}, _} ->
+            response = %{"error" => %{"message" => error,
+                                      "path" => path}} |> Poison.encode |> elem(1)
+            send_resp(conn, 400, response)
+            |> halt()
+          {_, {:error, error, path}} ->
             case is_list(error) do
               true -> Enum.into(error, %{})
               _ -> error
             end
-            send_resp(conn, 400, %{"error" => %{"message" => error, "path" => path}} |> Poison.encode |> elem(1))
+            response = %{"error" =>%{"message" => error,
+                                     "path" => path}} |> Poison.encode |> elem(1)
+            send_resp(conn, 400, response)
             |> halt()
         end
+    end
+  end
+
+  defp validate_integer(name, value, parameters) do
+    try do
+      _ = String.to_integer(value)
+      validate_query_params(parameters)
+    rescue _e in ArgumentError ->
+        {:error, "Type mismatch. Expected Integer but got String.", "#/#{name}"}
+    end
+  end
+
+  defp validate_query_params([]), do: :ok
+  defp validate_query_params([{_type, _name, nil, false} | parameters]) do
+    validate_query_params(parameters)
+  end
+  defp validate_query_params([{_type, name, nil, true} | _]) do
+    {:error, "Required property #{name} was not present.", "#"}
+  end
+  defp validate_query_params([{"string", _name, _val, _} | parameters]) do
+    validate_query_params(parameters)
+  end
+  defp validate_query_params([{"integer", name, val, _} | parameters]) do
+    validate_integer(name, val, parameters)
+  end
+  defp validate_query_params(path, params) do
+    [{_, schema}] = :ets.lookup(@table, path)
+    parameters = Enum.map(schema.schema["parameters"], fn parameter ->
+      if parameter["type"] != nil and parameter["in"] == "query" do
+        {parameter["type"], parameter["name"], params[parameter["name"]], parameter["required"]}
+      else
+        []
+      end
+    end) |> List.flatten
+    validate_query_params(parameters)
+  end
+
+  defp validate_body_params(path, params) do
+    [{_, schema}] = :ets.lookup(@table, path)
+    parameters = Enum.map(schema.schema["parameters"], fn parameter ->
+      if parameter["type"] != nil and parameter["in"] == "query" do
+        parameter["name"]
+      else
+        []
+      end
+    end) |> List.flatten
+    if parameters == [] do
+      Validator.validate(path, params)
+    else
+      params = Enum.filter(params, fn ({name, _val}) ->
+        not name in parameters
+      end) |> Enum.into(%{})
+      Validator.validate(path, params)
     end
   end
 

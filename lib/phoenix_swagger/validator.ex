@@ -107,105 +107,48 @@ defmodule PhoenixSwagger.Validator do
           # Let's go through requests parameters from swagger scheme
           # and collect it into json schema properties.
           properties = Enum.reduce(parameters, %{}, fn(parameter, acc) ->
-            Map.merge(acc, get_property_type(schema, parameter, "", acc))
+            acc = if parameter["type"] == nil do
+                    ref = String.split(parameter["schema"]["$ref"], "/") |> List.last
+                    Map.merge(acc, schema["definitions"][ref])
+                  else
+                    acc
+                  end
+            acc
           end)
+          # collect request primitive parameters which do not refer to `definitions`
+          # these are mostly parameters from query string
+          properties = Enum.reduce(parameters, properties, fn(parameter, acc) ->
+            if parameter["type"] != nil do
+              collect_properties(acc, parameter)
+            else
+              acc
+            end
+          end)
+          # actually all requests which have parameters are objects
+          properties = if properties["type"] == nil do
+                         Map.put_new(properties, "type", "object")
+                       else
+                         properties
+                       end
           # store path concatenated with method. This allows us
           # to identify the same resources with different http methods.
           path = "/" <> method <> path
-          # collect required feilds
-          required = Enum.map(parameters, fn(parameter) ->
-            if parameter["schema"] != nil do
-              {parameter, parameter["required"] == true}
-            else
-              if parameter["required"] == true do
-                parameter["name"]
-              else
-                false
-              end
-            end
-          end)
-          required = Enum.map(required, fn(property) ->
-            case property do
-              false ->
-                []
-              {_, true} ->
-                Enum.reduce(properties, [], fn({property, _property_opts}, acc) ->
-                  [property | acc]
-                end)
-              _ ->
-                property
-            end
-          end) |> List.flatten |> Enum.uniq
-          schema_object = if length(required) == 0 do
-                            %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"]}
-                          else
-                            %{"type" => "object", "properties" => properties, "definitions" => schema["definitions"], "required" => required}
-                          end
-          :ets.insert(@table, {path, ExJsonSchema.Schema.resolve(schema_object)})
-          {path, ExJsonSchema.Schema.resolve(schema_object)}
+          schema_object = Map.merge(%{"parameters" => parameters, "type" => "object", "definitions" => schema["definitions"]}, properties)
+          resolved_schema = ExJsonSchema.Schema.resolve(schema_object)
+          :ets.insert(@table, {path, resolved_schema})
+          {path, resolved_schema}
         end
       end)
     end) |> List.flatten
   end
 
   @doc false
-  defp get_property_type(schema, parameter, property_name, acc) do
-    {properties, has_properties?} = get_properties(schema, parameter, parameter["schema"] || parameter)
-    if has_properties? do
-      collect_properties(schema, parameter, properties, property_name)
-    else
-      Map.put_new(acc || %{}, parameter["name"], %{"type" => parameter["type"]})
-    end
+  defp collect_properties(properties, parameter) when properties == %{} do
+    Map.put(%{}, "properties", Map.put_new(%{}, parameter["name"], %{"type" => parameter["type"]}))
   end
-
-  @doc false
-  defp get_properties(schema, parameter, ref) do
-    if ref["$ref"] != nil do
-      [_, definition, path] = String.split(ref["$ref"], "/")
-      props = schema[definition][path]["properties"] 
-      {props, props != nil}
-    else
-      if parameter["properties"] != nil do
-        {parameter["properties"], true}
-      else
-        props = parameter["schema"]["properties"]
-        {props, props != nil}
-      end
-    end
-  end
-
-  @doc false
-  defp collect_properties(schema, parameter, properties, property_name) do
-    Enum.reduce(properties, %{}, fn({property, type}, ref_acc) ->
-      if type["$ref"] != nil do
-        [_, definition, path] = String.split(type["$ref"], "/")
-        type = schema[definition][path]["type"]
-        if type == "object" or type == "array" do
-          Map.put_new(ref_acc, path, %{"type" => type, "$ref" => "#/definitions/" <> path})
-        else
-          Map.put_new(ref_acc, property, %{"type" => schema[definition][path]["type"]})
-        end
-      else
-        if ref_acc[parameter["name"]] == nil do
-          if parameter["name"] == nil do
-            map = Map.put_new(%{}, property, %{"type" => type["type"]})
-            ref_acc = if ref_acc[property_name] == nil do
-                        Map.put_new(ref_acc, property_name, map)
-                      else
-                        Map.put(ref_acc, property_name, Map.merge(ref_acc[property_name] || %{}, map))
-                      end
-            ref_acc
-          else
-            ref_acc = Map.put_new(ref_acc, property, %{"type" => type["type"]})
-            ref_acc
-          end
-        else
-          map = Map.put_new(ref_acc[parameter["name"]], property, %{"type" => type["type"]})
-          ref_acc = Map.delete(ref_acc, parameter["name"])
-          |> Map.put_new(parameter["name"], map)
-        end
-      end
-    end)
+  defp collect_properties(properties, parameter) do
+    props = Map.put(properties["properties"], parameter["name"], %{"type" => parameter["type"]})
+    Map.put(properties, "properties", props)
   end
 
   @doc false
