@@ -25,7 +25,7 @@ defmodule PhoenixSwaggerTest do
 
   test "tag matches with module" do
     {[description], _parameters, [tag], response_code,
-     response_description, _meta} = swagger_users
+     response_description, _meta} = swagger_users()
     assert @description == description
     assert "PhoenixSwaggerTest" == tag
     assert 200 == response_code
@@ -33,7 +33,7 @@ defmodule PhoenixSwaggerTest do
   end
 
   test "parameter as swagger object" do
-    {_desc, [parameter], _tags, _code, _resp, _meta} = swagger_user
+    {_desc, [parameter], _tags, _code, _resp, _meta} = swagger_user()
     assert {:param, [in: :body, name: :body, schema: @schema, required: false, description: @description]} == parameter
   end
 end
