@@ -17,6 +17,7 @@ defmodule PhoenixSwagger.Plug.Validate do
       [] ->
         response = %{"error" => %{"message" => "API does not provide resource",
                                   "path" => "/" <> (conn.path_info |> Enum.join("/"))}}
+        |> Poison.encode!
         send_resp(conn, 404, response)
         |> halt()
       [{path, _}] ->
@@ -26,7 +27,7 @@ defmodule PhoenixSwagger.Plug.Validate do
             conn
           {{:error, error, path}, _} ->
             response = %{"error" => %{"message" => error,
-                                      "path" => path}} |> Poison.encode |> elem(1)
+                                      "path" => path}} |> Poison.encode!
             send_resp(conn, 400, response)
             |> halt()
           {_, {:error, error, path}} ->
@@ -35,7 +36,7 @@ defmodule PhoenixSwagger.Plug.Validate do
               _ -> error
             end
             response = %{"error" =>%{"message" => error,
-                                     "path" => path}} |> Poison.encode |> elem(1)
+                                     "path" => path}} |> Poison.encode!
             send_resp(conn, 400, response)
             |> halt()
         end
