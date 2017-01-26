@@ -7,8 +7,9 @@ defmodule PhoenixSwagger.Plug.Validate do
   def init(opts), do: opts
 
   def call(conn, _data) do
-    req_path = Enum.filter(:ets.tab2list(@table), fn({path, _}) ->
-      req_path = ("/" <> String.downcase(conn.method) <> "/" <> Enum.join(conn.path_info |> tl, "/"))
+    req_path = Enum.filter(:ets.tab2list(@table), fn({path, basePath, _}) ->
+      pathInfo = remove_base_path(conn.path_info, String.split(basePath, "/") |> tl)
+      req_path = ("/" <> String.downcase(conn.method) <> "/" <> Enum.join(pathInfo, "/"))
                  |> String.split("/")
                  |> tl
       equal_paths(path, String.split(path, "/") |> tl, req_path) != []
@@ -20,7 +21,7 @@ defmodule PhoenixSwagger.Plug.Validate do
         |> Poison.encode!
         send_resp(conn, 404, response)
         |> halt()
-      [{path, _}] ->
+      [{path, _, _}] ->
         case {validate_body_params(path, conn.params),
               validate_query_params(path, conn.params)} do
           {:ok, :ok} ->
@@ -66,7 +67,7 @@ defmodule PhoenixSwagger.Plug.Validate do
     validate_integer(name, val, parameters)
   end
   defp validate_query_params(path, params) do
-    [{_, schema}] = :ets.lookup(@table, path)
+    [{_, _basePath, schema}] = :ets.lookup(@table, path)
     parameters = Enum.map(schema.schema["parameters"], fn parameter ->
       if parameter["type"] != nil and parameter["in"] == "query" do
         {parameter["type"], parameter["name"], params[parameter["name"]], parameter["required"]}
@@ -78,7 +79,7 @@ defmodule PhoenixSwagger.Plug.Validate do
   end
 
   defp validate_body_params(path, params) do
-    [{_, schema}] = :ets.lookup(@table, path)
+    [{_, _, schema}] = :ets.lookup(@table, path)
     parameters = Enum.map(schema.schema["parameters"], fn parameter ->
       if parameter["type"] != nil and parameter["in"] == "query" do
         parameter["name"]
@@ -105,5 +106,12 @@ defmodule PhoenixSwagger.Plug.Validate do
     else
       []
     end
+  end
+
+  # It is pretty safe to strip request path by base path. They can't be
+  # non-equal. In this way, the router even will not execute this plug.
+  defp remove_base_path(path, []), do: path
+  defp remove_base_path([_path | rest], [_base_path | base_path_rest]) do
+    remove_base_path(rest, base_path_rest)
   end
 end
