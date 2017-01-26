@@ -82,7 +82,7 @@ defmodule PhoenixSwagger.Validator do
     case :ets.lookup(@table, path) do
       [] ->
         {:error, :resource_not_exists}
-      [{_, schema}] ->
+      [{_, _, schema}] ->
         case ExJsonSchema.Validator.validate(schema, params) do
           :ok ->
             :ok
@@ -135,7 +135,7 @@ defmodule PhoenixSwagger.Validator do
           path = "/" <> method <> path
           schema_object = Map.merge(%{"parameters" => parameters, "type" => "object", "definitions" => schema["definitions"]}, properties)
           resolved_schema = ExJsonSchema.Schema.resolve(schema_object)
-          :ets.insert(@table, {path, resolved_schema})
+          :ets.insert(@table, {path, schema["basePath"], resolved_schema})
           {path, resolved_schema}
         end
       end)
@@ -158,7 +158,7 @@ defmodule PhoenixSwagger.Validator do
     # need only in these fields for validation
     Enum.reduce(schema, %{}, fn(map, acc) ->
       {key, val} = map
-      if key in ["paths", "definitions"] do
+      if key in ["basePath", "paths", "definitions"] do
         Map.put_new(acc, key, val)
       else
         acc
