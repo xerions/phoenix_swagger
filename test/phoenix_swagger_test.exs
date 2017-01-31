@@ -1,16 +1,18 @@
 defmodule PhoenixSwaggerTest do
   use ExUnit.Case
   doctest PhoenixSwagger
+  doctest PhoenixSwagger.Schema
 
   use PhoenixSwagger
 
   @description "Some description"
   @response "Some response description"
-  @schema %{
+  @schema %Schema{
       title: "User",
       type: :object,
-      properties: %{name: %{type: :string}}
     }
+    |> Schema.description("A user with a name")
+    |> Schema.property(:name, :string, "Full Name", required: true, maxLength: 255)
 
   swagger_model :users do
     description @description
