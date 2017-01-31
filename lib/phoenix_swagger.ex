@@ -130,4 +130,101 @@ defmodule PhoenixSwagger do
     module.description()
   end
 
+  @doc """
+  Builds a swagger schema map using a DSL from the functions defined in `PhoenixSwagger.Schema`.
+
+  ## Example
+
+      iex> use PhoenixSwagger
+      ...> swagger_schema do
+      ...>   title "Pet"
+      ...>   description "A pet in the pet store"
+      ...>   properties do
+      ...>     id :integer, "Unique identifier", required: true, format: :int64
+      ...>     name :string, "Pets name", required: true
+      ...>     tags array(:string), "Tag categories for this pet"
+      ...>   end
+      ...>   additional_properties false
+      ...> end
+      %{
+        "title" => "Pet",
+        "type" => "object",
+        "description" => "A pet in the pet store",
+        "properties" => %{
+          "id" => %{
+            "description" => "Unique identifier",
+            "format" => "int64",
+            "type" => "integer"
+          },
+         "name" => %{
+            "description" => "Pets name",
+            "type" => "string"
+          },
+          "tags" => %{
+            "description" => "Tag categories for this pet",
+            "items" => %{
+              "type" => "string"
+            },
+            "type" => "array"
+          }
+        },
+        "required" => ["name", "id"],
+        "additionalProperties" => false
+      }
+
+      iex> use PhoenixSwagger
+      ...> swagger_schema do
+      ...>   title "Phone"
+      ...>   description "An 8 digit phone number with optional 2 digit area code"
+      ...>   type :string
+      ...>   max_length 11
+      ...>   pattern ~S"^(\([0-9]{2}\))?[0-9]{4}-[0-9]{4}$"
+      ...> end
+      %{
+        "description" => "An 8 digit phone number with optional 2 digit area code",
+        "maxLength" => 11,
+        "pattern" => "^(\\([0-9]{2}\\))?[0-9]{4}-[0-9]{4}$",
+        "title" => "Phone",
+        "type" => "string"
+      }
+  """
+  defmacro swagger_schema([do: {:__block__, _, exprs}]) do
+    acc = quote do %Schema{type: :object} end
+    body = Enum.reduce(exprs, acc, fn expr, acc ->
+      quote do unquote(acc) |> unquote(expr) end
+    end)
+
+    # Immediately invoked anonymous function for locally scoped import
+    quote do
+      (fn ->
+        import PhoenixSwagger.Schema
+        alias PhoenixSwagger.Schema
+        unquote(body)
+        |> PhoenixSwagger.to_json
+      end).()
+    end
+  end
+
+  @doc false
+  # Converts a Schema struct to regular map, removing nils
+  def to_json(value = %{__struct__: _}) do
+    value
+    |> Map.from_struct
+    |> to_json
+  end
+  def to_json(value) when is_map(value) do
+    value
+    |> Enum.map(fn {k,v} -> {to_string(k), to_json(v)} end)
+    |> Enum.filter(fn {_, :null} -> false; _ -> true end)
+    |> Enum.into(%{})
+  end
+  def to_json(value) when is_list(value) do
+    Enum.map(value, &to_json/1)
+  end
+  def to_json(nil) do :null end
+  def to_json(:null) do :null end
+  def to_json(true) do true end
+  def to_json(false) do false end
+  def to_json(value) when is_atom(value) do to_string(value) end
+  def to_json(value) do value end
 end

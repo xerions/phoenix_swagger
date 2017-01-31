@@ -7,12 +7,17 @@ defmodule PhoenixSwaggerTest do
 
   @description "Some description"
   @response "Some response description"
-  @schema %Schema{
-      title: "User",
-      type: :object,
-    }
-    |> Schema.description("A user with a name")
-    |> Schema.property(:name, :string, "Full Name", required: true, maxLength: 255)
+  @schema (
+    swagger_schema do
+      title "User"
+      description "A user with name and address"
+      properties do
+        name :string, "Full Name", required: true, maxLength: 255
+        address :string, "Street Address", minLength: 4
+        friends array(:User), "Friends list", maxItems: 10
+      end
+      additional_properties false
+    end)
 
   swagger_model :users do
     description @description
