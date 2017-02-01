@@ -38,7 +38,7 @@ defmodule PhoenixSwagger.Schema do
 
   @doc """
   Construct a schema reference, using name of definition in this swagger document,
-    or a complete path.
+  or a complete path.
 
   ## Example
 
@@ -459,7 +459,7 @@ defmodule PhoenixSwagger.Schema do
   Sets the schema/s for the items of an array.
   Use a single schema for arrays when each item should have the same schema.
   Use a list of schemas when the array represents a tuple, each element will be validated against
-   the corresponding schema in the `items` list.
+  the corresponding schema in the `items` list.
 
   ## Example
 
@@ -501,7 +501,7 @@ defmodule PhoenixSwagger.Schema do
 
   @doc """
   Boolean indicating that additional properties are allowed, or
-   a schema to be used for validating any additional properties not listed in `properties`.
+  a schema to be used for validating any additional properties not listed in `properties`.
   Default behaviour is to allow additional properties.
 
   ## Example

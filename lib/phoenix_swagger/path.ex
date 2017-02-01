@@ -2,7 +2,7 @@ defmodule PhoenixSwagger.Path do
   @moduledoc """
   Defines the swagger path DSL for specifying Controller actions.
   This module should not be imported directly, it will be automatically imported
-   in the scope of a `swagger_path` macro body.
+  in the scope of a `swagger_path` macro body.
 
   ## Examples
 
