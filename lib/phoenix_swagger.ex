@@ -200,7 +200,7 @@ defmodule PhoenixSwagger do
         import PhoenixSwagger.Schema
         alias PhoenixSwagger.Schema
         unquote(body)
-        |> PhoenixSwagger.to_json
+        |> PhoenixSwagger.to_json()
       end).()
     end
   end
@@ -209,8 +209,8 @@ defmodule PhoenixSwagger do
   # Converts a Schema struct to regular map, removing nils
   def to_json(value = %{__struct__: _}) do
     value
-    |> Map.from_struct
-    |> to_json
+    |> Map.from_struct()
+    |> to_json()
   end
   def to_json(value) when is_map(value) do
     value

@@ -163,7 +163,7 @@ defmodule PhoenixSwagger.Schema do
     quote do
       (fn ->
         import PhoenixSwagger.Schema
-        unquote body
+        unquote(body)
       end).()
     end
   end
