@@ -1,6 +1,8 @@
 defmodule PhoenixSwagger do
 
   use Application
+  alias PhoenixSwagger.Path
+  alias PhoenixSwagger.Path.PathObject
 
   @shortdoc "Generate swagger_[action] function for a phoenix controller"
 
@@ -204,6 +206,59 @@ defmodule PhoenixSwagger do
       end).()
     end
   end
+
+  @doc """
+    Swagger operations (aka "paths") are defined inside a `swagger_path` block.
+
+    Within the do-end block, the DSL provided by the `PhoenixSwagger.Path` module can be used.
+    The DSL always starts with one of the `get`, `put`, `post`, `delete`, `head`, `options` functions,
+    followed by any functions with first argument being a `PhoenixSwagger.Path.PathObject` struct.
+
+    ## Example
+
+        defmodule ExampleController do
+          use ExampleApp.Web, :controller
+          use PhoenixSwagger
+
+          swagger_path :index do
+            get "/users"
+            summary "Get users"
+            description "Get users, filtering by account ID"
+            parameter :query, :id, :integer, "account id", required: true
+            response 200, "Description", :Users
+            tag "users"
+          end
+
+          def index(conn, _params) do
+            posts = Repo.all(Post)
+            render(conn, "index.json", posts: posts)
+          end
+        end
+    """
+    defmacro swagger_path(action, [do: {:__block__, _, [first_expr | exprs]}]) do
+      fun_name = "swagger_path_#{action}" |> String.to_atom
+      body = Enum.reduce(exprs, first_expr, fn expr, acc ->
+              quote do unquote(acc) |> unquote(expr) end
+             end)
+
+      quote do
+        def unquote(fun_name)() do
+          import PhoenixSwagger.Path
+
+          unquote(body)
+          |> PhoenixSwagger.ensure_operation_id(__MODULE__, unquote(action))
+          |> PhoenixSwagger.Path.nest()
+          |> PhoenixSwagger.to_json()
+        end
+      end
+    end
+
+  @doc false
+  # Add a default operationId based on model name and action if required
+  def ensure_operation_id(path = %PathObject{operation: %{operationId: ""}}, module, action) do
+    Path.operation_id(path, String.replace_prefix("#{module}.#{action}", "Elixir.", ""))
+  end
+  def ensure_operation_id(path, _module, _action), do: path
 
   @doc false
   # Converts a Schema struct to regular map, removing nils
