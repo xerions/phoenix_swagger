@@ -53,85 +53,6 @@ defmodule PhoenixSwagger do
     end
   end
 
-  defmacro swagger_model(action, expr) do
-    metadata = unblock(expr)
-    description = Keyword.get(metadata, :description)
-    tags = Keyword.get(metadata, :tags, get_tags_module(__CALLER__))
-    parameters = get_parameters(metadata)
-    fun_name = ("swagger_" <> to_string(action)) |> String.to_atom
-    [response_code, response_description | meta] = Keyword.get(metadata, :responses)
-
-    quote do
-      def unquote(fun_name)() do
-        {PhoenixSwagger.get_description(__MODULE__, unquote(description)),
-         unquote(parameters),
-         unquote(tags),
-         unquote(response_code),
-         unquote(response_description),
-         unquote(meta)}
-      end
-    end
-  end
-
-  defp get_tags_module(caller) do
-    caller.module
-    |> Module.split
-    |> Enum.reverse
-    |> hd
-    |> String.split("Controller")
-    |> Enum.filter(&(String.length(&1) > 0))
-  end
-
-  @doc false
-  defp get_parameters(parameters) do
-    Enum.map(parameters,
-      fn(metadata) ->
-        case metadata do
-          {:parameter, [:body, name, schema, :required, description]} ->
-            {:param, [in: :body, name: name, schema: schema, required: true, description: description]}
-          {:parameter, [:body, name, schema, :required]} ->
-            {:param, [in: :body, name: name, schema: schema, required: true, description: ""]}
-          {:parameter, [:body, name, schema, description]} ->
-            {:param, [in: :body, name: name, schema: schema, required: false, description: description]}
-          {:parameter, [:body, name, schema]} ->
-            {:param, [in: :body, name: name, schema: schema, required: false, description: ""]}
-          {:parameter, [path, name, type, :required, description]} ->
-            {:param, [in: path, name: name, type: valid_type?(type), required: true, description: description]}
-          {:parameter, [path, name, type, :required]} ->
-            {:param, [in: path, name: name, type: valid_type?(type), required: true, description: ""]}
-          {:parameter, [path, name, type, description]} ->
-            {:param, [in: path, name: name, type: valid_type?(type), required: false, description: description]}
-          {:parameter, [path, name, type]} ->
-            {:param, [in: path, name: name, type: valid_type?(type), required: false, description: ""]}
-          _ ->
-            []
-        end
-      end) |> List.flatten
-  end
-
-  @doc false
-  defp valid_type?(type) do
-    if not (type in @swagger_data_types) do
-      raise "Error: write datatype: #{type}"
-    else
-      type
-    end
-  end
-
-  @doc false
-  defp unblock([do: {:__block__, _, body}]) do
-    Enum.map(body, fn({name, _line, params}) -> {name, params} end)
-  end
-
-  @doc false
-  def get_description(_, description) when is_list(description) do
-    description
-  end
-
-  def get_description(module, description) when is_function(description) do
-    module.description()
-  end
-
   @doc """
   Builds a swagger schema map using a DSL from the functions defined in `PhoenixSwagger.Schema`.
 
@@ -247,6 +168,7 @@ defmodule PhoenixSwagger do
 
           unquote(body)
           |> PhoenixSwagger.ensure_operation_id(__MODULE__, unquote(action))
+          |> PhoenixSwagger.ensure_tag(__MODULE__)
           |> PhoenixSwagger.Path.nest()
           |> PhoenixSwagger.to_json()
         end
@@ -259,6 +181,21 @@ defmodule PhoenixSwagger do
     Path.operation_id(path, String.replace_prefix("#{module}.#{action}", "Elixir.", ""))
   end
   def ensure_operation_id(path, _module, _action), do: path
+
+  @doc false
+  # Add a default tag based on controller module name if none present
+  def ensure_tag(path = %PathObject{operation: %{tags: []}}, module) do
+    tags =
+      module
+      |> Module.split
+      |> Enum.reverse
+      |> hd
+      |> String.split("Controller")
+      |> Enum.filter(&(String.length(&1) > 0))
+
+    put_in path.operation.tags, tags
+  end
+  def ensure_tag(path, _module), do: path
 
   @doc false
   # Converts a Schema struct to regular map, removing nils
