@@ -93,55 +93,48 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   @doc false
-  defp collect_paths(swagger_map, router_mod, app_mod) do
-    # get routes that have pipeline - api
-    api_routes = get_api_routes(router_mod)
-    # build 'paths' swagger attribute
-    paths = List.foldl(api_routes, %{},
-      fn (route_map, acc) ->
-        {controller, swagger_fun} = get_api(app_mod, route_map)
-        # phoenix router accepts parameters in a '/path/path/:id'
-        # format, but the swagger has another format, that's why
-        # why we need to convert it to swagger format '/path/{id}'
-        path = format_path(route_map.path)
-        # check that give controller haev swagger_.* function and call it
-        case function_exported?(controller, swagger_fun, 0) do
-          true ->
-            {[description], parameters, tags, response_code,
-             response_description, meta} = apply(controller, swagger_fun, [])
-            # convert list of parameters to maps
-            parameters = get_parameters(parameters)
-            # make 'description' and 'parameters' maps
-            request_map = Map.put_new(%{}, :description, description)
-            request_map = Map.put_new(request_map, :tags, tags)
-            request_map = Map.put_new(request_map, :parameters,  parameters)
-            # make internals of 'responses' map
-            response_map = Map.put_new(%{}, :description, response_description)
-            response_map = case meta do
-                             [] ->
-                               response_map
-                             [meta] ->
-                               Map.put_new(response_map, :schema, meta)
-                           end
-            # make response map - #{http_code: .....}
-            response = Map.put_new(%{}, response_code |> to_string, response_map)
+  defp collect_paths(swagger_map, router) do
+    router.__routes__
+    |> Enum.map(&find_swagger_path_function/1)
+    |> Enum.filter(&controller_function_exported?/1)
+    |> Enum.map(&get_swagger_path/1)
+    |> Enum.reduce(swagger_map, &merge_paths/2)
+  end
 
-            if acc[path][route_map.verb] do
-              IO.puts "Warning: Double definition for #{route_map.verb} #{path}"
-            end
+  defp find_swagger_path_function(route_map) do
+    controller = find_controller(route_map)
+    swagger_fun = "swagger_path_#{to_string(route_map.opts)}" |> String.to_atom
 
-            path_map = (acc[path] || %{})
-                       |> Map.put(route_map.verb, Map.put(request_map, :responses, response))
+    unless Code.ensure_loaded?(controller) do
+      raise "Error: #{controller} module didn't load."
+    end
 
-            Map.put(acc, path, path_map)
-          _ ->
-            # A controller has no swagger_[action] function, so
-            # we ust miss this API
-            acc
-        end
-      end)
+    %{
+      controller: controller,
+      swagger_fun: swagger_fun,
+      path: format_path(route_map.path)
+    }
+  end
 
-    Map.put_new(swagger_map, :paths, paths)
+  defp format_path(path) do
+    Regex.replace(~r/:([^\/]+)/, path, "{\\1}")
+  end
+
+  defp controller_function_exported?(%{controller: controller, swagger_fun: fun}) do
+    function_exported?(controller, fun, 0)
+  end
+
+  defp get_swagger_path(%{controller: controller, swagger_fun: fun, path: path}) do
+    %{^path => _action} = apply(controller, fun, [])
+  end
+
+  defp merge_paths(path, swagger_map) do
+    paths = Map.merge(swagger_map.paths, path, &merge_conflicts/3)
+    %{swagger_map | paths: paths}
+  end
+
+  defp merge_conflicts(_key, value1, value2) do
+    Map.merge(value1, value2)
   end
 
   @doc false
