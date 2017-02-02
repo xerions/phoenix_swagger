@@ -37,6 +37,16 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     """
   end
 
+  @doc false
+  defp write_file(output_file, contents) do
+    directory = Path.dirname(output_file)
+    unless File.exists? directory do
+      File.mkdir_p! directory
+    end
+    File.write!(output_file, contents)
+  end
+
+  @doc false
   defp load_router(switches) do
     {:module, router} =
       switches
