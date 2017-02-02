@@ -86,6 +86,37 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     |> Poison.encode!(pretty: true)
   end
 
+  @doc false
+  defp collect_info(router) do
+    cond do
+      function_exported?(router, :swagger_info, 0) ->
+        Map.merge(default_swagger_info, router.swagger_info())
+
+      function_exported?(Mix.Project.get, :swagger_info, 0) ->
+        info =
+          Mix.Project.get.swagger_info()
+          |> Keyword.put_new(:title, @default_title)
+          |> Keyword.put_new(:version, @default_version)
+          |> Enum.into(%{})
+        %{default_swagger_info() | info: info}
+
+      true ->
+        default_swagger_info()
+    end
+  end
+
+  def default_swagger_info do
+    %{
+      swagger: "2.0",
+      info: %{
+        title: @default_title,
+        version: @default_version,
+      },
+      paths: %{},
+      definitions: %{}
+    }
+  end
+
   defp collect_paths(swagger_map, router) do
     router.__routes__
     |> Enum.map(&find_swagger_path_function/1)
@@ -163,32 +194,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   defp merge_definitions(definitions, swagger_map = %{definitions: existing}) do
     %{swagger_map | definitions: Map.merge(existing, definitions)}
-  end
-
-  @doc false
-  defp collect_info(swagger_map) do
-    case function_exported?(Mix.Project.get, :swagger_info, 0) do
-      true ->
-        info = Mix.Project.get.swagger_info
-        title = Keyword.get(info, :title, @default_title)
-        version = Keyword.get(info, :version, @default_version)
-        # collect :info swagger fields to the map
-        info = List.foldl(info, %{},
-          fn ({info_key, info_val}, map) ->
-            Map.put_new(map, info_key, info_val)
-          end)
-          |> Map.put_new(:title, title)
-          |> Map.put_new(:version, version)
-        # resulted :info swagger field
-        Map.put_new(swagger_map, :info, info)
-      false ->
-        # we have swagger_info/0 in the mix.exs, so we
-        # just adding default values for the mandatory
-        # fields
-        info = Map.put_new(%{}, :title, @default_title)
-        info = Map.put_new(info, :version, @default_version)
-        Map.put_new(swagger_map, :info, info)
-    end
   end
 
   @doc false
