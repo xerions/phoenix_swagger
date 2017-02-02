@@ -145,30 +145,21 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   @doc false
-  defp collect_host(swagger_map, app_name, app_mod) do
-    endpoint_config = Application.get_env(app_name,Module.concat([app_mod, :Endpoint]))
-    host =
-      endpoint_config
-      |> Keyword.get(:url, [{:host, "localhost"}])
-      |> Keyword.get(:host, "localhost")
-    port =
-      endpoint_config
-      |> Keyword.get(:http, [{:port, @default_port}])
-      |> Keyword.get(:port, @default_port)
-    https = Keyword.get(endpoint_config, :https, nil)
-    swagger_map = Map.put_new(swagger_map, :host, host <> ":" <> port_to_string(port))
-    case https do
+  defp collect_host(swagger_map) do
+    endpoint_config = Application.get_env(@app_name, Module.concat([@app_module, :Endpoint]))
+
+    url = Keyword.get(endpoint_config, :url, [host: "localhost", port: @default_port])
+    host = Keyword.get(url, :host, "localhost")
+    port = Keyword.get(url, :port, @default_port)
+    swagger_map = Map.put_new(swagger_map, :host, "#{host}:#{port}")
+
+    case endpoint_config[:https] do
       nil ->
         swagger_map
       _ ->
         Map.put_new(swagger_map, :schemes, ["https", "http"])
     end
   end
-
-  @doc false
-  defp port_to_string({:system, env_var}), do: port_to_string(System.get_env(env_var))
-  defp port_to_string(port) when is_integer(port), do: to_string(port)
-  defp port_to_string(port) when is_binary(port), do: port
 
   @doc false
   defp collect_info(swagger_map) do
