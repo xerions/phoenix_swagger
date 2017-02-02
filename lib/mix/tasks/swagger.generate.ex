@@ -37,6 +37,17 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     """
   end
 
+  defp load_router(switches) do
+    {:module, router} =
+      switches
+      |> Keyword.get(:router, @default_router_module)
+      |> List.wrap()
+      |> Module.concat()
+      |> Code.ensure_loaded()
+
+    router
+  end
+
   @doc false
   def run([]) do
     run(@swagger_file_path)
