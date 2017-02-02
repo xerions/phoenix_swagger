@@ -1,6 +1,8 @@
 defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   use Mix.Task
 
+  @recursive true
+
   @shortdoc "Generates swagger.json file based on phoenix router"
 
   @moduledoc """
