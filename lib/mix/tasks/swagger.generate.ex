@@ -27,6 +27,24 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   @default_swagger_file_path @app_path <> "swagger.json"
   @default_router_module Module.concat([@app_module, :Router])
 
+  def run(args) do
+    Mix.Task.reenable("phoenix.swagger.generate")
+    Code.append_path("#{@app_path}_build/#{Mix.env}/lib/#{@app_name}/ebin")
+    {switches, params, _unknown} = OptionParser.parse(
+      args,
+      switches: [router: :string, help: :boolean],
+      aliases: [r: :router, h: :help])
+
+    if (Keyword.get(switches, :help)) do
+      usage
+    else
+      router = load_router(switches)
+      output_file = Enum.at(params, 0, @default_swagger_file_path)
+      write_file(output_file, swagger_document(router))
+      IO.puts "Generated #{output_file}"
+    end
+  end
+
   @doc false
   defp usage do
     IO.puts """
@@ -56,50 +74,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       |> Code.ensure_loaded()
 
     router
-  end
-
-  @doc false
-  def run([]) do
-    run(@swagger_file_path)
-  end
-
-  def run([output_file]) do
-    run(output_file)
-  end
-
-  def run(opts) when is_list(opts) do
-    IO.puts """
-    Usage: mix phoenix.swagger.generate [FILE]
-
-    With no FILE, default swagger file - #{@swagger_file_path}.
-    """
-  end
-
-  def run(output_file) do
-    # initial swagger API data
-    swagger_map = %{swagger: "2.0"}
-    # get some information about our application
-    app = Mix.Project.get.application
-    project = Mix.Project.get.project
-    # get application and router modules
-    app_name = project |> Keyword.get(:app)
-    app_mod = app |> Keyword.get(:mod) |> elem(0)
-    router_mod = Module.concat([app_mod, :Router])
-    # append path with the given application
-    ebin = @app_path <> "_build/" <> (Mix.env |> to_string) <> "/lib/" <> (app_name |> to_string) <> "/ebin"
-    Code.append_path(ebin)
-    # collect data and generate swagger map
-    result = collect_info(swagger_map)
-             |> collect_host(app_name, app_mod)
-             |> collect_paths(router_mod, app_mod)
-             |> Poison.encode!
-    directory = Path.dirname(output_file)
-    unless File.exists? directory do
-      File.mkdir_p! directory
-    end
-    File.write(output_file, result)
-    Code.delete_path(ebin)
-    IO.puts "Done."
   end
 
   @doc false
