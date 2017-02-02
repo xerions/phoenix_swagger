@@ -13,6 +13,8 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       mix phoenix.swagger.generate
 
       mix phoenix.swagger.generate ../swagger.json
+
+      mix phoenix.swagger.generate ../swagger.json --router MyApp.Router
   """
 
   @app_path Enum.at(Mix.Project.load_paths, 0) |> String.split("_build") |> Enum.at(0)
@@ -24,6 +26,16 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   @default_version "0.0.1"
   @default_swagger_file_path @app_path <> "swagger.json"
   @default_router_module Module.concat([@app_module, :Router])
+
+  @doc false
+  defp usage do
+    IO.puts """
+    Usage: mix phoenix.swagger.generate FILE --router ROUTER
+
+    With no FILE, default swagger file #{@default_swagger_file_path}
+    With no ROUTER, defaults to @default_router_module
+    """
+  end
 
   @doc false
   def run([]) do
