@@ -162,6 +162,24 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   @doc false
+  defp collect_definitions(swagger_map, router) do
+    router.__routes__
+    |> Enum.map(&find_controller/1)
+    |> Enum.uniq()
+    |> Enum.filter(&function_exported?(&1, :swagger_definitions, 0))
+    |> Enum.map(&apply(&1, :swagger_definitions, []))
+    |> Enum.reduce(swagger_map, &merge_definitions/2)
+  end
+
+  defp find_controller(route_map) do
+    Module.concat([:Elixir | Module.split(route_map.plug)])
+  end
+
+  defp merge_definitions(definitions, swagger_map = %{definitions: existing}) do
+    %{swagger_map | definitions: Map.merge(existing, definitions)}
+  end
+
+  @doc false
   defp collect_info(swagger_map) do
     case function_exported?(Mix.Project.get, :swagger_info, 0) do
       true ->
