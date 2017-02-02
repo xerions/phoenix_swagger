@@ -77,6 +77,15 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   @doc false
+  defp swagger_document(router) do
+    router
+    |> collect_info()
+    |> collect_host()
+    |> collect_paths(router)
+    |> collect_definitions(router)
+    |> Poison.encode!(pretty: true)
+  end
+
   defp collect_paths(swagger_map, router) do
     router.__routes__
     |> Enum.map(&find_swagger_path_function/1)
