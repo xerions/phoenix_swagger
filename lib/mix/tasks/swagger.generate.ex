@@ -17,19 +17,21 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       mix phoenix.swagger.generate ../swagger.json --router MyApp.Router
   """
 
-  @app_path Enum.at(Mix.Project.load_paths, 0) |> String.split("_build") |> Enum.at(0)
-  @app_module Mix.Project.get.application[:mod] |> elem(0)
-  @app_name Mix.Project.get.project[:app]
-
   @default_port 4000
   @default_title "<enter your title>"
   @default_version "0.0.1"
-  @default_swagger_file_path @app_path <> "swagger.json"
-  @default_router_module Module.concat([@app_module, :Router])
+
+  defp app_path do
+    Enum.at(Mix.Project.load_paths, 0) |> String.split("_build") |> Enum.at(0)
+  end
+  defp app_module, do: Mix.Project.get.application[:mod] |> elem(0)
+  defp app_name, do: Mix.Project.get.project[:app]
+  defp default_swagger_file_path, do: app_path() <> "swagger.json"
+  defp default_router_module, do: Module.concat([app_module(), :Router])
 
   def run(args) do
     Mix.Task.reenable("phoenix.swagger.generate")
-    Code.append_path("#{@app_path}_build/#{Mix.env}/lib/#{@app_name}/ebin")
+    Code.append_path("#{app_path()}_build/#{Mix.env}/lib/#{app_name()}/ebin")
     {switches, params, _unknown} = OptionParser.parse(
       args,
       switches: [router: :string, help: :boolean],
@@ -39,7 +41,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       usage
     else
       router = load_router(switches)
-      output_file = Enum.at(params, 0, @default_swagger_file_path)
+      output_file = Enum.at(params, 0, default_swagger_file_path())
       write_file(output_file, swagger_document(router))
       IO.puts "Generated #{output_file}"
     end
@@ -49,8 +51,8 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     IO.puts """
     Usage: mix phoenix.swagger.generate FILE --router ROUTER
 
-    With no FILE, default swagger file #{@default_swagger_file_path}
-    With no ROUTER, defaults to @default_router_module
+    With no FILE, default swagger file #{default_swagger_file_path()}
+    With no ROUTER, defaults to #{default_router_module()}
     """
   end
 
@@ -65,7 +67,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   defp load_router(switches) do
     {:module, router} =
       switches
-      |> Keyword.get(:router, @default_router_module)
+      |> Keyword.get(:router, default_router_module())
       |> List.wrap()
       |> Module.concat()
       |> Code.ensure_loaded()
@@ -157,7 +159,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   defp collect_host(swagger_map) do
-    endpoint_config = Application.get_env(@app_name, Module.concat([@app_module, :Endpoint]))
+    endpoint_config = Application.get_env(app_name(), Module.concat([app_module(), :Endpoint]))
 
     url = Keyword.get(endpoint_config, :url, [host: "localhost", port: @default_port])
     host = Keyword.get(url, :host, "localhost")
