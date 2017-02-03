@@ -45,7 +45,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     end
   end
 
-  @doc false
   defp usage do
     IO.puts """
     Usage: mix phoenix.swagger.generate FILE --router ROUTER
@@ -55,7 +54,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     """
   end
 
-  @doc false
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
     unless File.exists? directory do
@@ -64,7 +62,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     File.write!(output_file, contents)
   end
 
-  @doc false
   defp load_router(switches) do
     {:module, router} =
       switches
@@ -76,7 +73,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     router
   end
 
-  @doc false
   defp swagger_document(router) do
     router
     |> collect_info()
@@ -86,7 +82,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     |> Poison.encode!(pretty: true)
   end
 
-  @doc false
   defp collect_info(router) do
     cond do
       function_exported?(router, :swagger_info, 0) ->
@@ -161,7 +156,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     Map.merge(value1, value2)
   end
 
-  @doc false
   defp collect_host(swagger_map) do
     endpoint_config = Application.get_env(@app_name, Module.concat([@app_module, :Endpoint]))
 
@@ -178,7 +172,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     end
   end
 
-  @doc false
   defp collect_definitions(swagger_map, router) do
     router.__routes__
     |> Enum.map(&find_controller/1)
