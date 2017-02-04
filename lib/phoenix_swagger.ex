@@ -4,31 +4,41 @@ defmodule PhoenixSwagger do
   alias PhoenixSwagger.Path
   alias PhoenixSwagger.Path.PathObject
 
-  @shortdoc "Generate swagger_[action] function for a phoenix controller"
-
   @moduledoc """
-  The PhoenixSwagger module provides swagger_model/2 macro that akes two
-  arguments:
-
-    * `action` - name of the controller action (:index, ...);
-    * `expr`   - do block that contains swagger definitions.
+  The PhoenixSwagger module provides macros for defining swagger operations and schemas.
 
   Example:
 
-      swagger_model :index do
-        description "Short description"
-        parameter :path, :id, :number, :required, "property id"
-        responses 200, "Description", schema
+      use PhoenixSwagger
+
+      swagger_path :create do
+        post "/api/v1/{team}/users"
+        summary "Create a new user"
+        consumes "application/json"
+        produces "application/json"
+        parameters do
+          user :body, Schema.ref(:User), "user attributes"
+          team :path, :string, "Users team ID"
+        end
+        response 200, "OK", Schema.ref(:User)
       end
 
-  Where the `schema` is a map that contains swagger response schema
-  or a function that returns map.
+      def swagger_definitions do
+        %{
+          User: swagger_schema do
+            title "User"
+            description "A user of the application"
+            properties do
+              name :string, "Users name", required: true
+              id :string, "Unique identifier", required: true
+              address :string, "Home adress"
+            end
+          end
+        }
+      end
   """
 
   @table :validator_table
-  @swagger_data_types [:integer, :long, :float, :double, :string,
-                       :byte, :binary, :boolean, :date, :dateTime,
-                       :password]
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
@@ -134,6 +144,12 @@ defmodule PhoenixSwagger do
     Within the do-end block, the DSL provided by the `PhoenixSwagger.Path` module can be used.
     The DSL always starts with one of the `get`, `put`, `post`, `delete`, `head`, `options` functions,
     followed by any functions with first argument being a `PhoenixSwagger.Path.PathObject` struct.
+
+    Swagger `tags` will default to match the module name with trailing `Controller` removed.
+    Eg operations defined in module MyApp.UserController will have `tags: ["User"]`.
+
+    Swagger `operationId` will default to the fully qualified action function name.
+    Eg `index` action in `MyApp.UserController` will have `operationId: "MyApp.UserController.index"`.
 
     ## Example
 
