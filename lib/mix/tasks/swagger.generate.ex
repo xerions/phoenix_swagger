@@ -22,10 +22,10 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   @default_version "0.0.1"
 
   defp app_path do
-    Enum.at(Mix.Project.load_paths, 0) |> String.split("_build") |> Enum.at(0)
+    Enum.at(Mix.Project.load_paths(), 0) |> String.split("_build") |> Enum.at(0)
   end
-  defp app_module, do: Mix.Project.get.application[:mod] |> elem(0)
-  defp app_name, do: Mix.Project.get.project[:app]
+  defp app_module, do: Mix.Project.get().application()[:mod] |> elem(0)
+  defp app_name, do: Mix.Project.get().project()[:app]
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
   defp default_router_module, do: Module.concat([app_module(), :Router])
 
@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       aliases: [r: :router, h: :help])
 
     if (Keyword.get(switches, :help)) do
-      usage
+      usage()
     else
       router = load_router(switches)
       output_file = Enum.at(params, 0, default_swagger_file_path())
@@ -58,8 +58,8 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
-    unless File.exists? directory do
-      File.mkdir_p! directory
+    unless File.exists?(directory) do
+      File.mkdir_p!(directory)
     end
     File.write!(output_file, contents)
   end
@@ -87,9 +87,9 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   defp collect_info(router) do
     cond do
       function_exported?(router, :swagger_info, 0) ->
-        Map.merge(default_swagger_info, router.swagger_info())
+        Map.merge(default_swagger_info(), router.swagger_info())
 
-      function_exported?(Mix.Project.get, :swagger_info, 0) ->
+      function_exported?(Mix.Project.get(), :swagger_info, 0) ->
         info =
           Mix.Project.get.swagger_info()
           |> Keyword.put_new(:title, @default_title)
@@ -115,7 +115,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   defp collect_paths(swagger_map, router) do
-    router.__routes__
+    router.__routes__()
     |> Enum.map(&find_swagger_path_function/1)
     |> Enum.filter(&controller_function_exported?/1)
     |> Enum.map(&get_swagger_path/1)
@@ -124,7 +124,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   defp find_swagger_path_function(route_map) do
     controller = find_controller(route_map)
-    swagger_fun = "swagger_path_#{to_string(route_map.opts)}" |> String.to_atom
+    swagger_fun = "swagger_path_#{to_string(route_map.opts)}" |> String.to_atom()
 
     unless Code.ensure_loaded?(controller) do
       raise "Error: #{controller} module didn't load."
@@ -175,7 +175,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   defp collect_definitions(swagger_map, router) do
-    router.__routes__
+    router.__routes__()
     |> Enum.map(&find_controller/1)
     |> Enum.uniq()
     |> Enum.filter(&function_exported?(&1, :swagger_definitions, 0))

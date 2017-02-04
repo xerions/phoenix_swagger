@@ -29,7 +29,7 @@ defmodule PhoenixSwagger.PathTest do
       user :body, Schema.ref(:User), "user attributes"
       team :path, :string, "Users team ID"
     end
-    response 200, "OK", user_schema
+    response 200, "OK", user_schema()
   end
 
   def user_schema do
