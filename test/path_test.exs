@@ -25,12 +25,11 @@ defmodule PhoenixSwagger.PathTest do
     summary "Create a new user"
     consumes "application/json"
     produces "application/json"
-    tag "Users"
     parameters do
       user :body, Schema.ref(:User), "user attributes"
       team :path, :string, "Users team ID"
     end
-    response 200, "OK", user_schema
+    response 200, "OK", user_schema()
   end
 
   def user_schema do
@@ -158,7 +157,7 @@ defmodule PhoenixSwagger.PathTest do
             }
           },
           "summary" => "Create a new user",
-          "tags" => ["Users"]
+          "tags" => ["PathTest"]
         }
       }
     }
