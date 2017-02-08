@@ -203,13 +203,13 @@ defmodule PhoenixSwagger do
   def ensure_tag(path = %PathObject{operation: %{tags: []}}, module) do
     tags =
       module
-      |> Module.split
-      |> Enum.reverse
-      |> hd
+      |> Module.split()
+      |> Enum.reverse()
+      |> hd()
       |> String.split("Controller")
       |> Enum.filter(&(String.length(&1) > 0))
 
-    put_in path.operation.tags, tags
+    put_in(path.operation.tags, tags)
   end
   def ensure_tag(path, _module), do: path
 
