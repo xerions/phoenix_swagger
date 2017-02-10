@@ -50,6 +50,7 @@ defmodule PhoenixSwagger do
     quote do
       import PhoenixSwagger
       alias PhoenixSwagger.Schema
+      alias PhoenixSwagger.JsonApi
     end
   end
 
