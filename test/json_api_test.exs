@@ -26,7 +26,7 @@ defmodule PhoenixSwagger.JsonApiTest do
   end
 
   test "produces expected paginated users schema" do
-    users_schema = swagger_definitions[:Users]
+    users_schema = swagger_definitions()[:Users]
     assert users_schema == %{
       "description" => "A page of [UserResource](#userresource) results",
       "properties" => %{
@@ -63,7 +63,7 @@ defmodule PhoenixSwagger.JsonApiTest do
   end
 
   test "produces expected user top level schema" do
-    user_schema = swagger_definitions[:User]
+    user_schema = swagger_definitions()[:User]
     assert user_schema == %{
       "description" => "A JSON-API document with a single [UserResource](#userresource) resource",
       "properties" => %{
@@ -91,7 +91,7 @@ defmodule PhoenixSwagger.JsonApiTest do
   end
 
   test "produces expected user resource schema" do
-    user_resource_schema = swagger_definitions[:UserResource]
+    user_resource_schema = swagger_definitions()[:UserResource]
     assert user_resource_schema == %{
       "description" => "A user that may have one or more supporter pages.",
       "type" => "object",
