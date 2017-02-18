@@ -1,15 +1,22 @@
 defmodule PhoenixSwagger.Mixfile do
   use Mix.Project
 
+  @version "0.4.0"
+
   def project do
     [app: :phoenix_swagger,
-     version: "0.3.3",
+     version: @version,
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
      description: description(),
-     package: package()]
+     package: package(),
+
+     #Docs
+     source_url: "https://github.com/xerions/phoenix_swagger",
+     homepage_url: "https://github.com/xerions/phoenix_swagger",
+     docs: [extras: ["README.md"], main: "readme", source_ref: "v#{@version}"]]
   end
 
   # Configuration for the OTP application
@@ -33,7 +40,8 @@ defmodule PhoenixSwagger.Mixfile do
     [
         {:poison, "~> 1.5 or ~> 2.0"},
         {:ex_json_schema, "~> 0.5.1", optional: :true},
-        {:plug, "~> 1.1"}
+        {:plug, "~> 1.1"},
+        {:ex_doc, "~> 0.14", only: :dev, runtime: false}
     ]
   end
 
