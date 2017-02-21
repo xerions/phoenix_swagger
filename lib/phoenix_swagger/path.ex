@@ -19,6 +19,8 @@ defmodule PhoenixSwagger.Path do
       end
   """
 
+  alias PhoenixSwagger.Schema
+
   defmodule Parameter do
     @moduledoc """
     A swagger parameter definition, similar to a `Schema`, but swagger defines
@@ -235,15 +237,38 @@ defmodule PhoenixSwagger.Path do
   end
 
   @doc """
-  Adds a parameter to the operation of a swagger `%PathObject{}`, with a schema
+  Adds a response to the operation of a swagger `%PathObject{}`, with a schema
+
+  Optional keyword args can be provided for `headers` and `examples`
+  If the mime-type is known from the `produces` list, then a single can be given as a shorthand.
+
+  ## Example
+
+      get "/users/{id}"
+      produces "application/json"
+      parameter :id, :path, :integer, "user id", required: true
+      response 200, "Success", :User, examples: %{"application/json": %{id: 1, name: "Joe"}}
+
+      get "/users/{id}"
+      produces "application/json"
+      parameter :id, :path, :integer, "user id", required: true
+      response 200, "Success", :User, example: %{id: 1, name: "Joe"}
   """
-  def response(path = %PathObject{}, status, description, schema) when is_atom(schema)  do
-    resp = %ResponseObject{description: description, schema: %{"$ref" => "#/definitions/#{schema}"}}
-    put_in path.operation.responses[to_string(status)], resp
+  def response(path, status, description, schema, opts \\ [])
+  def response(path = %PathObject{}, status, description, schema, opts) when is_atom(schema)  do
+    response(path, status, description, Schema.ref(schema), opts)
   end
-  def response(path = %PathObject{}, status, description, schema = %{}) do
-    resp = %ResponseObject{description: description, schema: schema}
-    put_in path.operation.responses[to_string(status)], resp
+  def response(path = %PathObject{}, status, description, schema = %{}, opts) do
+    opts = expand_response_example(path, opts)
+    resp = struct(ResponseObject, [description: description, schema: schema] ++ opts)
+    put_in path.operation.responses[status |> to_string], resp
+  end
+
+  def expand_response_example(%PathObject{operation: %{produces: [mimetype | _]}}, opts) do
+    Enum.map(opts, fn
+      {:example, e} -> {:examples, %{mimetype => e}}
+      opt -> opt
+    end)
   end
 
   @doc """
