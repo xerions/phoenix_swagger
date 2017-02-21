@@ -1,3 +1,7 @@
+# 0.4.2
+
+  * Fix FunctionClauseError in `response` when no `produces` mime type defined on an operation.
+
 # 0.4.1
 
   * Fix compilation errors when using `PhoenixSwagger.JsonApi` macros
