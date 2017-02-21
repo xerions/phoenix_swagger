@@ -4,6 +4,14 @@ defmodule PhoenixSwagger.PathTest do
 
   doctest PhoenixSwagger.Path
 
+  swagger_path :show do
+    get "/api/v1/users/{id}"
+    summary "Get a user"
+    description "Get a user by ID"
+    parameter "id", :path, :string, "User ID", required: true, example: "123"
+    response 200, "OK", :User
+  end
+
   swagger_path :index do
     get "/api/v1/users"
     summary "Query for users"
@@ -42,6 +50,37 @@ defmodule PhoenixSwagger.PathTest do
         address :string, "Home adress"
       end
     end
+  end
+
+  test "swagger_path_show produces expected swagger json" do
+    assert swagger_path_show() == %{
+      "/api/v1/users/{id}" => %{
+        "get" => %{
+          "description" => "Get a user by ID",
+          "operationId" => "PhoenixSwagger.PathTest.show",
+          "parameters" => [
+            %{
+              "description" => "User ID",
+              "in" => "path",
+              "name" => "id",
+              "required" => true,
+              "type" => "string",
+              "x-example" => "123"
+            }
+          ],
+          "responses" => %{
+            "200" => %{
+              "description" => "OK",
+              "schema" => %{
+                "$ref" => "#/definitions/User"
+              }
+            }
+          },
+          "summary" => "Get a user",
+          "tags" => ["PathTest"]
+        }
+      }
+    }
   end
 
   test "swagger_path_index produces expected swagger json" do
