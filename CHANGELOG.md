@@ -1,3 +1,7 @@
+# 0.4.1
+
+  * Fix compilation errors when using `PhoenixSwagger.JsonApi` macros
+
 # 0.4.0
 
   * Add `PhoenixSwagger.Schema` module that provides a structure which represents

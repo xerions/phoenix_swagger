@@ -59,8 +59,8 @@ defmodule PhoenixSwagger do
   defmacro __using__(_) do
     quote do
       import PhoenixSwagger
-      alias PhoenixSwagger.Schema
-      alias PhoenixSwagger.JsonApi
+      require PhoenixSwagger.Schema, as: Schema
+      require PhoenixSwagger.JsonApi, as: JsonApi
     end
   end
 
