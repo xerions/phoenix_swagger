@@ -270,6 +270,7 @@ defmodule PhoenixSwagger.Path do
       opt -> opt
     end)
   end
+  def expand_response_example(%PathObject{}, opts), do: opts
 
   @doc """
   Converts the `%PathObject{}` struct into the nested JSON form expected by swagger
