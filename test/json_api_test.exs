@@ -3,6 +3,7 @@ defmodule PhoenixSwagger.JsonApiTest do
   use PhoenixSwagger
 
   doctest PhoenixSwagger.JsonApi
+  doctest PhoenixSwagger.Schema
 
   def swagger_definitions do
     %{
@@ -16,6 +17,7 @@ defmodule PhoenixSwagger.JsonApiTest do
           email :string, "Email", required: true
           birthday :string, "Birthday in YYYY-MM-DD format"
           address Schema.ref(:Address), "Users address"
+          gender [:string, "null"], "Gender"
         end
         link :self, "The link to this user resource"
         relationship :posts
@@ -105,6 +107,7 @@ defmodule PhoenixSwagger.JsonApiTest do
             "birthday" => %{ "description" => "Birthday in YYYY-MM-DD format", "type" => "string"},
             "email" => %{"description" => "Email", "type" => "string"},
             "full_name" => %{"description" => "Full name", "type" => "string"},
+            "gender" => %{"description" => "Gender", "type" => ["string", "null"]},
             "phone" => %{"description" => "Users phone number", "type" => "string"},
             "user_created_at" => %{"description" => "First created timestamp UTC", "type" => "string"},
             "user_updated_at" => %{"description" => "Last update timestamp UTC", "type" => "string", "format" => "ISO-8601"}
