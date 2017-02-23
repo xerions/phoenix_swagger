@@ -1,3 +1,8 @@
+# 0.4.3
+
+  * Allow for a list of types on `PhoenixSwagger.Schema.type`
+  * Fix not running all doctests
+
 # 0.4.2
 
   * Fix FunctionClauseError in `response` when no `produces` mime type defined on an operation.
