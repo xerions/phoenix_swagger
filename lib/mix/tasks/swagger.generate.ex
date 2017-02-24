@@ -117,14 +117,15 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   defp collect_paths(swagger_map, router) do
     router.__routes__()
     |> Enum.map(&find_swagger_path_function/1)
+    |> Enum.filter(&!is_nil(&1))
     |> Enum.filter(&controller_function_exported?/1)
     |> Enum.map(&get_swagger_path/1)
     |> Enum.reduce(swagger_map, &merge_paths/2)
   end
 
-  defp find_swagger_path_function(route_map) do
-    controller = find_controller(route_map)
-    swagger_fun = "swagger_path_#{to_string(route_map.opts)}" |> String.to_atom()
+  defp find_swagger_path_function(route = %{opts: action, path: path}) when is_atom(action) do
+    controller = find_controller(route)
+    swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
     unless Code.ensure_loaded?(controller) do
       raise "Error: #{controller} module didn't load."
@@ -133,9 +134,14 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     %{
       controller: controller,
       swagger_fun: swagger_fun,
-      path: format_path(route_map.path)
+      path: format_path(path)
     }
   end
+  defp find_swagger_path_function(_route) do
+    # action not an atom usually means route to a plug which isn't a Phoenix controller
+    nil
+  end
+
 
   defp format_path(path) do
     Regex.replace(~r/:([^\/]+)/, path, "{\\1}")
