@@ -95,6 +95,7 @@ defmodule PhoenixSwagger.Schema do
       iex> alias PhoenixSwagger.Schema
       ...> %Schema{type: :object}
       ...> |> Schema.property(:name, :string, "Full name", required: true, maxLength: 256)
+      ...> |> Schema.property(:address, [:string, "null"], "Street Address")
       ...> |> Schema.property(:friends, Schema.array(:User), "Friends list", required: true)
       %PhoenixSwagger.Schema{
         type: :object,
@@ -103,6 +104,10 @@ defmodule PhoenixSwagger.Schema do
             type: :array,
             description: "Friends list",
             items: %PhoenixSwagger.Schema{"$ref": "#/definitions/User"}
+          },
+          address: %PhoenixSwagger.Schema{
+            type: [:string, "null"],
+            description: "Street Address"
           },
           name: %PhoenixSwagger.Schema{
             type: :string,
@@ -114,7 +119,7 @@ defmodule PhoenixSwagger.Schema do
       }
   """
   def property(model, name, type_or_schema, description, opts \\ [])
-  def property(model = %Schema{type: :object}, name, type, description, opts) when is_atom(type) do
+  def property(model = %Schema{type: :object}, name, type, description, opts) when is_atom(type) or is_list(type) do
     property(model, name, %Schema{type: type}, description, opts)
   end
   def property(model = %Schema{type: :object}, name, type = %Schema{}, description, opts) do

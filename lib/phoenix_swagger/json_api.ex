@@ -200,7 +200,7 @@ defmodule PhoenixSwagger.JsonApi do
    name of this attribute to be added to the "required" list of the attributes schema.
   """
   def attribute(model, name, type, description, opts \\ [])
-  def attribute(model, name, type, description, opts) when is_atom(type) do
+  def attribute(model, name, type, description, opts) when is_atom(type) or is_list(type) do
     attribute(model, name, %Schema{type: type}, description, opts)
   end
   def attribute(model = %Schema{}, name, type = %Schema{}, description, opts) do
