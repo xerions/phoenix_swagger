@@ -1,5 +1,6 @@
 # 0.4.3
 
+  * Include swagger-ui plug `PhoenixSwagger.Plug.SwaggerUI`
   * Allow for a list of types on `PhoenixSwagger.Schema.type`
   * Fix not running all doctests
   * Fix `ArgumentError` in `Phoenix.Swagger.Generate` when routing to plug with keyword opts [#58](https://github.com/xerions/phoenix_swagger/issues/58)
