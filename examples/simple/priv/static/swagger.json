@@ -1,0 +1,297 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/api/users/{id}": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update user",
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            },
+            "examples": {
+              "application/json": {
+                "data": {
+                  "updated_at": "2017-02-12T13:45:23Z",
+                  "name": "Joe",
+                  "inserted_at": "2017-02-08T12:34:55Z",
+                  "id": 3,
+                  "email": "Joe5@mail.com"
+                }
+              }
+            },
+            "description": "Updated Successfully"
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "x-example": 3,
+            "type": "integer",
+            "required": true,
+            "name": "id",
+            "in": "path",
+            "description": "User ID"
+          },
+          {
+            "x-example": {
+              "user": {
+                "name": "Joe",
+                "email": "joe4@mail.com"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/UserRequest"
+            },
+            "required": false,
+            "name": "user",
+            "in": "body",
+            "description": "The user details"
+          }
+        ],
+        "operationId": "Simple.UserController.update",
+        "description": "Update all attributes of a user",
+        "consumes": [
+          "application/json"
+        ]
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Show User",
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            },
+            "examples": {
+              "application/json": {
+                "data": {
+                  "updated_at": "2017-02-12T13:45:23Z",
+                  "name": "Joe",
+                  "inserted_at": "2017-02-08T12:34:55Z",
+                  "id": 123,
+                  "email": "Joe3@mail.com"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "x-example": 123,
+            "type": "integer",
+            "required": true,
+            "name": "id",
+            "in": "path",
+            "description": "User ID"
+          }
+        ],
+        "operationId": "Simple.UserController.show",
+        "description": "Show a user by ID"
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete User",
+        "responses": {
+          "203": {
+            "description": "No Content - Deleted Successfully"
+          }
+        },
+        "parameters": [
+          {
+            "x-example": 3,
+            "type": "integer",
+            "required": true,
+            "name": "id",
+            "in": "path",
+            "description": "User ID"
+          }
+        ],
+        "operationId": "Simple.UserController.delete",
+        "description": "Delete a user by ID"
+      }
+    },
+    "/api/users": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Create user",
+        "responses": {
+          "201": {
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            },
+            "examples": {
+              "application/json": {
+                "data": {
+                  "updated_at": "2017-02-12T13:45:23Z",
+                  "name": "Joe",
+                  "inserted_at": "2017-02-08T12:34:55Z",
+                  "id": 1,
+                  "email": "Joe2@mail.com"
+                }
+              }
+            },
+            "description": "User created OK"
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "x-example": {
+              "user": {
+                "name": "Joe",
+                "email": "Joe1@mail.com"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/UserRequest"
+            },
+            "required": false,
+            "name": "user",
+            "in": "body",
+            "description": "The user details"
+          }
+        ],
+        "operationId": "Simple.UserController.create",
+        "description": "Creates a new user",
+        "consumes": [
+          "application/json"
+        ]
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "List Users",
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UsersResponse"
+            },
+            "examples": {
+              "application/json": {
+                "data": [
+                  {
+                    "updated_at": "2017-02-12T13:45:23Z",
+                    "name": "Joe",
+                    "inserted_at": "2017-02-08T12:34:55Z",
+                    "id": 1,
+                    "email": "Joe6@mail.com"
+                  },
+                  {
+                    "updated_at": "2017-02-15T23:15:43Z",
+                    "name": "Jack",
+                    "inserted_at": "2017-02-04T11:24:45Z",
+                    "id": 2,
+                    "email": "Jack7@mail.com"
+                  }
+                ]
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "operationId": "Simple.UserController.index",
+        "description": "List all users in the database"
+      }
+    }
+  },
+  "info": {
+    "version": "1.0",
+    "title": "Simple App"
+  },
+  "host": "localhost:4000",
+  "definitions": {
+    "UsersResponse": {
+      "type": "object",
+      "title": "UsersReponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          },
+          "description": "The users details"
+        }
+      },
+      "description": "Response schema for multiple users"
+    },
+    "UserResponse": {
+      "type": "object",
+      "title": "UserResponse",
+      "properties": {
+        "data": {
+          "description": "The user details",
+          "$ref": "#/definitions/User"
+        }
+      },
+      "description": "Response schema for single user"
+    },
+    "UserRequest": {
+      "type": "object",
+      "title": "UserRequest",
+      "properties": {
+        "user": {
+          "description": "The user details",
+          "$ref": "#/definitions/User"
+        }
+      },
+      "description": "POST body for creating a user"
+    },
+    "User": {
+      "type": "object",
+      "title": "User",
+      "required": [
+        "email",
+        "name"
+      ],
+      "properties": {
+        "updated_at": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Update timestamp"
+        },
+        "name": {
+          "type": "string",
+          "description": "User name"
+        },
+        "inserted_at": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Creation timestamp"
+        },
+        "id": {
+          "type": "integer",
+          "description": "User ID"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address"
+        }
+      },
+      "description": "A user of the app"
+    }
+  }
+}
