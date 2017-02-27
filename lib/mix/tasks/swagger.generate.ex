@@ -146,7 +146,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   defp get_swagger_path(%{controller: controller, swagger_fun: fun, path: path}) do
-    %{^path => _action} = apply(controller, fun, [])
+    apply(controller, fun, [])
   end
 
   defp merge_paths(path, swagger_map) do
