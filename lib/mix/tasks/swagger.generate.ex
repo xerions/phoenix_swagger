@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       (Keyword.get(switches, :help)) ->
         usage()
       has_no_endpoint() ->
-        IO.puts "No Endpoint configured for app #{app_name()}, skipping."
+        IO.puts "Skipping app #{app_name()}, no Endpoint configured."
       true ->
         router = load_router(switches)
         output_file = Enum.at(params, 0, default_swagger_file_path())
