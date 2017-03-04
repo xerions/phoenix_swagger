@@ -37,13 +37,16 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       switches: [router: :string, help: :boolean],
       aliases: [r: :router, h: :help])
 
-    if (Keyword.get(switches, :help)) do
-      usage()
-    else
-      router = load_router(switches)
-      output_file = Enum.at(params, 0, default_swagger_file_path())
-      write_file(output_file, swagger_document(router))
-      IO.puts "Generated #{output_file}"
+    cond do
+      (Keyword.get(switches, :help)) ->
+        usage()
+      has_no_endpoint() ->
+        IO.puts "No Endpoint configured for app #{app_name()}, skipping."
+      true ->
+        router = load_router(switches)
+        output_file = Enum.at(params, 0, default_swagger_file_path())
+        write_file(output_file, swagger_document(router))
+        IO.puts "Generated #{output_file}"
     end
   end
 
@@ -55,6 +58,12 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     With no ROUTER, defaults to #{default_router_module()}
     """
   end
+
+  defp has_no_endpoint do
+    !Keyword.has_key?(Mix.Project.get().application(), :mod)
+       || is_nil(Application.get_env(app_name(), Module.concat([app_module(), :Endpoint])))
+  end
+
 
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
