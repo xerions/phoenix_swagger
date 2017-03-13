@@ -1,4 +1,4 @@
-# 0.4.3
+# 0.5.0
 
   * Include swagger-ui plug `PhoenixSwagger.Plug.SwaggerUI`
   * Allow for a list of types on `PhoenixSwagger.Schema.type`
