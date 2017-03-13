@@ -278,3 +278,28 @@ scope "/api", MyApp do
   post "/users", UsersController, :send
 end
 ```
+
+## Swagger UI
+
+PhoenixSwagger includes a plug with all static assets required to host swagger-ui from your Phoenix application.
+
+Usage:
+
+Generate a swagger file and place it in your applications `priv/static` dir:
+
+```
+mix phoenix.swagger.generate priv/static/myapp.json
+```
+
+Add a swagger scope to your router, and forward all requests to SwaggerUI
+
+```elixir
+    scope "/api/swagger" do
+      forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json"
+    end
+```
+
+Run the server with `mix phoenix.server` and browse to `localhost:8080/api/swagger/`,
+Swagger-ui should be shown with your swagger spec loaded.
+
+See the `examples/simple` project for a runnable example with swagger-ui.
