@@ -160,7 +160,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
     function_exported?(controller, fun, 0)
   end
 
-  defp get_swagger_path(%{controller: controller, swagger_fun: fun, path: path}) do
+  defp get_swagger_path(%{controller: controller, swagger_fun: fun}) do
     apply(controller, fun, [])
   end
 
