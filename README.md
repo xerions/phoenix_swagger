@@ -136,6 +136,11 @@ def swagger_definitions do
         id :string, "Unique identifier", required: true
         address :string, "Home address"
       end
+      example %{
+        name: "Joe",
+        id: "123",
+        address: "742 Evergreen Terrace"
+      }
     end,
     Users: swagger_schema do
       title "Users"
