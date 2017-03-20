@@ -1,3 +1,7 @@
+# 0.5.1
+
+  * Allow schemas to include an example
+
 # 0.5.0
 
   * Include swagger-ui plug `PhoenixSwagger.Plug.SwaggerUI`
