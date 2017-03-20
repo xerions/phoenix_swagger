@@ -34,7 +34,8 @@ defmodule PhoenixSwagger.Schema do
     :items,
     :allOf,
     :properties,
-    :additionalProperties]
+    :additionalProperties,
+    :example]
 
   @doc """
   Construct a schema reference, using name of definition in this swagger document,
@@ -588,5 +589,27 @@ defmodule PhoenixSwagger.Schema do
   end
   def required(model = %Schema{type: :object}, names) when is_list(names) do
     %{model | required: names ++ (model.required || [])}
+  end
+
+  @doc """
+  Adds an example of the schema.
+
+    ## Example
+
+    iex> alias PhoenixSwagger.Schema
+    ...> %Schema{type: :object, properties: %{phone_number: %Schema{type: :string}}}
+    ...> |> Schema.example(%{phone_number: "555-123-456"})
+    %PhoenixSwagger.Schema{
+      type: :object,
+      properties: %{
+        phone_number: %PhoenixSwagger.Schema{
+          type: :string
+        }
+      },
+      example: %{phone_number: "555-123-456"}
+    }
+  """
+  def example(model = %Schema{}, example) do
+    %{model | example: example}
   end
 end
