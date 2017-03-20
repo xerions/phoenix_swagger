@@ -17,7 +17,6 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
       mix phoenix.swagger.generate ../swagger.json --router MyApp.Router
   """
 
-  @default_port 4000
   @default_title "<enter your title>"
   @default_version "0.0.1"
 
@@ -176,10 +175,21 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   defp collect_host(swagger_map) do
     endpoint_config = Application.get_env(app_name(), Module.concat([app_module(), :Endpoint]))
 
-    url = Keyword.get(endpoint_config, :url, [host: "localhost", port: @default_port])
-    host = Keyword.get(url, :host, "localhost")
-    port = Keyword.get(url, :port, @default_port)
-    swagger_map = Map.put_new(swagger_map, :host, "#{host}:#{port}")
+    case Keyword.get(endpoint_config, :url) do
+      nil -> swagger_map
+      _ -> collect_host_from_endpoint(swagger_map, endpoint_config)
+    end
+  end
+
+  defp collect_host_from_endpoint(swagger_map, endpoint_config) do
+    url = Keyword.get(endpoint_config, :url)
+    host = Keyword.get(url, :host)
+    port = Keyword.get(url, :port)
+    host_address = [host, port]
+      |> Enum.filter(&(!is_nil(&1)))
+      |> Enum.join(":")
+
+    swagger_map = Map.put_new(swagger_map, :host, host_address)
 
     case endpoint_config[:https] do
       nil ->
