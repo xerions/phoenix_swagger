@@ -291,6 +291,11 @@
           "description": "Email address"
         }
       },
+      "example": {
+        "name": "Joe",
+        "id": 123,
+        "email": "joe@gmail.com"
+      },
       "description": "A user of the app"
     }
   }

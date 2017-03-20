@@ -16,6 +16,11 @@ defmodule Simple.UserController do
           inserted_at :string, "Creation timestamp", format: :datetime
           updated_at :string, "Update timestamp", format: :datetime
         end
+        example %{
+          id: 123,
+          name: "Joe",
+          email: "joe@gmail.com"
+        }
       end,
       UserRequest: swagger_schema do
         title "UserRequest"
