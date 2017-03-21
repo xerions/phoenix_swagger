@@ -135,6 +135,12 @@ def swagger_definitions do
         name :string, "Users name", required: true
         id :string, "Unique identifier", required: true
         address :string, "Home address"
+        preferences (Schema.new do
+          properties do
+            subscribe_to_mailing_list :boolean, "mailing list subscription", default: true
+            send_special_offers :boolean, "special offers list subscription", default: true
+          end
+        end)
       end
       example %{
         name: "Joe",
