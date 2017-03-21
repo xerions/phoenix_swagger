@@ -122,7 +122,12 @@ defmodule PhoenixSwagger do
         "type" => "string"
       }
   """
-  defmacro swagger_schema([do: {:__block__, _, exprs}]) do
+  defmacro swagger_schema(block) do
+    exprs = case block do
+      [do: {:__block__, _, exprs}] -> exprs
+      [do: expr] -> [expr]
+    end
+
     acc = quote do %Schema{type: :object} end
     body = Enum.reduce(exprs, acc, fn expr, acc ->
       quote do unquote(acc) |> unquote(expr) end

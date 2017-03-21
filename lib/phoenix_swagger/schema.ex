@@ -158,7 +158,12 @@ defmodule PhoenixSwagger.Schema do
         required: [:name]
       }
   """
-  defmacro properties(model, [do: {:__block__, _, exprs}]) do
+  defmacro properties(model, block) do
+    exprs = case block do
+      [do: {:__block__, _, exprs}] -> exprs
+      [do: expr] -> [expr]
+    end
+    
     body =
       exprs
       |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)

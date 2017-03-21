@@ -181,7 +181,12 @@ defmodule PhoenixSwagger.JsonApi do
       |> attribute(:name, :string, "Full name of the user", required: true)
       |> attribute(:dateOfBirth, :string, "Date of Birth", format: "ISO-8601", required: false)
   """
-  defmacro attributes(model, [do: {:__block__, _, attrs}]) do
+  defmacro attributes(model, block) do
+    attrs = case block do
+      [do: {:__block__, _, attrs}] -> attrs
+      [do: attr] -> [attr]
+    end
+    
     attrs
     |> Enum.map(fn {name, line, args} -> {:attribute, line, [name | args]} end)
     |> Enum.reduce(model, fn next, pipeline ->
