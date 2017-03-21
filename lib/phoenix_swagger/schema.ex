@@ -39,6 +39,57 @@ defmodule PhoenixSwagger.Schema do
     :example]
 
   @doc """
+  Construct a new %Schema{} struct using the schema DSL.
+
+  This macro is similar to PhoenixSwagger.swagger_schema, except that it produces a Schema struct instead
+  of a plain map with string keys.
+
+  ## Example
+
+      iex> require PhoenixSwagger.Schema, as: Schema
+      ...> Schema.new do
+      ...>   type :object
+      ...>   properties do
+      ...>     name :string, "user name", required: true
+      ...>     date_of_birth :string, "date of birth", format: :datetime
+      ...>   end
+      ...> end
+      %Schema{
+        type: :object,
+        properties: %{
+          name: %Schema {
+            type: :string,
+            description: "user name"
+          },
+          date_of_birth: %Schema {
+            type: :string,
+            format: :datetime,
+            description: "date of birth"
+          }
+        },
+        required: [:name]
+      }
+  """
+  defmacro new(block) do
+    exprs = case block do
+       [do: {:__block__, _, exprs}] -> exprs
+       [do: expr] -> [expr]
+    end
+
+    body =
+      Enum.reduce(exprs, Macro.escape(%Schema{type: :object}), fn expr, acc ->
+         quote do unquote(acc) |> unquote(expr) end
+      end)
+
+    quote do
+      (fn ->
+        import PhoenixSwagger.Schema
+        unquote(body)
+      end).()
+    end
+  end
+
+  @doc """
   Construct a schema reference, using name of definition in this swagger document,
   or a complete path.
 
@@ -120,13 +171,13 @@ defmodule PhoenixSwagger.Schema do
         required: [:friends, :name]
       }
   """
-  def property(model, name, type_or_schema, description, opts \\ [])
+  def property(model, name, type_or_schema, description \\ nil, opts \\ [])
   def property(model = %Schema{type: :object}, name, type, description, opts) when is_atom(type) or is_list(type) do
     property(model, name, %Schema{type: type}, description, opts)
   end
   def property(model = %Schema{type: :object}, name, type = %Schema{}, description, opts) do
     {required?, opts} = Keyword.pop(opts, :required)
-    property_schema = struct!(type, [description: description] ++ opts)
+    property_schema = struct!(type, [description: type.description || description] ++ opts)
     properties = (model.properties || %{}) |> Map.put(name, property_schema)
     model = %{model | properties: properties}
     if required?, do: required(model, name), else: model
@@ -159,7 +210,12 @@ defmodule PhoenixSwagger.Schema do
         required: [:name]
       }
   """
-  defmacro properties(model, [do: {:__block__, _, exprs}]) do
+  defmacro properties(model, block) do
+    exprs = case block do
+      [do: {:__block__, _, exprs}] -> exprs
+      [do: expr] -> [expr]
+    end
+    
     body =
       exprs
       |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)

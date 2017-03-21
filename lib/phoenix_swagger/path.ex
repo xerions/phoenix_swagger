@@ -168,7 +168,12 @@ defmodule PhoenixSwagger.Path do
         response 200, "OK", :User
       end
   """
-  defmacro parameters(path, [do: {:__block__, _, exprs}]) do
+  defmacro parameters(path, block) do
+    exprs = case block do
+      [do: {:__block__, _, exprs}] -> exprs
+      [do: expr] -> [expr]
+    end
+
     exprs
     |> Enum.map(fn {name, line, args} -> {:parameter, line, [name | args]} end)
     |> Enum.reduce(path, fn expr, acc ->

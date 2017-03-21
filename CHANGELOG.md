@@ -1,5 +1,6 @@
 # 0.5.1
 
+  * Allow property schemas to be declared inline using `Schema.new` macro
   * Allow schemas to include an example
   * Add support for `discriminator` in polymorphic schemas
   * Do not set a host if a url has not been provided
