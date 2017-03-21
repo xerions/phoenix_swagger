@@ -170,13 +170,13 @@ defmodule PhoenixSwagger.Schema do
         required: [:friends, :name]
       }
   """
-  def property(model, name, type_or_schema, description, opts \\ [])
+  def property(model, name, type_or_schema, description \\ nil, opts \\ [])
   def property(model = %Schema{type: :object}, name, type, description, opts) when is_atom(type) or is_list(type) do
     property(model, name, %Schema{type: type}, description, opts)
   end
   def property(model = %Schema{type: :object}, name, type = %Schema{}, description, opts) do
     {required?, opts} = Keyword.pop(opts, :required)
-    property_schema = struct!(type, [description: description] ++ opts)
+    property_schema = struct!(type, [description: type.description || description] ++ opts)
     properties = (model.properties || %{}) |> Map.put(name, property_schema)
     model = %{model | properties: properties}
     if required?, do: required(model, name), else: model

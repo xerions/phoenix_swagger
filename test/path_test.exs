@@ -48,6 +48,12 @@ defmodule PhoenixSwagger.PathTest do
         name :string, "Users name", required: true
         id :string, "Unique identifier", required: true
         address :string, "Home adress"
+        preferences (Schema.new do
+          properties do
+            subscribe_to_mailing_list :boolean, "mailing list subscription", default: true
+            send_special_offers :boolean, "special offers list subscription", default: true
+          end
+        end)
       end
     end
   end
@@ -196,6 +202,21 @@ defmodule PhoenixSwagger.PathTest do
                   "name" => %{
                     "description" => "Users name",
                     "type" => "string"
+                  },
+                  "preferences" => %{
+                    "properties" => %{
+                      "send_special_offers" => %{
+                        "default" => true,
+                        "description" => "special offers list subscription",
+                        "type" => "boolean"
+                      },
+                      "subscribe_to_mailing_list" => %{
+                        "default" => true,
+                        "description" => "mailing list subscription",
+                        "type" => "boolean"
+                      }
+                    },
+                    "type" => "object"
                   }
                 },
                 "required" => ["id", "name"]
