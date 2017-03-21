@@ -35,6 +35,7 @@ defmodule PhoenixSwagger.Schema do
     :allOf,
     :properties,
     :additionalProperties,
+    :discriminator,
     :example]
 
   @doc """
@@ -488,6 +489,8 @@ defmodule PhoenixSwagger.Schema do
 
   @doc """
   Used to combine multiple schemas, requiring a value to conform to all schemas.
+  Can be used in conjunction with `discriminator` to define polymorphic inheritance relationships.
+  See http://swagger.io/specification/#composition-and-inheritance--polymorphism--83
 
   ## Example
 
@@ -612,4 +615,40 @@ defmodule PhoenixSwagger.Schema do
   def example(model = %Schema{}, example) do
     %{model | example: example}
   end
+
+  @doc """
+  Specifies the name of a property that identifies the polymorphic schema for a JSON object.
+  The value of this property should be the name of this schema, or another schema that inherits
+  from this schema using `all_of`.
+  See http://swagger.io/specification/#composition-and-inheritance--polymorphism--83
+
+
+    ## Example
+
+    iex> alias PhoenixSwagger.Schema
+    ...> %Schema{}
+    ...> |> Schema.type(:object)
+    ...> |> Schema.title("Pet")
+    ...> |> Schema.property(:pet_type, :string, "polymorphic pet schema type", example: "Dog")
+    ...> |> Schema.discriminator(:pet_type)
+    %Schema{
+      type: :object,
+      title: "Pet",
+      properties: %{
+        pet_type: %Schema{
+          type: :string,
+          description: "polymorphic pet schema type",
+          example: "Dog"
+        }
+      },
+      discriminator: :pet_type,
+      required: [:pet_type]
+    }
+  """
+  def discriminator(model = %Schema{}, property_name) do
+    model
+    |> Map.put(:discriminator, property_name)
+    |> required(property_name)
+  end
+
 end

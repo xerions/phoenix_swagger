@@ -1,6 +1,7 @@
 # 0.5.1
 
   * Allow schemas to include an example
+  * Add support for `discriminator` in polymorphic schemas
   * Do not set a host if a url has not been provided
 
 # 0.5.0
