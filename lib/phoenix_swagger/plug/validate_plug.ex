@@ -42,6 +42,19 @@ defmodule PhoenixSwagger.Plug.Validate do
     end
   end
 
+  defp validate_boolean(name, value, parameters) do
+    try do
+      val = String.to_existing_atom(value)
+      if val != true and val != false do
+        {:error, "Type mismatch. Expected Boolean but got String.", "#/#{name}"}
+      else
+        validate_query_params(parameters)
+      end
+    rescue _e in ArgumentError ->
+        {:error, "Type mismatch. Expected Boolean but got String.", "#/#{name}"}
+    end
+  end
+
   defp validate_integer(name, value, parameters) do
     try do
       _ = String.to_integer(value)
@@ -63,6 +76,9 @@ defmodule PhoenixSwagger.Plug.Validate do
   end
   defp validate_query_params([{"integer", name, val, _} | parameters]) do
     validate_integer(name, val, parameters)
+  end
+  defp validate_query_params([{"boolean", name, val, _} | parameters]) do
+    validate_boolean(name, val, parameters)
   end
   defp validate_query_params(path, params) do
     [{_, _basePath, schema}] = :ets.lookup(@table, path)
