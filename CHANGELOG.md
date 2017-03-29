@@ -4,6 +4,7 @@
   * Allow schemas to include an example
   * Add support for `discriminator` in polymorphic schemas
   * Do not set a host if a url has not been provided
+  * Ability to validate boolean values
 
 # 0.5.0
 
