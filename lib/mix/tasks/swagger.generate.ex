@@ -29,6 +29,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   defp default_router_module, do: Module.concat([app_module(), :Router])
 
   def run(args) do
+    Mix.Task.run("compile")
     Mix.Task.reenable("phoenix.swagger.generate")
     Code.append_path("#{app_path()}_build/#{Mix.env}/lib/#{app_name()}/ebin")
     {switches, params, _unknown} = OptionParser.parse(
