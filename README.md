@@ -199,7 +199,7 @@ end
 
 ## Generate Swagger File
 
-After adding swagger spec to you controllers, recompile your app `mix phoenix.server`, then run the `phoenix.swagger.generate`
+After adding swagger spec to you controllers, run the `phoenix.swagger.generate`
 mix task for the `swagger-ui` json file generation into directory with `phoenix` application:
 
 ```
