@@ -23,10 +23,10 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   defp app_path do
     Enum.at(Mix.Project.load_paths(), 0) |> String.split("_build") |> Enum.at(0)
   end
-  defp app_module, do: Mix.Project.get().application()[:mod] |> elem(0)
+  defp top_level_namespace, do: Mix.Project.get().application()[:mod] |> elem(0) |> Module.split |> Enum.drop(-1) |> Module.concat
   defp app_name, do: Mix.Project.get().project()[:app]
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
-  defp default_router_module, do: Module.concat([app_module(), :Router])
+  defp default_router_module, do: Module.concat([top_level_namespace(), :Web, :Router])
 
   def run(args) do
     Mix.Task.run("compile")
@@ -61,7 +61,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   defp has_no_endpoint do
     !Keyword.has_key?(Mix.Project.get().application(), :mod)
-       || is_nil(Application.get_env(app_name(), Module.concat([app_module(), :Endpoint])))
+      || is_nil(Application.get_env(app_name(), Module.concat([top_level_namespace(), :Web, :Endpoint])))
   end
 
 
@@ -174,7 +174,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
   end
 
   defp collect_host(swagger_map) do
-    endpoint_config = Application.get_env(app_name(), Module.concat([app_module(), :Endpoint]))
+    endpoint_config = Application.get_env(app_name(), Module.concat([top_level_namespace(), :Web, :Endpoint]))
 
     case Keyword.get(endpoint_config, :url) do
       nil -> swagger_map
