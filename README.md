@@ -310,7 +310,7 @@ Add a swagger scope to your router, and forward all requests to SwaggerUI
     end
 ```
 
-Run the server with `mix phoenix.server` and browse to `localhost:8080/api/swagger/`,
+Run the server with `mix phoenix.server` and browse to `localhost:8080/api/swagger/` (trailing slash required!),
 Swagger-ui should be shown with your swagger spec loaded.
 
 See the `examples/simple` project for a runnable example with swagger-ui.
