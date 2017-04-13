@@ -19,11 +19,11 @@ dependencies in the `mix.exs` file:
 
 ```elixir
 def deps do
-  [{:phoenix_swagger, "~> 0.5.0"}]
+  [{:phoenix_swagger, "~> 0.6.0"}]
 end
 ```
 
-For Phoenix 1.2 or lower, please use version 0.4.
+For Phoenix 1.2 or lower, please use version `"~> 0.5.0"`.
 
 Now you can use `phoenix_swagger` to generate `swagger-ui` file for you application.
 
