@@ -7,7 +7,7 @@ validates the requests.
 
 ## Installation
 
-`PhoenixSwagger` provides `phoenix.swagger.generate` mix task for the swagger-ui `json`
+`PhoenixSwagger` provides `phx.swagger.generate` mix task for the swagger-ui `json`
 file generation that contains swagger specification that describes API of the `phoenix`
 application.
 
@@ -19,9 +19,11 @@ dependencies in the `mix.exs` file:
 
 ```elixir
 def deps do
-  [{:phoenix_swagger, "~> 0.4.0"}]
+  [{:phoenix_swagger, "~> 0.6.0"}]
 end
 ```
+
+For Phoenix 1.2 or lower, please use version `"~> 0.5.0"`.
 
 Now you can use `phoenix_swagger` to generate `swagger-ui` file for you application.
 
@@ -48,7 +50,7 @@ defmodule MyApp.Router do
       info: %{
         version: "1.0",
         title: "My App"
-      }    
+      }
     }
   end
 end
@@ -199,26 +201,26 @@ end
 
 ## Generate Swagger File
 
-After adding swagger spec to you controllers, run the `phoenix.swagger.generate`
+After adding swagger spec to you controllers, run the `phx.swagger.generate`
 mix task for the `swagger-ui` json file generation into directory with `phoenix` application:
 
 ```
-mix phoenix.swagger.generate
+mix phx.swagger.generate
 ```
 
 As the result there will be `swagger.json` file into root directory of the `phoenix` application.
 To generate `swagger` file with the custom name/place, pass it to the main mix task:
 
 ```
-mix phoenix.swagger.generate ~/my-phoenix-api.json
+mix phx.swagger.generate ~/my-phoenix-api.json
 ```
 
-If the project contains multiple `Router` modules, you can generate a swagger file for each one by specifying the router module as an argument to `mix phoenix.swagger.generate`:
+If the project contains multiple `Router` modules, you can generate a swagger file for each one by specifying the router module as an argument to `mix phx.swagger.generate`:
 
 ```
-mix phoenix.swagger.generate booking-api.json -r MyApp.BookingRouter
-mix phoenix.swagger.generate reports-api.json -r MyApp.ReportsRouter
-mix phoenix.swagger.generate admin-api.json -r MyApp.AdminRouter
+mix phx.swagger.generate booking-api.json -r MyApp.BookingRouter
+mix phx.swagger.generate reports-api.json -r MyApp.ReportsRouter
+mix phx.swagger.generate admin-api.json -r MyApp.AdminRouter
 ```
 
 For more informantion, you can find `swagger` specification [here](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md).
@@ -299,7 +301,7 @@ Usage:
 Generate a swagger file and place it in your applications `priv/static` dir:
 
 ```
-mix phoenix.swagger.generate priv/static/myapp.json
+mix phx.swagger.generate priv/static/myapp.json
 ```
 
 Add a swagger scope to your router, and forward all requests to SwaggerUI
