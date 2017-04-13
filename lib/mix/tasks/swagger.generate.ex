@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Phoenix.Swagger.Generate do
+defmodule Mix.Tasks.Phx.Swagger.Generate do
   use Mix.Task
 
   @recursive true
@@ -10,11 +10,11 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   Usage:
 
-      mix phoenix.swagger.generate
+      mix phx.swagger.generate
 
-      mix phoenix.swagger.generate ../swagger.json
+      mix phx.swagger.generate ../swagger.json
 
-      mix phoenix.swagger.generate ../swagger.json --router MyApp.Router
+      mix phx.swagger.generate ../swagger.json --router MyApp.Router
   """
 
   @default_title "<enter your title>"
@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   def run(args) do
     Mix.Task.run("compile")
-    Mix.Task.reenable("phoenix.swagger.generate")
+    Mix.Task.reenable("phx.swagger.generate")
     Code.append_path("#{app_path()}_build/#{Mix.env}/lib/#{app_name()}/ebin")
     {switches, params, _unknown} = OptionParser.parse(
       args,
@@ -52,7 +52,7 @@ defmodule Mix.Tasks.Phoenix.Swagger.Generate do
 
   defp usage do
     IO.puts """
-    Usage: mix phoenix.swagger.generate FILE --router ROUTER
+    Usage: mix phx.swagger.generate FILE --router ROUTER
 
     With no FILE, default swagger file #{default_swagger_file_path()}
     With no ROUTER, defaults to #{default_router_module()}
