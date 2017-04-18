@@ -19,11 +19,15 @@ dependencies in the `mix.exs` file:
 
 ```elixir
 def deps do
-  [{:phoenix_swagger, "~> 0.6.0"}]
+  [
+    {:phoenix_swagger, "~> 0.6.1"},
+    {:ex_json_schema, "~> 0.5"} # optional
+  ]
 end
 ```
 
 For Phoenix 1.2 or lower, please use version `"~> 0.5.0"`.
+`ex_json_schema` is an optional dependency of `phoenix_swagger` required only for schema validation plug and test helper.
 
 Now you can use `phoenix_swagger` to generate `swagger-ui` file for you application.
 
@@ -291,6 +295,33 @@ end
 
 The current minimal version of elixir should be `1.3` and in this case you must add `phoenix_swagger` application
 to the application list in your `mix.exs`.
+
+## Test Response Validator
+
+PhoenixSwagger also includes a testing helper module `PhoenixSwagger.SchemaTest` to conveniently assert that responses
+from Phoenix controller actions conform to your swagger schema.
+
+In your controller test files add the `PhoenixSwagger.SchemaTest` mixin with the path to your swagger spec:
+
+```elixir
+defmodule YourApp.UserControllerTest do
+  use YourApp.ConnCase, async: true
+  use PhoenixSwagger.SchemaTest, "priv/static/swagger.json"
+```
+
+Then in each test, the context will contain the swagger_schema, which can be used with
+the `validate_resp_schema` function:
+
+```elixir
+test "shows chosen resource", %{conn: conn, swagger_schema: schema} do
+  user = Repo.insert! struct(User, @valid_attrs)
+  response =
+    conn
+    |> get(user_path(conn, :show, user))
+    |> validate_resp_schema(schema, "UserResponse")
+    |> json_response(200)
+end
+```
 
 ## Swagger UI
 

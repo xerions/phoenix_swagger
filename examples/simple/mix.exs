@@ -36,6 +36,7 @@ defmodule Simple.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
+     {:ex_json_schema, "~> 0.5"},
      {:phoenix_swagger, path: "../../"}]
   end
 

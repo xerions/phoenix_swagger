@@ -1,3 +1,11 @@
+# 0.6.1
+
+  * Add `PhoenixSwagger.SchemaTest` module for response validation
+
+# 0.6.0
+
+  * Use phoenix 1.3 conventions for mix tasks and module names
+
 # 0.5.1
 
   * Allow property schemas to be declared inline using `Schema.new` macro
