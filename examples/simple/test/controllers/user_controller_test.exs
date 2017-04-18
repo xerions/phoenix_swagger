@@ -1,8 +1,9 @@
 defmodule Simple.UserControllerTest do
   use Simple.ConnCase
+  use PhoenixSwagger.SchemaTest, "priv/static/swagger.json"
 
   alias Simple.User
-  @valid_attrs %{email: "some content", name: "some content"}
+  @valid_attrs %{email: "YuSer@gmail.com", name: "Yu Ser"}
   @invalid_attrs %{}
 
   setup %{conn: conn} do
@@ -14,12 +15,19 @@ defmodule Simple.UserControllerTest do
     assert json_response(conn, 200)["data"] == []
   end
 
-  test "shows chosen resource", %{conn: conn} do
-    user = Repo.insert! %User{}
-    conn = get conn, user_path(conn, :show, user)
-    assert json_response(conn, 200)["data"] == %{"id" => user.id,
+  test "shows chosen resource", %{conn: conn, swagger_schema: schema} do
+    user = Repo.insert! struct(User, @valid_attrs)
+    response =
+      conn
+      |> get(user_path(conn, :show, user))
+      |> validate_resp_schema(schema, "UserResponse")
+      |> json_response(200)
+
+    assert response["data"] == %{
+      "id" => user.id,
       "name" => user.name,
-      "email" => user.email}
+      "email" => user.email
+    }
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -28,9 +36,14 @@ defmodule Simple.UserControllerTest do
     end
   end
 
-  test "creates and renders resource when data is valid", %{conn: conn} do
-    conn = post conn, user_path(conn, :create), user: @valid_attrs
-    assert json_response(conn, 201)["data"]["id"]
+  test "creates and renders resource when data is valid", %{conn: conn, swagger_schema: schema} do
+    response =
+      conn
+      |> post(user_path(conn, :create), user: @valid_attrs)
+      |> validate_resp_schema(schema, "UserResponse")
+      |> json_response(201)
+
+    assert response["data"]["id"]
     assert Repo.get_by(User, @valid_attrs)
   end
 
@@ -39,10 +52,15 @@ defmodule Simple.UserControllerTest do
     assert json_response(conn, 422)["errors"] != %{}
   end
 
-  test "updates and renders chosen resource when data is valid", %{conn: conn} do
+  test "updates and renders chosen resource when data is valid", %{conn: conn, swagger_schema: schema} do
     user = Repo.insert! %User{}
-    conn = put conn, user_path(conn, :update, user), user: @valid_attrs
-    assert json_response(conn, 200)["data"]["id"]
+    response =
+      conn
+      |> put(user_path(conn, :update, user), user: @valid_attrs)
+      |> validate_resp_schema(schema, "UserResponse")
+      |> json_response(200)
+
+    assert response["data"]["id"]
     assert Repo.get_by(User, @valid_attrs)
   end
 
