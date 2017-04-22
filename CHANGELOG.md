@@ -1,6 +1,7 @@
 # 0.6.1
 
   * Add `PhoenixSwagger.SchemaTest` module for response validation
+  * Swagger UI plug redirects / to /index.html automatically avoiding errors when fetching assets.
 
 # 0.6.0
 
