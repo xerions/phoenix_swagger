@@ -19,6 +19,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   """
 
   use Plug.Router
+  alias Plug.Conn
 
   # Serve static assets before routing
   plug Plug.Static, at: "/", from: :phoenix_swagger
@@ -67,7 +68,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
         if (url && url.length > 1) {
           url = decodeURIComponent(url[1]);
         } else {
-          url = "<%= spec_url %>";
+          url = window.location.pathname.replace("index.html", "<%= spec_url %>")
         }
 
         hljs.configure({
@@ -137,23 +138,28 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   </html>
   """
 
-  # Render the index template for "/" or "/index.html"
-  get "/", do: render_index(conn)
-  get "/index.html", do: render_index(conn)
+  # Redirect / to /index.html
+  get "/" do
+    base_path = conn.request_path |> String.trim_trailing("/")
+    conn
+    |> Conn.put_resp_header("location", "#{base_path}/index.html")
+    |> Conn.put_resp_content_type("text/html")
+    |> Conn.send_resp(302, "Redirecting")
+  end
+
+  get "/index.html" do
+    conn
+    |> Conn.put_resp_content_type("text/html")
+    |> Conn.send_resp(200, conn.assigns.index_body)
+  end
 
   # Render the swagger.json file or 404 for any other file
   get "/:name" do
     spec_url = conn.assigns.spec_url
     case conn.path_params["name"] do
-      ^spec_url -> Plug.Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
-      _ -> Plug.Conn.send_resp(conn, 404, "not found")
+      ^spec_url -> Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
+      _ -> Conn.send_resp(conn, 404, "not found")
     end
-  end
-
-  def render_index(conn) do
-    conn
-    |> Plug.Conn.put_resp_content_type("text/html")
-    |> Plug.Conn.send_resp(200, conn.assigns.index_body)
   end
 
   @doc """
@@ -170,9 +176,9 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   """
   def call(conn, body: body, spec_url: url, swagger_file_path: swagger_file_path) do
     conn
-    |> Plug.Conn.assign(:index_body, body)
-    |> Plug.Conn.assign(:spec_url, url)
-    |> Plug.Conn.assign(:swagger_file_path, swagger_file_path)
+    |> Conn.assign(:index_body, body)
+    |> Conn.assign(:spec_url, url)
+    |> Conn.assign(:swagger_file_path, swagger_file_path)
     |> super([])
   end
 end
