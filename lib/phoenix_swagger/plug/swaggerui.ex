@@ -102,7 +102,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
           onFailure: function(data) {
             log("Unable to Load SwaggerUI");
           },
-          docExpansion: "none",
+          docExpansion: "list",
           jsonEditor: false,
           defaultModelRendering: 'schema',
           showRequestHeaders: false,
