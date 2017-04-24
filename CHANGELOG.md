@@ -2,6 +2,7 @@
 
   * Add `PhoenixSwagger.SchemaTest` module for response validation
   * Swagger UI plug redirects / to /index.html automatically avoiding errors when fetching assets.
+  * Swagger UI configured to list all operations by default
 
 # 0.6.0
 
