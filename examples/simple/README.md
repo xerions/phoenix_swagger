@@ -8,5 +8,5 @@ A simple demo API app to show phoenix_swagger in action.
  * Create database: `mix ecto.setup`
  * Compile source: `mix compile`
  * Generate Swagger: `mix swagger`
- * Start Server: `mix phoenix.server`
+ * Start Server: `mix phx.server`
  * Open SwaggerUI: visit [`localhost:4000/api/swagger/`](http://localhost:4000/api/swagger/) from your browser

@@ -1,4 +1,4 @@
-defmodule Simple.ErrorView do
+defmodule Simple.Web.ErrorView do
   use Simple.Web, :view
 
   def render("404.json", _assigns) do

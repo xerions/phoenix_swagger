@@ -1,4 +1,4 @@
-defmodule Simple.UserController do
+defmodule Simple.Web.UserController do
   use Simple.Web, :controller
   use PhoenixSwagger
 
@@ -85,7 +85,7 @@ defmodule Simple.UserController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(Simple.ChangesetView, "error.json", changeset: changeset)
+        |> render(Simple.Web.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
@@ -134,7 +134,7 @@ defmodule Simple.UserController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(Simple.ChangesetView, "error.json", changeset: changeset)
+        |> render(Simple.Web.ChangesetView, "error.json", changeset: changeset)
     end
   end
 

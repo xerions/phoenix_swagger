@@ -1,4 +1,4 @@
-defmodule Simple do
+defmodule Simple.Application do
   use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
@@ -11,7 +11,7 @@ defmodule Simple do
       # Start the Ecto repository
       supervisor(Simple.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(Simple.Endpoint, []),
+      supervisor(Simple.Web.Endpoint, []),
       # Start your own worker by calling: Simple.Worker.start_link(arg1, arg2, arg3)
       # worker(Simple.Worker, [arg1, arg2, arg3]),
     ]
@@ -25,7 +25,7 @@ defmodule Simple do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    Simple.Endpoint.config_change(changed, removed)
+    Simple.Web.Endpoint.config_change(changed, removed)
     :ok
   end
 end

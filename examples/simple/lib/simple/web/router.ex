@@ -1,11 +1,11 @@
-defmodule Simple.Router do
+defmodule Simple.Web.Router do
   use Simple.Web, :router
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/api", Simple do
+  scope "/api", Simple.Web do
     pipe_through :api
     resources "/users", UserController, except: [:new, :edit]
   end
