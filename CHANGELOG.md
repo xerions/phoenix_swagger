@@ -1,12 +1,9 @@
-# 0.6.1
-
-  * Add `PhoenixSwagger.SchemaTest` module for response validation
-  * Swagger UI plug redirects / to /index.html automatically avoiding errors when fetching assets.
-  * Swagger UI configured to list all operations by default
-
 # 0.6.0
 
   * Use phoenix 1.3 conventions for mix tasks and module names
+  * Add `PhoenixSwagger.SchemaTest` module for response validation
+  * Swagger UI plug redirects / to /index.html automatically avoiding errors when fetching assets.
+  * Swagger UI configured to list all operations by default
 
 # 0.5.1
 

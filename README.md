@@ -20,7 +20,7 @@ dependencies in the `mix.exs` file:
 ```elixir
 def deps do
   [
-    {:phoenix_swagger, "~> 0.6.1"},
+    {:phoenix_swagger, "~> 0.6.0"},
     {:ex_json_schema, "~> 0.5"} # optional
   ]
 end
