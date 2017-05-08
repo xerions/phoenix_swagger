@@ -16,39 +16,29 @@ defmodule Simple.Web do
   below.
   """
 
-  def model do
-    quote do
-      use Ecto.Schema
-
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query
-    end
-  end
-
   def controller do
     quote do
-      use Phoenix.Controller
+      use Phoenix.Controller, namespace: Simple.Web
 
       alias Simple.Repo
       import Ecto
       import Ecto.Query
 
-      import Simple.Router.Helpers
-      import Simple.Gettext
+      import Simple.Web.Router.Helpers
+      import Simple.Web.Gettext
     end
   end
 
   def view do
     quote do
-      use Phoenix.View, root: "web/templates"
+      use Phoenix.View, root: "lib/simple/web/templates", namespace: Simple.Web
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
 
-      import Simple.Router.Helpers
-      import Simple.ErrorHelpers
-      import Simple.Gettext
+      import Simple.Web.Router.Helpers
+      import Simple.Web.ErrorHelpers
+      import Simple.Web.Gettext
     end
   end
 
@@ -65,7 +55,7 @@ defmodule Simple.Web do
       alias Simple.Repo
       import Ecto
       import Ecto.Query
-      import Simple.Gettext
+      import Simple.Web.Gettext
     end
   end
 

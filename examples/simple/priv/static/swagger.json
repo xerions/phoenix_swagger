@@ -54,7 +54,7 @@
             "description": "The user details"
           }
         ],
-        "operationId": "Simple.UserController.update",
+        "operationId": "Simple.Web.UserController.update",
         "description": "Update all attributes of a user",
         "consumes": [
           "application/json"
@@ -97,7 +97,7 @@
             "description": "User ID"
           }
         ],
-        "operationId": "Simple.UserController.show",
+        "operationId": "Simple.Web.UserController.show",
         "description": "Show a user by ID"
       },
       "delete": {
@@ -120,7 +120,7 @@
             "description": "User ID"
           }
         ],
-        "operationId": "Simple.UserController.delete",
+        "operationId": "Simple.Web.UserController.delete",
         "description": "Delete a user by ID"
       }
     },
@@ -169,7 +169,7 @@
             "description": "The user details"
           }
         ],
-        "operationId": "Simple.UserController.create",
+        "operationId": "Simple.Web.UserController.create",
         "description": "Creates a new user",
         "consumes": [
           "application/json"
@@ -212,7 +212,7 @@
           "application/json"
         ],
         "parameters": [],
-        "operationId": "Simple.UserController.index",
+        "operationId": "Simple.Web.UserController.index",
         "description": "List all users in the database"
       }
     }
@@ -221,7 +221,6 @@
     "version": "1.0",
     "title": "Simple App"
   },
-  "host": "localhost:4000",
   "definitions": {
     "UsersResponse": {
       "type": "object",

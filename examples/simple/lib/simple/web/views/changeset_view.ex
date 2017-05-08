@@ -1,4 +1,4 @@
-defmodule Simple.ChangesetView do
+defmodule Simple.Web.ChangesetView do
   use Simple.Web, :view
 
   @doc """

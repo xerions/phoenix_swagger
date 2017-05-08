@@ -1,5 +1,5 @@
 defmodule Simple.UserControllerTest do
-  use Simple.ConnCase
+  use Simple.Web.ConnCase
   use PhoenixSwagger.SchemaTest, "priv/static/swagger.json"
 
   alias Simple.User

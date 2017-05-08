@@ -1,5 +1,6 @@
 defmodule Simple.User do
-  use Simple.Web, :model
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "users" do
     field :name, :string

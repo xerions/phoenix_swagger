@@ -10,10 +10,10 @@ config :simple,
   ecto_repos: [Simple.Repo]
 
 # Configures the endpoint
-config :simple, Simple.Endpoint,
-  url: [host: "localhost"],
+config :simple, Simple.Web.Endpoint,
+  # url: [host: "localhost"],
   secret_key_base: "occcf4JQ1yY8UbMxsqJx0+wxhrQFQMvAJi+mYlaWCSJxmmrgGLyt4eZ9oFhrisRP",
-  render_errors: [view: Simple.ErrorView, accepts: ~w(json)],
+  render_errors: [view: Simple.Web.ErrorView, accepts: ~w(json)],
   pubsub: [name: Simple.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
