@@ -1,6 +1,8 @@
 # 0.6.2
 
   * fix path assignation of a swagger specification file in UI plug
+  * add `disable_validator` option to disable/enable validation of a
+swagger schema.
 
 # 0.6.1
 

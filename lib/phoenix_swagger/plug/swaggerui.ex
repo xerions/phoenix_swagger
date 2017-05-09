@@ -81,6 +81,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
         }
         window.swaggerUi = new SwaggerUi({
           url: url,
+          <%= validator_url %>
           dom_id: "swagger-ui-container",
           supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
           onComplete: function(swaggerApi, swaggerUi){
@@ -165,8 +166,15 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   @doc """
   Plug.init callback
   """
-  def init(otp_app: app, swagger_file: swagger_file) do
-    body = EEx.eval_string(@template, spec_url: swagger_file)
+  def init(otp_app: app, swagger_file: swagger_file, opts: opts) do
+    disable_validator = Keyword.get(opts, :disable_validator, false)
+    validator_url = cond do
+      disable_validator == true ->
+        "validatorUrl: null,"
+      true ->
+        ""
+    end
+    body = EEx.eval_string(@template, spec_url: swagger_file, validator_url: validator_url)
     swagger_file_path = Path.join(["priv", "static", swagger_file])
     [app: app, body: body, spec_url: swagger_file, swagger_file_path: swagger_file_path]
   end
