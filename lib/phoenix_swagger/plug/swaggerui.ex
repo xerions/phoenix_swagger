@@ -167,18 +167,18 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   """
   def init(otp_app: app, swagger_file: swagger_file) do
     body = EEx.eval_string(@template, spec_url: swagger_file)
-    swagger_file_path = Path.join([Application.app_dir(app), "priv/static", swagger_file])
-    [body: body, spec_url: swagger_file, swagger_file_path: swagger_file_path]
+    swagger_file_path = Path.join(["priv", "static", swagger_file])
+    [app: app, body: body, spec_url: swagger_file, swagger_file_path: swagger_file_path]
   end
 
   @doc """
   Plug.call callback
   """
-  def call(conn, body: body, spec_url: url, swagger_file_path: swagger_file_path) do
+  def call(conn, app: app, body: body, spec_url: url, swagger_file_path: swagger_file_path) do
     conn
     |> Conn.assign(:index_body, body)
     |> Conn.assign(:spec_url, url)
-    |> Conn.assign(:swagger_file_path, swagger_file_path)
+    |> Conn.assign(:swagger_file_path, Path.join([Application.app_dir(app), swagger_file_path]))
     |> super([])
   end
 end
