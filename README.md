@@ -67,6 +67,21 @@ function.
 See the [swaggerObject specification](http://swagger.io/specification/#swaggerObject) for details
 of other information that can be included.
 
+The swagger `host` value is built from the your phoenix `Endpoint` `url` config.
+
+```elixir
+# config.exs
+config :my_app, MyApp.Web.Endpoint,
+  url: [host: "localhost"], # "host": "localhost:4000" in generated swagger
+```
+
+If the `host` is configured to be set dynamically, the swagger host will be omitted. SwaggerUI will default to sending requests to the same host that is serving the swagger file.
+
+```elixir
+# prod.exs
+config :my_app, MyApp.Web.Endpoint,
+  url: [host: {:system, "HOST"}, port: {:system, "PORT"}], # No "host" in generated swagger
+```
 
 ## Swagger Path DSL
 
