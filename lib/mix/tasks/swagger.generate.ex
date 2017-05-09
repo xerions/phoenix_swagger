@@ -184,13 +184,15 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
   defp collect_host_from_endpoint(swagger_map, endpoint_config) do
     url = Keyword.get(endpoint_config, :url)
-    host = Keyword.get(url, :host)
-    port = Keyword.get(url, :port)
-    host_address = [host, port]
-      |> Enum.filter(&(!is_nil(&1)))
-      |> Enum.join(":")
+    host = Keyword.get(url, :host, "localhost")
+    port = Keyword.get(url, :port, 4000)
 
-    swagger_map = Map.put_new(swagger_map, :host, host_address)
+    swagger_map =
+      if is_binary(host) and (is_integer(port) or is_binary(port)) do
+        Map.put_new(swagger_map, :host, "#{host}:#{port}")
+      else
+        swagger_map # host / port may be {:system, "ENV_VAR"} tuples
+      end
 
     case endpoint_config[:https] do
       nil ->
