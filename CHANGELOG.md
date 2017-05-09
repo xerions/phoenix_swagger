@@ -1,3 +1,7 @@
+# 0.6.2
+
+  * fix path assignation of a swagger specification file in UI plug
+
 # 0.6.1
 
   * Provide default host and port when generating swagger host config
