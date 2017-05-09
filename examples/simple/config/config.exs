@@ -11,7 +11,7 @@ config :simple,
 
 # Configures the endpoint
 config :simple, Simple.Web.Endpoint,
-  # url: [host: "localhost"],
+  url: [host: "localhost"],
   secret_key_base: "occcf4JQ1yY8UbMxsqJx0+wxhrQFQMvAJi+mYlaWCSJxmmrgGLyt4eZ9oFhrisRP",
   render_errors: [view: Simple.Web.ErrorView, accepts: ~w(json)],
   pubsub: [name: Simple.PubSub,
