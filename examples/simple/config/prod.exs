@@ -13,11 +13,19 @@ use Mix.Config
 # which you typically run after static files are built.
 config :simple, Simple.Web.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [host: "example.com", port: 80],
+  url: [host: {:system, "HOST"}, port: {:system, "PORT"}],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+config :simple, Simple.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "simple_prod",
+  hostname: "localhost",
+  pool_size: 10
 
 # ## SSL Support
 #
@@ -62,4 +70,4 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.
-import_config "prod.secret.exs"
+# import_config "prod.secret.exs"

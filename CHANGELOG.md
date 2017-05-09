@@ -1,3 +1,8 @@
+# 0.6.1
+
+  * Provide default host and port when generating swagger host config
+  * Suppress host config when dynamic hostname or port are used
+
 # 0.6.0
 
   * Use phoenix 1.3 conventions for mix tasks and module names
