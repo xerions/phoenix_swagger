@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Phx.Swagger.Generate do
   use Mix.Task
-
+  require Logger
+  
   @recursive true
 
   @shortdoc "Generates swagger.json file based on phoenix router"
@@ -134,16 +135,18 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp find_swagger_path_function(route = %{opts: action, path: path}) when is_atom(action) do
     controller = find_controller(route)
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
-
-    unless Code.ensure_loaded?(controller) do
-      raise "Error: #{controller} module didn't load."
+    
+    cond do
+      Code.ensure_loaded?(controller) ->
+        %{
+          controller: controller,
+          swagger_fun: swagger_fun,
+          path: format_path(path)
+        }
+      true ->
+        Logger.warn "Warning: #{controller} module didn't load."
+        nil
     end
-
-    %{
-      controller: controller,
-      swagger_fun: swagger_fun,
-      path: format_path(path)
-    }
   end
   defp find_swagger_path_function(_route) do
     # action not an atom usually means route to a plug which isn't a Phoenix controller
