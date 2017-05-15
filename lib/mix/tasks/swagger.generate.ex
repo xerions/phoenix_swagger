@@ -26,8 +26,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp top_level_namespace, do: Mix.Project.get().application()[:mod] |> elem(0) |> Module.split |> Enum.drop(-1) |> Module.concat
   defp app_name, do: Mix.Project.get().project()[:app]
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
-  defp default_router_module, do: Module.concat([top_level_namespace(), :Web, :Router])
-
+  defp default_router_module_name, do: Module.concat([top_level_namespace(), :Web, :Router])
+  defp default_endpoint_module_name, do: Module.concat([top_level_namespace(), :Web, :Endpoint])
+  defp router_module(switches), do: switches |> Keyword.get(:router, default_endpoint_module_name()) |> ensure_module_loaded
+  defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> ensure_module_loaded
+  
   def run(args) do
     Mix.Task.run("compile")
     Mix.Task.reenable("phx.swagger.generate")
@@ -36,32 +39,34 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       args,
       switches: [router: :string, help: :boolean],
       aliases: [r: :router, h: :help])
-
+    
     cond do
       (Keyword.get(switches, :help)) ->
         usage()
-      has_no_endpoint() ->
+      has_no_endpoint(switches) ->
         IO.puts "Skipping app #{app_name()}, no Endpoint configured."
       true ->
-        router = load_router(switches)
+        router = router_module(switches)
+        endpoint = endpoint_module(switches)
         output_file = Enum.at(params, 0, default_swagger_file_path())
-        write_file(output_file, swagger_document(router))
+        write_file(output_file, swagger_document(router, endpoint))
         IO.puts "Generated #{output_file}"
     end
   end
 
   defp usage do
     IO.puts """
-    Usage: mix phx.swagger.generate FILE --router ROUTER
+    Usage: mix phx.swagger.generate FILE --router ROUTER --endpoint ENDPOINT
 
     With no FILE, default swagger file #{default_swagger_file_path()}
-    With no ROUTER, defaults to #{default_router_module()}
+    With no ROUTER, defaults to #{default_router_module_name()}
+    With no ENDPOINT, defaults to #{default_endpoint_module_name()}
     """
   end
 
-  defp has_no_endpoint do
+  defp has_no_endpoint(switches) do
     !Keyword.has_key?(Mix.Project.get().application(), :mod)
-      || is_nil(Application.get_env(app_name(), Module.concat([top_level_namespace(), :Web, :Endpoint])))
+      || is_nil(Application.get_env(app_name(), endpoint_module(switches)))
   end
 
 
@@ -72,22 +77,16 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     end
     File.write!(output_file, contents)
   end
-
-  defp load_router(switches) do
-    {:module, router} =
-      switches
-      |> Keyword.get(:router, default_router_module())
-      |> List.wrap()
-      |> Module.concat()
-      |> Code.ensure_loaded()
-
-    router
+  
+  defp ensure_module_loaded(name) do
+    {:module, result} = name |> List.wrap |> Module.concat |> Code.ensure_loaded
+    result
   end
 
-  defp swagger_document(router) do
+  defp swagger_document(router, endpoint) do
     router
     |> collect_info()
-    |> collect_host()
+    |> collect_host(endpoint)
     |> collect_paths(router)
     |> collect_definitions(router)
     |> Poison.encode!(pretty: true)
@@ -173,8 +172,8 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     Map.merge(value1, value2)
   end
 
-  defp collect_host(swagger_map) do
-    endpoint_config = Application.get_env(app_name(), Module.concat([top_level_namespace(), :Web, :Endpoint]))
+  defp collect_host(swagger_map, endpoint) do
+    endpoint_config = Application.get_env(app_name(), endpoint)
 
     case Keyword.get(endpoint_config, :url) do
       nil -> swagger_map
