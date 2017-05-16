@@ -40,6 +40,15 @@ defmodule PhoenixSwagger.PathTest do
     response 200, "OK", user_schema()
   end
 
+  swagger_path :update do
+    patch "/api/v1/user/{id}"
+    summary "Update a users name"
+    consumes "application/json"
+    produces "application/json"
+    parameter :name, :query, :string, "User name change", required: true
+    response 200, "OK", :string
+  end
+
   def user_schema do
     swagger_schema do
       title "User"
@@ -228,5 +237,19 @@ defmodule PhoenixSwagger.PathTest do
         }
       }
     }
+  end
+
+  test "swagger_path_update produces expected swagger json" do
+    assert swagger_path_update() == %{"/api/v1/user/{id}" =>
+      %{"patch" =>
+        %{"consumes" => ["application/json"],
+          "description" => "",
+          "operationId" => "PhoenixSwagger.PathTest.update",
+          "parameters" => [%{"description" => "User name change", "in" => "query",
+                             "name" => "name", "required" => true, "type" => "string"}],
+          "produces" => ["application/json"],
+          "responses" => %{"200" => %{"description" => "OK",
+          "schema" => %{"$ref" => "#/definitions/string"}}},
+      "summary" => "Update a users name", "tags" => ["PathTest"]}}}
   end
 end

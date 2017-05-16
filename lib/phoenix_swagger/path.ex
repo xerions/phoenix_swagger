@@ -101,6 +101,9 @@ defmodule PhoenixSwagger.Path do
   @doc "Initializes a Swagger Path DSL block with a put verb"
   def put(path), do: %PathObject{path: path, verb: "put"}
 
+  @doc "Initializes a Swagger Path DSL block with a patch verb"
+  def patch(path), do: %PathObject{path: path, verb: "patch"}
+
   @doc "Initializes a Swagger Path DSL block with a delete verb"
   def delete(path), do: %PathObject{path: path, verb: "delete"}
 
