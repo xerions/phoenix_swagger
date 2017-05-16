@@ -38,8 +38,8 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     Code.append_path("#{app_path()}_build/#{Mix.env}/lib/#{app_name()}/ebin")
     {switches, params, _unknown} = OptionParser.parse(
       args,
-      switches: [router: :string, help: :boolean],
-      aliases: [r: :router, h: :help])
+      switches: [router: :string, endpoint: :string, help: :boolean],
+      aliases: [r: :router, e: :endpoint, h: :help])
     
     router = router_module(switches)
     endpoint = endpoint_module(switches)
