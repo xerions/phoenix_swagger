@@ -29,8 +29,8 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
   defp default_router_module_name, do: Module.concat([top_level_namespace(), :Web, :Router])
   defp default_endpoint_module_name, do: Module.concat([top_level_namespace(), :Web, :Endpoint])
-  defp router_module(switches), do: switches |> Keyword.get(:router, default_endpoint_module_name()) |> ensure_module_loaded
-  defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> ensure_module_loaded
+  defp router_module(switches), do: switches |> Keyword.get(:router, default_endpoint_module_name()) |> attempt_load
+  defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> attempt_load
   
   def run(args) do
     Mix.Task.run("compile")
@@ -41,14 +41,16 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       switches: [router: :string, help: :boolean],
       aliases: [r: :router, h: :help])
     
+    router = router_module(switches)
+    endpoint = endpoint_module(switches)
     cond do
       (Keyword.get(switches, :help)) ->
         usage()
-      has_no_endpoint(switches) ->
-        IO.puts "Skipping app #{app_name()}, no Endpoint configured."
+      is_nil(router) ->
+        Logger.error "Skipping app #{app_name()}, no Router configured."
+      is_nil(endpoint) ->
+        Logger.error "Skipping app #{app_name()}, no Endpoint configured."
       true ->
-        router = router_module(switches)
-        endpoint = endpoint_module(switches)
         output_file = Enum.at(params, 0, default_swagger_file_path())
         write_file(output_file, swagger_document(router, endpoint))
         IO.puts "Generated #{output_file}"
@@ -65,11 +67,6 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     """
   end
 
-  defp has_no_endpoint(switches) do
-    !Keyword.has_key?(Mix.Project.get().application(), :mod)
-      || is_nil(Application.get_env(app_name(), endpoint_module(switches)))
-  end
-
 
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
@@ -79,9 +76,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     File.write!(output_file, contents)
   end
   
-  defp ensure_module_loaded(name) do
-    {:module, result} = name |> List.wrap |> Module.concat |> Code.ensure_loaded
-    result
+  defp attempt_load(module_name) do
+    case module_name |> List.wrap |> Module.concat |> Code.ensure_loaded do
+      {:module, result} -> result
+      _ -> nil
+    end
   end
 
   defp swagger_document(router, endpoint) do
