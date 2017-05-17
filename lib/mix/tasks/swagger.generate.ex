@@ -29,7 +29,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
   defp default_router_module_name, do: Module.concat([top_level_namespace(), :Web, :Router])
   defp default_endpoint_module_name, do: Module.concat([top_level_namespace(), :Web, :Endpoint])
-  defp router_module(switches), do: switches |> Keyword.get(:router, default_endpoint_module_name()) |> attempt_load()
+  defp router_module(switches), do: switches |> Keyword.get(:router, default_router_module_name()) |> attempt_load()
   defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> attempt_load()
   
   def run(args) do
