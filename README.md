@@ -354,7 +354,7 @@ Add a swagger scope to your router, and forward all requests to SwaggerUI
 
 ```elixir
     scope "/api/swagger" do
-      forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json", opts: [disable_validator: true]
+      forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json", disable_validator: true
     end
 ```
 
