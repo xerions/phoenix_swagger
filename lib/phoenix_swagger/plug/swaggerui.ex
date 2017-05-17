@@ -165,8 +165,17 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
 
   @doc """
   Plug.init callback
+
+  Options:
+
+   - `otp_app` (required) The name of the app has is hosting the swagger file
+   - `swagger_file` (required) The name of the file, eg "swagger.json"
+   - `disable_validator` (optional) When set to true, disables swagger schema validation
+
   """
-  def init(otp_app: app, swagger_file: swagger_file, opts: opts) do
+  def init(opts) do
+    app = Keyword.fetch!(opts, :otp_app)
+    swagger_file = Keyword.fetch!(opts, :swagger_file)
     disable_validator = Keyword.get(opts, :disable_validator, false)
     validator_url = cond do
       disable_validator == true ->
