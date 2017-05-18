@@ -1,3 +1,7 @@
+# 0.6.3
+
+  * Adds support for custom Endpoint module names by passing `--endpoint`
+
 # 0.6.2
 
   * fix path assignation of a swagger specification file in UI plug

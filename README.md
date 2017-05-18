@@ -234,7 +234,16 @@ To generate `swagger` file with the custom name/place, pass it to the main mix t
 mix phx.swagger.generate ~/my-phoenix-api.json
 ```
 
-If the project contains multiple `Router` modules, you can generate a swagger file for each one by specifying the router module as an argument to `mix phx.swagger.generate`:
+By default, the project looks for a Router named `(MyApp).Web.Router` and a Endpoint named `(MyApp).Web.Endpoint` consistent with Phoenix 1.3
+conventions. If your project does not yet follow that convention, or if you wish to generate a Swagger File with a custom Endpoint, you can
+specify the endpoint module as an argument (`-e` or `--endpoint`) to `mix phx.swagger.generate`:
+
+```
+mix phx.swagger.generate endpoint.json -e MyApp.Endpoint
+```
+
+If the project contains multiple `Router` modules, you can generate a swagger file for each one by specifying the router module as an argument
+(`-r` or `--router`) to `mix phx.swagger.generate`:
 
 ```
 mix phx.swagger.generate booking-api.json -r MyApp.BookingRouter
