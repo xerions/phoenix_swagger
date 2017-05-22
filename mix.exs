@@ -6,7 +6,7 @@ defmodule PhoenixSwagger.Mixfile do
   def project do
     [app: :phoenix_swagger,
      version: @version,
-     elixir: "~> 1.2",
+     elixir: "~> 1.4.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
