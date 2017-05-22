@@ -46,7 +46,7 @@ defmodule MyApp.Router do
 
   scope "/api", MyApp do
     pipe_through :api
-    resources "/users", UserController
+    resource "/users", UserController
   end
 
   def swagger_info do
