@@ -96,7 +96,7 @@ use PhoenixSwagger
 swagger_path :index do
   get "/posts"
   description "List blog posts"
-  responses 200, "Success"
+  response 200, "Success"
 end
 
 def index(conn, _params) do
