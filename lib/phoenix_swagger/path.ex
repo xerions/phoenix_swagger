@@ -157,6 +157,13 @@ defmodule PhoenixSwagger.Path do
   end
 
   @doc """
+  Adds the security section to the operation of a swagger `%PathObject{}`
+  """
+  def security(path = %PathObject{}, security) do
+    put_in path.operation.security, security
+  end
+
+  @doc """
   Defines multiple parameters for an operation with a custom DSL syntax
 
   ## Example
