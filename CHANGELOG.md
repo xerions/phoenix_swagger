@@ -1,6 +1,7 @@
 # 0.6.3
 
   * Adds support for custom Endpoint module names by passing `--endpoint`
+  * Added patch request support
 
 # 0.6.2
 
