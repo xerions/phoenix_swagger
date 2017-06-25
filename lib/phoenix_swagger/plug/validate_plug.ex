@@ -17,9 +17,7 @@ defmodule PhoenixSwagger.Plug.Validate do
     validation_failed_status = Keyword.get(opts, :validation_failed_status, 400)
     req_path = Enum.filter(:ets.tab2list(@table), fn({path, basePath, _}) ->
       pathInfo = remove_base_path(conn.path_info, String.split(basePath, "/") |> tl)
-      req_path = ("/" <> String.downcase(conn.method) <> "/" <> Enum.join(pathInfo, "/"))
-                 |> String.split("/")
-                 |> tl
+      req_path = [String.downcase(conn.method) | pathInfo]
       equal_paths(path, String.split(path, "/") |> tl, req_path) != []
     end)
     with [{path, _, _}] <- req_path,
