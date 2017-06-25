@@ -116,16 +116,10 @@ defmodule PhoenixSwagger.Plug.Validate do
     end
   end
 
-  defp equal_paths(_, [], req) when length(req) > 0, do: []
-  defp equal_paths(_, orig, []) when length(orig) > 0, do: []
-  defp equal_paths(orig_path, [], []), do: orig_path
-  defp equal_paths(orig_path, [orig | orig_path_rest], [ req | req_path_rest]) do
-    if (String.codepoints(orig) |> hd) == "{" or orig == req do
-      equal_paths(orig_path, orig_path_rest, req_path_rest)
-    else
-      []
-    end
-  end
+  defp equal_paths?([], []), do: true
+  defp equal_paths?([head | orig_path_rest], [head | req_path_rest]), do: equal_paths?(orig_path_rest, req_path_rest)
+  defp equal_paths?(["{" <> _ | orig_path_rest], [_ | req_path_rest]), do: equal_paths?(orig_path_rest, req_path_rest)
+  defp equal_paths?(_, _), do: false
 
   # It is pretty safe to strip request path by base path. They can't be
   # non-equal. In this way, the router even will not execute this plug.
