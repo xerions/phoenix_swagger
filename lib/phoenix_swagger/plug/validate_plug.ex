@@ -58,17 +58,11 @@ defmodule PhoenixSwagger.Plug.Validate do
     |> halt()
   end
 
-  defp validate_boolean(name, value, parameters) do
-    try do
-      val = String.to_existing_atom(value)
-      if val != true and val != false do
-        {:error, "Type mismatch. Expected Boolean but got String.", "#/#{name}"}
-      else
-        validate_query_params(parameters)
-      end
-    rescue _e in ArgumentError ->
-        {:error, "Type mismatch. Expected Boolean but got String.", "#/#{name}"}
-    end
+  defp validate_boolean(_name, value, parameters) when value in ["true", "false"] do
+    validate_query_params(parameters)
+  end
+  defp validate_boolean(name, _value, _parameters) do
+    {:error, "Type mismatch. Expected Boolean but got String.", "#/#{name}"}
   end
 
   defp validate_integer(name, value, parameters) do
