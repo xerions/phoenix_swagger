@@ -30,17 +30,11 @@ defmodule PhoenixSwagger.Plug.Validate do
         send_resp(conn, 404, response)
         |> halt()
       [{path, _, _}] ->
-        case {validate_body_params(path, conn.params),
-              validate_query_params(path, conn.params)} do
-          {:ok, :ok} ->
-            conn
-          {{:error, error, path}, _} ->
-            error = get_error_message(error)
-            response = %{"error" => %{"message" => error,
-                                      "path" => path}} |> Poison.encode!
-            send_resp(conn, validation_failed_status, response)
-            |> halt()
-          {_, {:error, error, path}} ->
+        with :ok <- validate_body_params(path, conn.params),
+             :ok <- validate_query_params(path, conn.params) do
+          conn
+        else
+          {:error, error, path} ->
             error = get_error_message(error)
             response = %{"error" => %{"message" => error,
                                       "path" => path}} |> Poison.encode!
