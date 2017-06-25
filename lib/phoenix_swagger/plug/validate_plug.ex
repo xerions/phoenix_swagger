@@ -133,7 +133,4 @@ defmodule PhoenixSwagger.Plug.Validate do
   defp remove_base_path([_path | rest], [_base_path | base_path_rest]) do
     remove_base_path(rest, base_path_rest)
   end
-
-  defp get_error_message(error) when is_list(error), do: List.first(error) |> elem(0)
-  defp get_error_message(error), do: error
 end
