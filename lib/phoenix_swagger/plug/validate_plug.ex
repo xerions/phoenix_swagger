@@ -15,42 +15,47 @@ defmodule PhoenixSwagger.Plug.Validate do
 
   def call(conn, opts) do
     validation_failed_status = Keyword.get(opts, :validation_failed_status, 400)
-    req_path = Enum.filter(:ets.tab2list(@table), fn({path, basePath, _}) ->
-      pathInfo = remove_base_path(conn.path_info, String.split(basePath, "/") |> tl)
-      req_path = [String.downcase(conn.method) | pathInfo]
-      equal_paths(path, String.split(path, "/") |> tl, req_path) != []
-    end)
-    with [{path, _, _}] <- req_path,
+
+    with {:ok, path} <- find_matching_path(conn),
          :ok <- validate_body_params(path, conn.params),
          :ok <- validate_query_params(path, conn.params) do
       conn
     else
-      [] ->
-        response = Poison.encode! %{
-          error: %{
-            message: "API does not provide resource",
-            path: "/" <> (conn.path_info |> Enum.join("/"))
-          }
-        }
+      {:error, :no_matching_path} ->
+        send_error_response(conn, 404, "API does not provide resource", conn.request_path)
 
-        conn
-        |> put_resp_content_type("application/json")
-        |> send_resp(404, response)
-        |> halt()
-
-      {:error, error, path} ->
-        response = Poison.encode! %{
-          error: %{
-            message: get_error_message(error),
-            path: path
-          }
-        }
-
-        conn
-        |> put_resp_content_type("application/json")
-        |> send_resp(validation_failed_status, response)
-        |> halt()
+      {:error, message, path} ->
+        send_error_response(conn, validation_failed_status, message, path)
     end
+  end
+
+  defp find_matching_path(conn) do
+    found = Enum.find(:ets.tab2list(@table), fn({path, base_path, _}) ->
+      base_path_segments = String.split(base_path || "", "/") |> tl
+      path_segments = String.split(path, "/") |> tl
+      path_info_without_base = remove_base_path(conn.path_info, base_path_segments)
+      req_path_segments = [String.downcase(conn.method) | path_info_without_base]
+      equal_paths?(path_segments, req_path_segments)
+    end)
+
+    case found do
+      nil -> {:error, :no_matching_path}
+      {path, _, _} -> {:ok, path}
+    end
+  end
+
+  defp send_error_response(conn, status, message, path) do
+    response = %{
+      error: %{
+        path: path,
+        message: message
+      }
+    }
+
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(status, Poison.encode!(response))
+    |> halt()
   end
 
   defp validate_boolean(name, value, parameters) do
