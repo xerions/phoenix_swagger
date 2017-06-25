@@ -104,7 +104,7 @@ defmodule PhoenixSwagger.Validator do
         if parameters == nil do
           []
         else
-          # Let's go through requests parameters from swagger scheme
+          # Let's go through requests parameters from swagger schema
           # and collect it into json schema properties.
           properties = Enum.reduce(parameters, %{}, fn(parameter, acc) ->
             acc = if parameter["type"] == nil do
