@@ -66,12 +66,10 @@ defmodule PhoenixSwagger.Plug.Validate do
   end
 
   defp validate_integer(name, value, parameters) do
-    try do
-      _ = String.to_integer(value)
-      validate_query_params(parameters)
-    rescue _e in ArgumentError ->
-        {:error, "Type mismatch. Expected Integer but got String.", "#/#{name}"}
-    end
+    _ = String.to_integer(value)
+    validate_query_params(parameters)
+  rescue ArgumentError ->
+      {:error, "Type mismatch. Expected Integer but got String.", "#/#{name}"}
   end
 
   defp validate_query_params([]), do: :ok
