@@ -22,31 +22,36 @@ defmodule PhoenixSwagger.Plug.Validate do
                  |> tl
       equal_paths(path, String.split(path, "/") |> tl, req_path) != []
     end)
-    case req_path do
+    with [{path, _, _}] <- req_path,
+         :ok <- validate_body_params(path, conn.params),
+         :ok <- validate_query_params(path, conn.params) do
+      conn
+    else
       [] ->
-        response = %{"error" => %{"message" => "API does not provide resource",
-                                  "path" => "/" <> (conn.path_info |> Enum.join("/"))}}
-        |> Poison.encode!
-        send_resp(conn, 404, response)
-        |> halt()
-      [{path, _, _}] ->
-        with :ok <- validate_body_params(path, conn.params),
-             :ok <- validate_query_params(path, conn.params) do
-          conn
-        else
-          {:error, error, path} ->
-            response = Poison.encode! %{
-              error: %{
-                message: get_error_message(error),
-                path: path
-              }
-            }
+        response = Poison.encode! %{
+          error: %{
+            message: "API does not provide resource",
+            path: "/" <> (conn.path_info |> Enum.join("/"))
+          }
+        }
 
-            conn
-            |> put_resp_content_type("application/json")
-            |> send_resp(validation_failed_status, response)
-            |> halt()
-        end
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(404, response)
+        |> halt()
+
+      {:error, error, path} ->
+        response = Poison.encode! %{
+          error: %{
+            message: get_error_message(error),
+            path: path
+          }
+        }
+
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(validation_failed_status, response)
+        |> halt()
     end
   end
 
