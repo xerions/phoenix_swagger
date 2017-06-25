@@ -17,7 +17,7 @@ defmodule PhoenixSwagger.Plug.Validate do
     validation_failed_status = Keyword.get(opts, :validation_failed_status, 400)
 
     with {:ok, path} <- find_matching_path(conn),
-         :ok <- validate_body_params(path, conn.params),
+         :ok <- validate_body_params(path, conn),
          :ok <- validate_query_params(path, conn.params) do
       conn
     else
@@ -108,22 +108,11 @@ defmodule PhoenixSwagger.Plug.Validate do
     validate_query_params(parameters)
   end
 
-  defp validate_body_params(path, params) do
-    [{_, _, schema}] = :ets.lookup(@table, path)
-    parameters = Enum.map(schema.schema["parameters"], fn parameter ->
-      if parameter["type"] != nil and parameter["in"] == "query" do
-        parameter["name"]
-      else
-        []
-      end
-    end) |> List.flatten
-    if parameters == [] do
-      Validator.validate(path, params)
-    else
-      params = Enum.filter(params, fn ({name, _val}) ->
-        not name in parameters
-      end) |> Enum.into(%{})
-      Validator.validate(path, params)
+  defp validate_body_params(path, conn) do
+    case Validator.validate(path, conn.body_params) do
+      :ok -> :ok
+      {:error, [{error, error_path} | _], _path} -> {:error, error, error_path}
+      {:error, error, error_path} ->  {:error, error, error_path}
     end
   end
 
