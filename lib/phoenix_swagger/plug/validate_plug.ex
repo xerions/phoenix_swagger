@@ -18,7 +18,7 @@ defmodule PhoenixSwagger.Plug.Validate do
 
     with {:ok, path} <- find_matching_path(conn),
          :ok <- validate_body_params(path, conn),
-         :ok <- validate_query_params(path, conn.params) do
+         :ok <- validate_query_params(path, conn) do
       conn
     else
       {:error, :no_matching_path} ->
@@ -90,15 +90,15 @@ defmodule PhoenixSwagger.Plug.Validate do
   defp validate_query_params([{"boolean", name, val, _} | parameters]) do
     validate_boolean(name, val, parameters)
   end
-  defp validate_query_params(path, params) do
-    [{_, _basePath, schema}] = :ets.lookup(@table, path)
-    parameters = Enum.map(schema.schema["parameters"], fn parameter ->
-      if parameter["type"] != nil and parameter["in"] == "query" do
+  defp validate_query_params(path, conn) do
+    params = Map.merge(conn.query_params, conn.path_params)
+    [{_path, _basePath, schema}] = :ets.lookup(@table, path)
+    parameters =
+      for parameter <- schema.schema["parameters"],
+          parameter["type"] != nil,
+          parameter["in"] in ["query", "path"] do
         {parameter["type"], parameter["name"], params[parameter["name"]], parameter["required"]}
-      else
-        []
       end
-    end) |> List.flatten
     validate_query_params(parameters)
   end
 
