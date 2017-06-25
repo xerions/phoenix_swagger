@@ -4,9 +4,17 @@ defmodule PhoenixSwagger.Plug.Validate do
 
   @table :validator_table
 
+  @doc """
+  Plug.init callback
+
+  Options:
+
+   - `:validation_failed_status` the response status to set when parameter validation fails, defaults to 400.
+  """
   def init(opts), do: opts
 
-  def call(conn, _data) do
+  def call(conn, opts) do
+    validation_failed_status = Keyword.get(opts, :validation_failed_status, 400)
     req_path = Enum.filter(:ets.tab2list(@table), fn({path, basePath, _}) ->
       pathInfo = remove_base_path(conn.path_info, String.split(basePath, "/") |> tl)
       req_path = ("/" <> String.downcase(conn.method) <> "/" <> Enum.join(pathInfo, "/"))
@@ -30,13 +38,13 @@ defmodule PhoenixSwagger.Plug.Validate do
             error = get_error_message(error)
             response = %{"error" => %{"message" => error,
                                       "path" => path}} |> Poison.encode!
-            send_resp(conn, 400, response)
+            send_resp(conn, validation_failed_status, response)
             |> halt()
           {_, {:error, error, path}} ->
             error = get_error_message(error)
             response = %{"error" => %{"message" => error,
                                       "path" => path}} |> Poison.encode!
-            send_resp(conn, 400, response)
+            send_resp(conn, validation_failed_status, response)
             |> halt()
         end
     end
