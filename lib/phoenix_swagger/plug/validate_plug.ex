@@ -35,10 +35,16 @@ defmodule PhoenixSwagger.Plug.Validate do
           conn
         else
           {:error, error, path} ->
-            error = get_error_message(error)
-            response = %{"error" => %{"message" => error,
-                                      "path" => path}} |> Poison.encode!
-            send_resp(conn, validation_failed_status, response)
+            response = Poison.encode! %{
+              error: %{
+                message: get_error_message(error),
+                path: path
+              }
+            }
+
+            conn
+            |> put_resp_content_type("application/json")
+            |> send_resp(validation_failed_status, response)
             |> halt()
         end
     end
