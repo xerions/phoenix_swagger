@@ -16,14 +16,17 @@ defmodule PhoenixSwagger.Plug.Validate do
   def call(conn, opts) do
     validation_failed_status = Keyword.get(opts, :validation_failed_status, 400)
 
-    with {:ok, path} <- find_matching_path(conn),
-         :ok <- validate_body_params(path, conn),
-         :ok <- validate_query_params(path, conn) do
-      conn
-    else
+    result =
+      with {:ok, path} <- find_matching_path(conn),
+           :ok <- validate_body_params(path, conn),
+           :ok <- validate_query_params(path, conn),
+           do: {:ok, conn}
+
+    case result do
+      {:ok, conn} ->
+        conn
       {:error, :no_matching_path} ->
         send_error_response(conn, 404, "API does not provide resource", conn.request_path)
-
       {:error, message, path} ->
         send_error_response(conn, validation_failed_status, message, path)
     end
