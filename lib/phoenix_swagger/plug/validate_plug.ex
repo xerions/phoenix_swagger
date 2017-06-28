@@ -92,13 +92,12 @@ defmodule PhoenixSwagger.Plug.Validate do
     validate_boolean(name, val, parameters)
   end
   defp validate_query_params(path, conn) do
-    params = Map.merge(conn.query_params, conn.path_params)
     [{_path, _basePath, schema}] = :ets.lookup(@table, path)
     parameters =
       for parameter <- schema.schema["parameters"],
           parameter["type"] != nil,
           parameter["in"] in ["query", "path"] do
-        {parameter["type"], parameter["name"], params[parameter["name"]], parameter["required"]}
+        {parameter["type"], parameter["name"], conn.params[parameter["name"]], parameter["required"]}
       end
     validate_query_params(parameters)
   end
