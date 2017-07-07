@@ -49,7 +49,10 @@ defmodule Simple.UserControllerTest do
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
     conn = post conn, user_path(conn, :create), user: @invalid_attrs
-    assert json_response(conn, 422)["errors"] != %{}
+    assert json_response(conn, 422)["error"] == %{
+      "message" => "Required property email was not present.",
+      "path" => "#/user"
+    }
   end
 
   test "updates and renders chosen resource when data is valid", %{conn: conn, swagger_schema: schema} do
@@ -67,7 +70,18 @@ defmodule Simple.UserControllerTest do
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
     user = Repo.insert! %User{}
     conn = put conn, user_path(conn, :update, user), user: @invalid_attrs
-    assert json_response(conn, 422)["errors"] != %{}
+    assert json_response(conn, 422)["error"] == %{
+      "message" => "Required property email was not present.",
+      "path" => "#/user"
+    }
+  end
+
+  test "UserID path param must be an integer", %{conn: conn} do
+    conn = put conn, user_path(conn, :update, "abc"), user: @valid_attrs
+    assert json_response(conn, 422)["error"] == %{
+      "message" => "Type mismatch. Expected Integer but got String.",
+      "path" => "#/id"
+    }
   end
 
   test "deletes chosen resource", %{conn: conn} do

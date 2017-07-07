@@ -18,7 +18,7 @@ defmodule Simple.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Simple.Application, []},
-     applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext,
+     applications: [:phoenix, :phoenix_pubsub, :phoenix_swagger, :cowboy, :logger, :gettext,
                     :phoenix_ecto, :postgrex]]
   end
 

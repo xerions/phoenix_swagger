@@ -1,8 +1,10 @@
 defmodule Simple.Web.Router do
   use Simple.Web, :router
+  alias PhoenixSwagger.Plug.Validate
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Validate, validation_failed_status: 422
   end
 
   scope "/api", Simple.Web do
