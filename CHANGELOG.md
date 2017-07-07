@@ -1,3 +1,7 @@
+# 0.6.4
+
+  * Adds support to enable security by endpoint
+
 # 0.6.3
 
   * Adds support for custom Endpoint module names by passing `--endpoint`
