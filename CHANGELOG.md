@@ -1,6 +1,6 @@
 # 0.6.4
 
-  * Adds support to enable sucurity by endpoint
+  * Adds support to enable security by endpoint
 
 # 0.6.3
 
