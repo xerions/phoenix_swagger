@@ -1,6 +1,9 @@
 # 0.6.4
 
   * Adds support to enable security by endpoint
+  * `PhoenixSwagger.Plug.Validate` sets response content type on error to `application/json`
+  * `PhoenixSwagger.Plug.Validate` accepts `:validation_failed_status` option, defaults to 400
+  * Example application includes usage of validator
 
 # 0.6.3
 
