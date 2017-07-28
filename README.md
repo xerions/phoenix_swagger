@@ -137,6 +137,10 @@ swagger_path :index do
 end
 ```
 
+The `swagger_path` macro layer is just some syntactic sugar over regular elixir functions. Therefore it can easily be extended, for instance, if we want to reuse some common parameters.
+
+For more details on this take a look at [Reusing Swagger Parameters](https://hexdocs.pm/phoenix_swagger/reusing-swagger-parameters.html).
+
 ## Swagger Schema DSL
 
 Response schema definitions are placed in a `swagger_definitions/0` function within each controller module.
