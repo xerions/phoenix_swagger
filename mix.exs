@@ -16,7 +16,7 @@ defmodule PhoenixSwagger.Mixfile do
      #Docs
      source_url: "https://github.com/xerions/phoenix_swagger",
      homepage_url: "https://github.com/xerions/phoenix_swagger",
-     docs: [extras: ["README.md"], main: "readme", source_ref: "v#{@version}"]]
+     docs: [extras: ["README.md", "docs/reusing-swagger-parameters.md"], main: "readme", source_ref: "v#{@version}"]]
   end
 
   # Configuration for the OTP application
