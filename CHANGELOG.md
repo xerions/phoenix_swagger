@@ -1,3 +1,9 @@
+# 0.6.5
+
+  * Minor fix that supports the Phoenix 1.3 namespacing, where it is {Project}Web instead
+    of {Project}.Web.
+  * A switch, --use_1_2_namespacing (or -n for short), was added to support legacy (Phoenix < 1.3) namespacing.
+
 # 0.6.4
 
   * Adds support to enable security by endpoint
