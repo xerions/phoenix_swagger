@@ -24,13 +24,55 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp app_path do
     Enum.at(Mix.Project.load_paths(), 0) |> String.split("_build") |> Enum.at(0)
   end
-  defp top_level_namespace, do: Mix.Project.get().application()[:mod] |> elem(0) |> Module.split |> Enum.drop(-1) |> Module.concat
+
+  defp top_level_namespace do
+    namespace = Mix.Project.get().application()[:mod] |> elem(0) |> Module.split
+    [_|suffix] = namespace
+
+    cond do
+      suffix == [] -> namespace |> Module.concat
+      true -> namespace |> Enum.drop(-1) |> Module.concat
+    end
+  end
+
+  defp web_namespace, do: "#{top_level_namespace()}Web"
+
   defp app_name, do: Mix.Project.get().project()[:app]
+
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
-  defp default_router_module_name, do: Module.concat([top_level_namespace(), :Web, :Router])
-  defp default_endpoint_module_name, do: Module.concat([top_level_namespace(), :Web, :Endpoint])
-  defp router_module(switches), do: switches |> Keyword.get(:router, default_router_module_name()) |> attempt_load()
-  defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> attempt_load()
+
+  defp default_router_module_name({:use_1_2_namespacing, true}) do
+    Module.concat([top_level_namespace(), :Router])
+  end
+  defp default_router_module_name(_), do:
+    Module.concat([web_namespace(), :Router])
+  end
+
+  defp default_endpoint_module_name({:use_1_2_namespacing, true}) do
+    Module.concat([top_level_namespace(), :Endpoint])
+  end
+  defp default_endpoint_module_name(_) do
+    Module.concat([web_namespace(), :Endpoint])
+  end
+
+  defp router_module(switches) do
+    switches
+    |> Keyword.get(:router, default_router_module_name(use_1_2_namespacing(switches)))
+    |> attempt_load()
+  end
+
+  defp endpoint_module(switches) do
+    switches
+    |> Keyword.get(:endpoint, default_endpoint_module_name(use_1_2_namespacing(switches)))
+    |> attempt_load()
+  end
+
+  defp use_1_2_namespacing(switches) do
+    {
+      :use_1_2_namespacing,
+      switches |> Keyword.get(:use_1_2_namespacing, false)
+    }
+  end
   
   def run(args) do
     Mix.Task.run("compile")
@@ -38,8 +80,8 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     Code.append_path("#{app_path()}_build/#{Mix.env}/lib/#{app_name()}/ebin")
     {switches, params, _unknown} = OptionParser.parse(
       args,
-      switches: [router: :string, endpoint: :string, help: :boolean],
-      aliases: [r: :router, e: :endpoint, h: :help])
+      switches: [router: :string, endpoint: :string, use_1_2_namespacing: :boolean, help: :boolean],
+      aliases: [r: :router, e: :endpoint, n: :use_1_2_namespacing, h: :help])
     
     router = router_module(switches)
     endpoint = endpoint_module(switches)
@@ -59,14 +101,14 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
   defp usage do
     IO.puts """
-    Usage: mix phx.swagger.generate FILE --router ROUTER --endpoint ENDPOINT
+    Usage: mix phx.swagger.generate FILE --router ROUTER --endpoint ENDPOINT --use_1_2_namespacing USE_1_2_NAMESPACING
 
     With no FILE, default swagger file #{default_swagger_file_path()}
-    With no ROUTER, defaults to #{default_router_module_name()}
-    With no ENDPOINT, defaults to #{default_endpoint_module_name()}
+    With no ROUTER, defaults to #{default_router_module_name(false)}
+    With no ENDPOINT, defaults to #{default_endpoint_module_name(false)}
+    With no USE_1_2_NAMESPACING, defaults to #{web_namespace()}, which is the Phoenix 1.3 namespacing
     """
   end
-
 
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
