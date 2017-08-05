@@ -255,6 +255,12 @@ mix phx.swagger.generate reports-api.json -r MyApp.ReportsRouter
 mix phx.swagger.generate admin-api.json -r MyApp.AdminRouter
 ```
 
+For Phoenix 1.2 or lower, use the --use_1_2_namespacing, or -n, to generate the `swagger.json` file:
+
+```
+mix phx.swagger.generate -n
+```
+
 For more informantion, you can find `swagger` specification [here](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md).
 
 ## Validator
