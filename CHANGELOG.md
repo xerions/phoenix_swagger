@@ -1,4 +1,4 @@
-# 0.6.5
+# 0.7.0
 
   * Minor fix that supports the Phoenix 1.3 namespacing, where it is {Project}Web instead of {Project}.Web.
 
