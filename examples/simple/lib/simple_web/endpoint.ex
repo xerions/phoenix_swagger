@@ -1,7 +1,7 @@
-defmodule Simple.Web.Endpoint do
+defmodule SimpleWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :simple
 
-  socket "/socket", Simple.Web.UserSocket
+  socket "/socket", SimpleWeb.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -36,5 +36,5 @@ defmodule Simple.Web.Endpoint do
     key: "_simple_key",
     signing_salt: "gRYIcmz4"
 
-  plug Simple.Web.Router
+  plug SimpleWeb.Router
 end

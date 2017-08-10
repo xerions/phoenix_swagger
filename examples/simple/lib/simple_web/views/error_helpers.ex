@@ -1,4 +1,4 @@
-defmodule Simple.Web.ErrorHelpers do
+defmodule SimpleWeb.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -21,9 +21,9 @@ defmodule Simple.Web.ErrorHelpers do
     #     dgettext "errors", "is invalid"
     #
     if count = opts[:count] do
-      Gettext.dngettext(Simple.Web.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(SimpleWeb.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(Simple.Web.Gettext, "errors", msg, opts)
+      Gettext.dgettext(SimpleWeb.Gettext, "errors", msg, opts)
     end
   end
 end

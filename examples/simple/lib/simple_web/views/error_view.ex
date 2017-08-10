@@ -1,5 +1,5 @@
-defmodule Simple.Web.ErrorView do
-  use Simple.Web, :view
+defmodule SimpleWeb.ErrorView do
+  use SimpleWeb, :view
 
   def render("404.json", _assigns) do
     %{errors: %{detail: "Page not found"}}
