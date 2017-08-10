@@ -1,3 +1,7 @@
+# 0.7.0
+
+  * Minor fix that supports the Phoenix 1.3 namespacing, where it is {Project}Web instead of {Project}.Web.
+
 # 0.6.4
 
   * Adds support to enable security by endpoint

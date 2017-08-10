@@ -27,11 +27,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp top_level_namespace, do: Mix.Project.get().application()[:mod] |> elem(0) |> Module.split |> Enum.drop(-1) |> Module.concat
   defp app_name, do: Mix.Project.get().project()[:app]
   defp default_swagger_file_path, do: app_path() <> "swagger.json"
-  defp default_router_module_name, do: Module.concat([top_level_namespace(), :Web, :Router])
-  defp default_endpoint_module_name, do: Module.concat([top_level_namespace(), :Web, :Endpoint])
+  defp default_router_module_name, do: Module.concat(["#{top_level_namespace()}Web", :Router])
+  defp default_endpoint_module_name, do: Module.concat(["#{top_level_namespace()}Web", :Endpoint])
   defp router_module(switches), do: switches |> Keyword.get(:router, default_router_module_name()) |> attempt_load()
   defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> attempt_load()
-  
+
   def run(args) do
     Mix.Task.run("compile")
     Mix.Task.reenable("phx.swagger.generate")
@@ -40,7 +40,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       args,
       switches: [router: :string, endpoint: :string, help: :boolean],
       aliases: [r: :router, e: :endpoint, h: :help])
-    
+
     router = router_module(switches)
     endpoint = endpoint_module(switches)
     cond do
