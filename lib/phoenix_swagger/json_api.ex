@@ -235,7 +235,8 @@ defmodule PhoenixSwagger.JsonApi do
   @doc """
   Defines a relationship
   """
-  def relationship(model = %Schema{}, name) do
+  def relationship(model = %Schema{}, name, opts \\ []) do
+
     put_in(
       model.properties.relationships.properties[name],
       %Schema{
@@ -249,7 +250,7 @@ defmodule PhoenixSwagger.JsonApi do
             }
           },
           data: %Schema{
-            type: :object,
+            type: opts[:type] || :object,
             properties: %{
               id: %Schema{type: :string, description: "Related #{name} resource id"},
               type: %Schema{type: :string, description: "Type of related #{name} resource"}
