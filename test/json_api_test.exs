@@ -163,7 +163,7 @@ defmodule PhoenixSwagger.JsonApiTest do
           gender [:string, "null"], "Gender"
         end
         link :self, "The link to this user resource"
-        relationship :posts, type: :array
+        relationship :posts, type: :has_many
       end
 
     assert user_resource_schema["properties"]["relationships"]["properties"]["posts"]["properties"]["data"]["type"] == "array"
