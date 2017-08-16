@@ -259,7 +259,7 @@ defmodule PhoenixSwagger.JsonApi do
     )
   end
 
-  def relationship_data(:has_one, name) do
+  defp relationship_data(:has_one, name) do
     %Schema{
       type: :object,
       properties: %{
@@ -268,7 +268,7 @@ defmodule PhoenixSwagger.JsonApi do
       }
     }
   end
-  def relationship_data(:has_many, name) do
+  defp relationship_data(:has_many, name) do
     %Schema{
       type: :array,
       items: %Schema{
