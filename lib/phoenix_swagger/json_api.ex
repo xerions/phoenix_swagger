@@ -234,8 +234,13 @@ defmodule PhoenixSwagger.JsonApi do
 
   @doc """
   Defines a relationship
+  Optionally can pass `type: :has_many` or `type: :has_one` to determine
+  whether to structure the relationship as an object or array.
+  Defaults to `:has_one`
   """
-  def relationship(model = %Schema{}, name) do
+  def relationship(model = %Schema{}, name, opts \\ []) do
+    type = opts[:type] || :has_one
+
     put_in(
       model.properties.relationships.properties[name],
       %Schema{
@@ -248,15 +253,31 @@ defmodule PhoenixSwagger.JsonApi do
               related: %Schema{type: :string, description: "Related #{name} link"}
             }
           },
-          data: %Schema{
-            type: :object,
-            properties: %{
-              id: %Schema{type: :string, description: "Related #{name} resource id"},
-              type: %Schema{type: :string, description: "Type of related #{name} resource"}
-            }
-          }
+          data: relationship_data(type, name)
         }
       }
     )
+  end
+
+  defp relationship_data(:has_one, name) do
+    %Schema{
+      type: :object,
+      properties: %{
+        id: %Schema{type: :string, description: "Related #{name} resource id"},
+        type: %Schema{type: :string, description: "Type of related #{name} resource"}
+      }
+    }
+  end
+  defp relationship_data(:has_many, name) do
+    %Schema{
+      type: :array,
+      items: %Schema{
+        type: :object,
+        properties: %{
+          id: %Schema{type: :string, description: "Related #{name} resource id"},
+          type: %Schema{type: :string, description: "Type of related #{name} resource"}
+        }
+      }
+    }
   end
 end
