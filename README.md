@@ -208,7 +208,8 @@ def swagger_definitions do
         address Schema.ref(:Address), "Users address"
       end
       link :self, "The link to this user resource"
-      relationship :posts
+      relationship :preferences
+      relationship :posts, type: :has_many
     end,
     Users: JsonApi.page(:UserResource),
     User: JsonApi.single(:UserResource)
