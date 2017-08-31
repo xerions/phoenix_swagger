@@ -372,6 +372,10 @@ Add a swagger scope to your router, and forward all requests to SwaggerUI
     end
 ```
 
+`PhoenixSwagger.Plug.SwaggerUI` takes a `:version` option that can be either
+`:v2` or `:v3` (it defaults to `:v2`). This determines which [swagger-ui
+version](https://github.com/swagger-api/swagger-ui#compatibility) is used
+
 Run the server with `mix phoenix.server` and browse to `localhost:4000/api/swagger`,
 Swagger-ui should be shown with your swagger spec loaded.
 
