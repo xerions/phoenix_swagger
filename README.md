@@ -64,8 +64,14 @@ The `version` and `title` are mandatory fields. By default the `version` will be
 and the `title` will be `<enter your title>` if you do not provide `swagger_info/0`
 function.
 
-See the [swaggerObject specification](http://swagger.io/specification/#swaggerObject) for details
-of other information that can be included.
+See the [Swagger Object specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object) for details
+of other information that can be included. You can set the description of `tags` here for example:
+```elixir
+%{
+  info: %{..},
+  tags: [%{name: "Users", description: "Operations about Users"}]
+}
+```
 
 The swagger `host` value is built from the your phoenix `Endpoint` `url` config.
 
