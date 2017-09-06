@@ -2,6 +2,7 @@
 
   * Minor fix that supports the Phoenix 1.3 namespacing, where it is {Project}Web instead of {Project}.Web.
   * Add support for has_many relationships for JSON-API resource schemas
+  * Upgrade to swagger-ui 3.1.7
 
 # 0.6.4
 
