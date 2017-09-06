@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Phx.Swagger.Generate do
   use Mix.Task
   require Logger
-  
+
   @recursive true
 
   @shortdoc "Generates swagger.json file based on phoenix router"
@@ -75,7 +75,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     end
     File.write!(output_file, contents)
   end
-  
+
   defp attempt_load(module_name) do
     case module_name |> List.wrap() |> Module.concat() |> Code.ensure_loaded() do
       {:module, result} -> result
@@ -134,7 +134,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp find_swagger_path_function(route = %{opts: action, path: path}) when is_atom(action) do
     controller = find_controller(route)
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
-    
+
     cond do
       Code.ensure_loaded?(controller) ->
         %{
@@ -184,15 +184,16 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp collect_host_from_endpoint(swagger_map, endpoint_config) do
+    load_from_system_env = Keyword.get(endpoint_config, :load_from_system_env, false)
     url = Keyword.get(endpoint_config, :url)
     host = Keyword.get(url, :host, "localhost")
     port = Keyword.get(url, :port, 4000)
 
     swagger_map =
-      if is_binary(host) and (is_integer(port) or is_binary(port)) do
+      if (!load_from_system_env) and is_binary(host) and (is_integer(port) or is_binary(port)) do
         Map.put_new(swagger_map, :host, "#{host}:#{port}")
       else
-        swagger_map # host / port may be {:system, "ENV_VAR"} tuples
+        swagger_map # host / port may be {:system, "ENV_VAR"} tuples or loaded in Endpoint.init callback
       end
 
     case endpoint_config[:https] do
