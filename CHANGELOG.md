@@ -1,3 +1,7 @@
+# 0.7.1
+
+  * Use the :load_from_system_env Endpoint config flag to detect dynamic host and port configuration
+
 # 0.7.0
 
   * Minor fix that supports the Phoenix 1.3 namespacing, where it is {Project}Web instead of {Project}.Web.

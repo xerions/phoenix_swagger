@@ -81,12 +81,13 @@ config :my_app, MyApp.Web.Endpoint,
   url: [host: "localhost"], # "host": "localhost:4000" in generated swagger
 ```
 
-If the `host` is configured to be set dynamically, the swagger host will be omitted. SwaggerUI will default to sending requests to the same host that is serving the swagger file.
+If the `host` is configured to be set dynamically (either by {:systems, "VAR"} tuples or the :load_from_system_env flag), "the swagger host will be omitted. SwaggerUI will default to sending requests to the same host that is serving the swagger file.
 
 ```elixir
 # prod.exs
 config :my_app, MyApp.Web.Endpoint,
-  url: [host: {:system, "HOST"}, port: {:system, "PORT"}], # No "host" in generated swagger
+  load_from_system_env: true, # Expects url host and port to be configured in Endpoint.init callback
+  url: [host: {:system, "HOST"}, port: {:system, "PORT"}], # alternatively using tuples for configuration
 ```
 
 ## Swagger Path DSL
