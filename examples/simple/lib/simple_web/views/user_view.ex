@@ -1,12 +1,13 @@
-defmodule Simple.Web.UserView do
-  use Simple.Web, :view
+defmodule SimpleWeb.UserView do
+  use SimpleWeb, :view
+  alias SimpleWeb.UserView
 
   def render("index.json", %{users: users}) do
-    %{data: render_many(users, Simple.Web.UserView, "user.json")}
+    %{data: render_many(users, UserView, "user.json")}
   end
 
   def render("show.json", %{user: user}) do
-    %{data: render_one(user, Simple.Web.UserView, "user.json")}
+    %{data: render_one(user, UserView, "user.json")}
   end
 
   def render("user.json", %{user: user}) do

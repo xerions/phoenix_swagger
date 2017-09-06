@@ -54,7 +54,7 @@
             "description": "The user details"
           }
         ],
-        "operationId": "Simple.Web.UserController.update",
+        "operationId": "SimpleWeb.UserController.update",
         "description": "Update all attributes of a user",
         "consumes": [
           "application/json"
@@ -97,7 +97,7 @@
             "description": "User ID"
           }
         ],
-        "operationId": "Simple.Web.UserController.show",
+        "operationId": "SimpleWeb.UserController.show",
         "description": "Show a user by ID"
       },
       "delete": {
@@ -120,7 +120,7 @@
             "description": "User ID"
           }
         ],
-        "operationId": "Simple.Web.UserController.delete",
+        "operationId": "SimpleWeb.UserController.delete",
         "description": "Delete a user by ID"
       }
     },
@@ -169,7 +169,7 @@
             "description": "The user details"
           }
         ],
-        "operationId": "Simple.Web.UserController.create",
+        "operationId": "SimpleWeb.UserController.create",
         "description": "Creates a new user",
         "consumes": [
           "application/json"
@@ -212,7 +212,7 @@
           "application/json"
         ],
         "parameters": [],
-        "operationId": "Simple.Web.UserController.index",
+        "operationId": "SimpleWeb.UserController.index",
         "description": "List all users in the database"
       }
     }

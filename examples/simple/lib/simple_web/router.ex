@@ -1,5 +1,5 @@
-defmodule Simple.Web.Router do
-  use Simple.Web, :router
+defmodule SimpleWeb.Router do
+  use SimpleWeb, :router
   alias PhoenixSwagger.Plug.Validate
 
   pipeline :api do
@@ -7,7 +7,7 @@ defmodule Simple.Web.Router do
     plug Validate, validation_failed_status: 422
   end
 
-  scope "/api", Simple.Web do
+  scope "/api", SimpleWeb do
     pipe_through :api
     resources "/users", UserController, except: [:new, :edit]
   end

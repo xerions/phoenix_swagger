@@ -13,7 +13,7 @@ defmodule Simple.Application do
       # Start the Ecto repository
       supervisor(Simple.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(Simple.Web.Endpoint, []),
+      supervisor(SimpleWeb.Endpoint, []),
       # Start your own worker by calling: Simple.Worker.start_link(arg1, arg2, arg3)
       # worker(Simple.Worker, [arg1, arg2, arg3]),
     ]
@@ -27,7 +27,7 @@ defmodule Simple.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    Simple.Web.Endpoint.config_change(changed, removed)
+    SimpleWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

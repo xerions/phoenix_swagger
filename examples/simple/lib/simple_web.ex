@@ -1,12 +1,12 @@
-defmodule Simple.Web do
+defmodule SimpleWeb do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
 
   This can be used in your application as:
 
-      use Simple.Web, :controller
-      use Simple.Web, :view
+      use SimpleWeb, :controller
+      use SimpleWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -18,27 +18,27 @@ defmodule Simple.Web do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: Simple.Web
+      use Phoenix.Controller, namespace: SimpleWeb
 
       alias Simple.Repo
       import Ecto
       import Ecto.Query
 
-      import Simple.Web.Router.Helpers
-      import Simple.Web.Gettext
+      import SimpleWeb.Router.Helpers
+      import SimpleWeb.Gettext
     end
   end
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/simple/web/templates", namespace: Simple.Web
+      use Phoenix.View, root: "lib/simple/web/templates", namespace: SimpleWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
 
-      import Simple.Web.Router.Helpers
-      import Simple.Web.ErrorHelpers
-      import Simple.Web.Gettext
+      import SimpleWeb.Router.Helpers
+      import SimpleWeb.ErrorHelpers
+      import SimpleWeb.Gettext
     end
   end
 
@@ -55,7 +55,7 @@ defmodule Simple.Web do
       alias Simple.Repo
       import Ecto
       import Ecto.Query
-      import Simple.Web.Gettext
+      import SimpleWeb.Gettext
     end
   end
 
