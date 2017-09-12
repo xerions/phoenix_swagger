@@ -28,6 +28,7 @@ defmodule ValidatePlugTest do
       test_conn = Validate.call(test_conn, [])
       assert is_nil test_conn.status
       assert is_nil test_conn.resp_body
+      assert test_conn.private[:phoenix_swagger][:valid]
     end
 
     test "validation fails on an invalid request" do
