@@ -10,19 +10,31 @@ defmodule PhoenixSwagger.Plug.Validate do
   Options:
 
    - `:validation_failed_status` the response status to set when parameter validation fails, defaults to 400.
+   - `:exclude_paths` paths matching these regular expressions will be excluded from validation
   """
   def init(opts), do: opts
 
   def call(conn, opts) do
+    regex_result = opts
+    |> Keyword.get(:exclude_paths, [~r/$^/]) # the default regex matches nothing
+    |> List.wrap
+    |> Enum.find(:no_regex_matched, fn r -> Regex.match?(r, conn.request_path) end)
+
+    case regex_result do
+      :no_regex_matched ->
+        handle_validation(conn, opts)
+      _ ->
+        conn
+    end
+  end
+
+  @doc """
+  Performs unconditional validation of a request. Will halt and send error on failed validation.
+  """
+  def handle_validation(conn, opts) do
     validation_failed_status = Keyword.get(opts, :validation_failed_status, 400)
 
-    result =
-      with {:ok, path} <- find_matching_path(conn),
-           :ok <- validate_body_params(path, conn),
-           :ok <- validate_query_params(path, conn),
-           do: {:ok, conn}
-
-    case result do
+    case validate(conn) do
       {:ok, conn} ->
         conn
       {:error, :no_matching_path} ->
@@ -30,6 +42,21 @@ defmodule PhoenixSwagger.Plug.Validate do
       {:error, message, path} ->
         send_error_response(conn, validation_failed_status, message, path)
     end
+  end
+
+  @doc """
+  Validate a request. Feel free to use it in your own Plugs. Returns:
+  * `{:ok, conn}` on success
+  * `{:error, :no_matching_path}` if the request path could not be mapped to a schema
+  * `{:error, message, path}` if the request was mapped but failed validation
+  """
+  def validate(conn) do
+    result =
+      with {:ok, path} <- find_matching_path(conn),
+           :ok <- validate_body_params(path, conn),
+           :ok <- validate_query_params(path, conn),
+           do: {:ok, conn}
+
   end
 
   defp find_matching_path(conn) do
