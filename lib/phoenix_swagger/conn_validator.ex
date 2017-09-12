@@ -1,5 +1,4 @@
 defmodule PhoenixSwagger.ConnValidator do
-  import Plug.Conn
   alias PhoenixSwagger.Validator
 
   @table :validator_table
@@ -9,6 +8,7 @@ defmodule PhoenixSwagger.ConnValidator do
   * `{:ok, conn}` on success
   * `{:error, :no_matching_path}` if the request path could not be mapped to a schema
   * `{:error, message, path}` if the request was mapped but failed validation
+  * `{:error, [{message, path}], path}` if more than one validation error has been detected
   """
   def validate(conn) do
     with {:ok, path} <- find_matching_path(conn),
@@ -73,13 +73,7 @@ defmodule PhoenixSwagger.ConnValidator do
     validate_query_params(parameters)
   end
 
-  defp validate_body_params(path, conn) do
-    case Validator.validate(path, conn.body_params) do
-      :ok -> :ok
-      {:error, [{error, error_path} | _], _path} -> {:error, error, error_path}
-      {:error, error, error_path} ->  {:error, error, error_path}
-    end
-  end
+  defp validate_body_params(path, conn), do: Validator.validate(path, conn.body_params)
 
   defp equal_paths?([], []), do: true
   defp equal_paths?([head | orig_path_rest], [head | req_path_rest]), do: equal_paths?(orig_path_rest, req_path_rest)

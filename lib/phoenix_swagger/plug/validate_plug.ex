@@ -29,6 +29,8 @@ defmodule PhoenixSwagger.Plug.Validate do
         conn |> put_private(:phoenix_swagger, %{valid: true})
       {:error, :no_matching_path} ->
         send_error_response(conn, 404, "API does not provide resource", conn.request_path)
+      {:error, [{message, path} | _], _path} ->
+        send_error_response(conn, validation_failed_status, message, path)
       {:error, message, path} ->
         send_error_response(conn, validation_failed_status, message, path)
     end
