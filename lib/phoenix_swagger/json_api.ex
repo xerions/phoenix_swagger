@@ -66,11 +66,11 @@ defmodule PhoenixSwagger.JsonApi do
               description:  "Link to this page of results"
             },
             prev: %Schema {
-              type:  [:string, "null"],
+              type:  :string,
               description:  "Link to the previous page of results"
             },
             next: %Schema {
-              type:  [:string, "null"],
+              type:  :string,
               description:  "Link to the next page of results"
             },
             last: %Schema {
@@ -186,7 +186,7 @@ defmodule PhoenixSwagger.JsonApi do
       [do: {:__block__, _, attrs}] -> attrs
       [do: attr] -> [attr]
     end
-    
+
     attrs
     |> Enum.map(fn {name, line, args} -> {:attribute, line, [name | args]} end)
     |> Enum.reduce(model, fn next, pipeline ->

@@ -41,8 +41,8 @@ defmodule PhoenixSwagger.JsonApiTest do
           "properties" => %{
             "first" => %{"description" => "Link to the first page of results", "type" => "string"},
             "last" => %{"description" => "Link to the last page of results", "type" => "string"},
-            "next" => %{"description" => "Link to the next page of results", "type" => ["string", "null"]},
-            "prev" => %{"description" => "Link to the previous page of results", "type" => ["string", "null"]},
+            "next" => %{"description" => "Link to the next page of results", "type" => "string"},
+            "prev" => %{"description" => "Link to the previous page of results", "type" => "string"},
             "self" => %{"description" => "Link to this page of results", "type" => "string"}
           },
           "type" => "object"
