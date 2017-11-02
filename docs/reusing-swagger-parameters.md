@@ -45,7 +45,7 @@ defmodule CommonParameters do
   import PhoenixSwagger.Path
 
   def authorization(path = %PathObject{}) do
-    path |> parameter("Authorization", :header, "OAuth2 access token", required: true)
+    path |> parameter("Authorization", :header, :string, "OAuth2 access token", required: true)
   end
 
   def sorting(path = %PathObject{}) do
