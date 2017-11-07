@@ -3,6 +3,8 @@
   * Minor fix that supports the Phoenix 1.3 namespacing, where it is {Project}Web instead of {Project}.Web.
   * Add support for has_many relationships for JSON-API resource schemas
   * Upgrade to swagger-ui 3.1.7
+  * Tests for nested and non-nested required parameters for `PhoenixSwagger.Plug.Validate`.
+  *  Decode parameter names using `Plug.Conn.Query.decode` and walk `conn.params` to find the nested param as `conn.params` is already nested while `parameter["name"]` is not when received by `PhoenixSwagger.Plug.Validate.validate_query_params/2`.
 
 # 0.6.4
 

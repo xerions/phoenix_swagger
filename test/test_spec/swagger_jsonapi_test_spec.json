@@ -1,0 +1,244 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/shapes": {
+      "get": {
+        "tags": [
+          "Shape"
+        ],
+        "summary": "",
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/Shapes"
+            },
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "type": "integer",
+            "required": false,
+            "name": "page[offset]",
+            "minimum": 0,
+            "in": "query",
+            "description": "Offset (0-based) of first element in the page"
+          },
+          {
+            "type": "integer",
+            "required": false,
+            "name": "page[limit]",
+            "minimum": 1,
+            "in": "query",
+            "description": "Max number of elements to return"
+          },
+          {
+            "type": "string",
+            "required": false,
+            "name": "sort",
+            "in": "query",
+            "enum": [
+              "direction_id",
+              "-direction_id",
+              "name",
+              "-name",
+              "polyline",
+              "-polyline",
+              "priority",
+              "-priority"
+            ],
+            "description": "Results can be [sorted](http://jsonapi.org/format/#fetching-sorting) by the id or any `/data/{index}/attributes` key. Assumes ascending; may be prefixed with '-' for descending\n\n| JSON pointer | Direction | `sort` |\n|--------------|-----------|------------|\n| `/data/{index}/attributes/direction_id` | ascending | `direction_id`\n| `/data/{index}/attributes/direction_id` | descending | `-direction_id`\n| `/data/{index}/attributes/name` | ascending | `name`\n| `/data/{index}/attributes/name` | descending | `-name`\n| `/data/{index}/attributes/polyline` | ascending | `polyline`\n| `/data/{index}/attributes/polyline` | descending | `-polyline`\n| `/data/{index}/attributes/priority` | ascending | `priority`\n| `/data/{index}/attributes/priority` | descending | `-priority`\n\n"
+          },
+          {
+            "type": "string",
+            "required": true,
+            "name": "api_key",
+            "in": "query",
+            "description": "Key for API access.\n\nRequests are counted in 1440 60000ms intervals per day.  The max requests per user per interval vary based on the type of user and whether they have requested a limit increase.\n\n| Type       | Requests Tracked By | Limit   | Max Requests Per Interval                          |\n|------------|---------------------|---------|----------------------------------------------------|\n| Anonymous  | IP Address          | `null`  | `5000`       |\n| Registered | User ID             | `null`  | `100000` |\n| Registered | User ID             | integer | `limit / 1440`   |\n\n* [Create a Registered User](/register)\n* [View Registered User limits](/portal)\n\n"
+          },
+          {
+            "type": "string",
+            "required": false,
+            "name": "include",
+            "in": "query",
+            "description": "Relationships to include.\n\n* `route`\n* `stops`\n\nThe value of the include parameter **MUST** be a comma-separated (U+002C COMMA, \",\") list of relationship paths. A relationship path is a dot-separated (U+002E FULL-STOP, “.”) list of relationship names.\n-- [JSONAPI Specificatiion Inclusion of Related Resources ¶5](http://jsonapi.org/format/#fetching-includes)\n\n\n"
+          },
+          {
+            "type": "string",
+            "required": true,
+            "name": "filter[route]",
+            "in": "query",
+            "description": "Filter by `/data/{index}/relationships/route/data/id`. Multiple `/data/{index}/relationships/route/data/id` **MUST** be a comma-separated (U+002C COMMA, \",\") list."
+          },
+          {
+            "type": "string",
+            "required": false,
+            "name": "filter[direction_id]",
+            "in": "query",
+            "enum": [
+              "0",
+              "1"
+            ],
+            "description": "Filter by direction of travel along the route.\n\nThe meaning of `direction_id` varies based on the route. You can programmatically get the direction names from `/routes` `/data/{index}/attributes/direction_names` or `/routes/{id}` `/data/attriutes/direction_names`.  The general pattern is as follows:\n\n| Route ID Pattern | `direction_id` | Direction Name |\n|------------------|----------------|----------------|\n| `Red` | `0` | `\"Southbound\"` |\n| `Red` | `1` | `\"Northbound\"` |\n| `Orange` | `0` | `\"Southbound\"` |\n| `Orange` | `1` | `\"Northbound\"` |\n| `Blue` | `0` | `\"Westbound\"` |\n| `Blue` | `1` | `\"Eastbound\"` |\n| `Green-*` | `0` | `\"Westbound\"` |\n| `Green-*` | `1` | `\"Eastbound\"` |\n| `*` | `0` | `\"Outbound\"` |\n| `*` | `1` | `\"Inbound\"` |\n\n\n\n\n"
+          }
+        ],
+        "operationId": "Api.ShapeController.index",
+        "description": "**NOTE:** `filter[route]` **MUST** be given for any shapes to be returned.\n\nList of shapes.\n\n## Vertices\n\n### World\n\n`/data/{index}/attributes/polyline` is in [Encoded Polyline Algorithm Format](https://developers.google.com/maps/documentation/utilities/polylinealgorithm), which encodes the latitude and longitude of a sequence of points in the shape.\n\n### Stops\n\nIf instead of getting the latitude and longitude directly, you want to show the stops in this shape use `/data/{index}/relationships/stops` to get the all the stop IDs or `include=stops` to include them in the response.\n\n"
+      }
+    }
+  },
+  "definitions": {
+    "Shapes": {
+      "type": "object",
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "links": {
+          "type": "object",
+          "properties": {
+            "self": {
+              "type": "string",
+              "description": "Link to this page of results"
+            },
+            "prev": {
+              "type": "string",
+              "description": "Link to the previous page of results"
+            },
+            "next": {
+              "type": "string",
+              "description": "Link to the next page of results"
+            },
+            "last": {
+              "type": "string",
+              "description": "Link to the last page of results"
+            },
+            "first": {
+              "type": "string",
+              "description": "Link to the first page of results"
+            }
+          }
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ShapeResource"
+          },
+          "description": "Content with [ShapeResource](#shaperesource) objects"
+        }
+      },
+      "description": "A page of [ShapeResource](#shaperesource) results"
+    },
+    "ShapeResource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The JSON-API resource type"
+        },
+        "relationships": {
+          "type": "object",
+          "properties": {
+            "stops": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "self": {
+                      "type": "string",
+                      "description": "Relationship link for stops"
+                    },
+                    "related": {
+                      "type": "string",
+                      "description": "Related stops link"
+                    }
+                  }
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Type of related stops resource"
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "Related stops resource id"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "route": {
+              "type": "object",
+              "properties": {
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "self": {
+                      "type": "string",
+                      "description": "Relationship link for route"
+                    },
+                    "related": {
+                      "type": "string",
+                      "description": "Related route link"
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "Type of related route resource"
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "Related route resource id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "links": {
+          "type": "object",
+          "properties": {}
+        },
+        "id": {
+          "type": "string",
+          "description": "The JSON-API resource ID"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "priority": {
+              "type": "integer",
+              "example": 2,
+              "description": "Representation of how important a shape is when choosing one for display. Higher number is higher priority.\n"
+            },
+            "polyline": {
+              "type": "string",
+              "description": "## [Encoded Polyline Algorithm Format](https://developers.google.com/maps/documentation/utilities/polylinealgorithm)\n\nPolyline encoding is a lossy compression algorithm that allows you to store a series of coordinates as a single string. Point coordinates are encoded using signed values.\n\nThe encoding process converts a binary value into a series of character codes for ASCII characters using the familiar base64 encoding scheme: to ensure proper display of these characters, encoded values are summed with 63 (the ASCII character '?') before converting them into ASCII. The algorithm also checks for additional character codes for a given point by checking the least significant bit of each byte group; if this bit is set to 1, the point is not yet fully formed and additional data must follow.\n\nAdditionally, to conserve space, **points only include the offset from the previous point** (except of course for the first point). All points are encoded in Base64 as signed integers, as latitudes and longitudes are signed values. The encoding format within a polyline needs to represent two coordinates representing latitude and longitude to a reasonable precision. Given a maximum longitude of +/- 180 degrees to a precision of 5 decimal places (180.00000 to -180.00000), this results in the need for a 32 bit signed binary integer value.\n\nThe steps for encoding such a signed value are specified below.\n\n1. Take the initial signed value:\n   ```\n   -179.9832104\n   ```\n2. Take the decimal value and multiply it by 1e5, rounding the result:\n   ```\n   -17998321\n   ```\n3. Convert the decimal value to binary. Note that a negative value must be calculated using its    [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) by inverting the binary    value and adding one to the result:\n   ```\n   00000001 00010010 10100001 11110001\n   11111110 11101101 01011110 00001110\n   11111110 11101101 01011110 00001111\n   ```\n4. Left-shift the binary value one bit:\n   ```\n   11111101 11011010 10111100 00011110`\n   ```\n5. If the original decimal value is negative, invert this encoding:\n   ```\n   00000010 00100101 01000011 11100001\n   ```\n6. Break the binary value out into 5-bit chunks (starting from the right hand side):\n   ```\n   00001 00010 01010 10000 11111 00001\n   ```\n7. Place the 5-bit chunks into reverse order:\n   ```\n   00001 11111 10000 01010 00010 00001\n   ```\n8. OR each value with 0x20 if another bit chunk follows:\n   ```\n   100001 111111 110000 101010 100010 000001\n   ```\n9. Convert each value to decimal:\n   ```\n   33 63 48 42 34 1\n   ```\n10. Add 63 to each value:\n    ```\n    96 126 111 105 97 64\n    ```\n11. Convert each value to its ASCII equivalent:\n    ```\n    `~oia@\n    ```\n\n## Decoding\n\nPolyline can be decoded by following the encoding steps above in reverse.  Some pre-existing libraries:\n\n* [Javascript](https://www.npmjs.com/package/polyline)\n* [Erlang](https://blog.kempkens.io/posts/encoding-and-decoding-polylines-with-erlang/)\n* [Elixir](https://hex.pm/packages/polyline)\n"
+            },
+            "name": {
+              "type": "string",
+              "example": "Dudley",
+              "description": "User-facing name for shape. It may, but is not required to, be a headsign"
+            },
+            "direction_id": {
+              "type": "integer",
+              "description": "Direction in which trip is traveling: 0 or 1.\n\nThe meaning of `direction_id` varies based on the route. You can programmatically get the direction names from `/routes` `/data/{index}/attributes/direction_names` or `/routes/{id}` `/data/attriutes/direction_names`.  The general pattern is as follows:\n\n| Route ID Pattern | `direction_id` | Direction Name |\n|------------------|----------------|----------------|\n| `Red` | `0` | `\"Southbound\"` |\n| `Red` | `1` | `\"Northbound\"` |\n| `Orange` | `0` | `\"Southbound\"` |\n| `Orange` | `1` | `\"Northbound\"` |\n| `Blue` | `0` | `\"Westbound\"` |\n| `Blue` | `1` | `\"Eastbound\"` |\n| `Green-*` | `0` | `\"Westbound\"` |\n| `Green-*` | `1` | `\"Eastbound\"` |\n| `*` | `0` | `\"Outbound\"` |\n| `*` | `1` | `\"Inbound\"` |\n\n\n"
+            }
+          }
+        }
+      },
+      "description": "Shape representing the stops to which a particular trip can go. Trips grouped under the same route can have different shapes, and thus different stops. See [GTFS `shapes.txt`](https://github.com/google/transit/blob/master/gtfs/spec/en/reference.md#shapestxt)\n"
+    }
+  }
+}
