@@ -73,7 +73,7 @@ of other information that can be included. You can set the description of `tags`
 }
 ```
 
-The swagger `host` value is built from the your phoenix `Endpoint` `url` config.
+The swagger `host` value is built from your phoenix `Endpoint` `url` config.
 
 ```elixir
 # config.exs
