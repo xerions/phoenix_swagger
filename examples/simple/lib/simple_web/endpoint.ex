@@ -37,4 +37,18 @@ defmodule SimpleWeb.Endpoint do
     signing_salt: "gRYIcmz4"
 
   plug SimpleWeb.Router
+
+  def init(_key, config) do
+    if config[:load_from_system_env] do
+      port = System.get_env("PORT") || 4000
+      host = System.get_env("HOST") || "localhost"
+      config =
+        config
+        |> Keyword.put(:http, [port: port])
+        |> Keyword.put(:url, [host: host, port: port])
+      {:ok, config}
+    else
+      {:ok, config}
+    end
+  end
 end
