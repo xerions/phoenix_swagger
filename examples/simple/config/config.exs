@@ -9,6 +9,11 @@ use Mix.Config
 config :simple,
   ecto_repos: [Simple.Repo]
 
+config :simple, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [router: SimpleWeb.Router]
+  }
+
 # Configures the endpoint
 config :simple, SimpleWeb.Endpoint,
   url: [host: "localhost"],
