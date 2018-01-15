@@ -1,3 +1,17 @@
+# 0.8.0
+
+  * Passing module names and output path as mix task parameters is no longer supported.
+  * Inferring default module names from mix project is no longer supported.
+  * Swagger file outputs, router module and optional endpoint module must now be specified in application config:
+
+  ```elixir
+  config :my_app, :phoenix_swagger,
+    swagger_files: %{
+      "priv/static/swagger.json" => [router: MyAppWeb.Router, endpoint: MyAppWeb.Endpoint],
+      # additional swagger files here
+    }
+  ```
+
 # 0.7.1
 
   * Use the :load_from_system_env Endpoint config flag to detect dynamic host and port configuration
