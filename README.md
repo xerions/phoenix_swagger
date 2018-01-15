@@ -20,18 +20,29 @@ dependencies in the `mix.exs` file:
 ```elixir
 def deps do
   [
-    {:phoenix_swagger, "~> 0.7.0"},
+    {:phoenix_swagger, "~> 0.8"},
     {:ex_json_schema, "~> 0.5"} # optional
   ]
 end
 ```
 
-For Phoenix 1.2 or lower, please use version `"~> 0.5.0"`.
 `ex_json_schema` is an optional dependency of `phoenix_swagger` required only for schema validation plug and test helper.
 
 Now you can use `phoenix_swagger` to generate `swagger-ui` file for you application.
 
 ## Usage
+
+Add a config entry to your phoenix application specifying the output filename, router and endpoint modules used to generate the swagger file:
+
+```elixir
+config :my_app, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: MyAppWeb.Router,     # phoenix routes will be converted to swagger paths
+      endpoint: MyAppWeb.Endpoint  # (optional) endpoint config used to set host, port and https schemes.
+    ]
+  }
+```
 
 The outline of the swagger document should be returned from a `swagger_info/0` function
 defined in your phoenix `Router.ex` module.
@@ -239,28 +250,15 @@ mix task for the `swagger-ui` json file generation into directory with `phoenix`
 mix phx.swagger.generate
 ```
 
-As the result there will be `swagger.json` file into root directory of the `phoenix` application.
-To generate `swagger` file with the custom name/place, pass it to the main mix task:
+If multiple swagger files need to be generated, add additional entries to the project config:
 
-```
-mix phx.swagger.generate ~/my-phoenix-api.json
-```
-
-By default, the project looks for a Router named `(MyApp).Web.Router` and a Endpoint named `(MyApp).Web.Endpoint` consistent with Phoenix 1.3
-conventions. If your project does not yet follow that convention, or if you wish to generate a Swagger File with a custom Endpoint, you can
-specify the endpoint module as an argument (`-e` or `--endpoint`) to `mix phx.swagger.generate`:
-
-```
-mix phx.swagger.generate endpoint.json -e MyApp.Endpoint
-```
-
-If the project contains multiple `Router` modules, you can generate a swagger file for each one by specifying the router module as an argument
-(`-r` or `--router`) to `mix phx.swagger.generate`:
-
-```
-mix phx.swagger.generate booking-api.json -r MyApp.BookingRouter
-mix phx.swagger.generate reports-api.json -r MyApp.ReportsRouter
-mix phx.swagger.generate admin-api.json -r MyApp.AdminRouter
+```elixir
+config :my_app, :phoenix_swagger,
+  swagger_files: %{
+    "booking-api.json" => [router: MyApp.BookingRouter],
+    "reports-api.json" => [router: MyApp.ReportsRouter],
+    "admin-api.json" => [router: MyApp.AdminRouter]
+  }
 ```
 
 For more informantion, you can find `swagger` specification [here](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md).
@@ -365,17 +363,24 @@ PhoenixSwagger includes a plug with all static assets required to host swagger-u
 
 Usage:
 
-Generate a swagger file and place it in your applications `priv/static` dir:
+Generate a swagger file in your applications `priv/static` dir:
 
 ```
-mix phx.swagger.generate priv/static/myapp.json
+config :my_app, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [router: MyAppWeb.Router]
+  }
+```
+
+```
+mix phx.swagger.generate
 ```
 
 Add a swagger scope to your router, and forward all requests to SwaggerUI
 
 ```elixir
     scope "/api/swagger" do
-      forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json", disable_validator: true
+      forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json"
     end
 ```
 
