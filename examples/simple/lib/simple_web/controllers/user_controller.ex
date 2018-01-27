@@ -85,7 +85,6 @@ defmodule SimpleWeb.UserController do
   end
 
   swagger_path(:show) do
-    get "/api/users/{id}"
     summary "Show User"
     description "Show a user by ID"
     produces "application/json"
@@ -128,7 +127,7 @@ defmodule SimpleWeb.UserController do
   end
 
   swagger_path(:delete) do
-    delete "/api/users/{id}"
+    PhoenixSwagger.Path.delete "/api/users/{id}"
     summary "Delete User"
     description "Delete a user by ID"
     parameter :id, :path, :integer, "User ID", required: true, example: 3
