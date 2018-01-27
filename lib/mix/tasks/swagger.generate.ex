@@ -13,60 +13,37 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
       mix phx.swagger.generate
 
-      mix phx.swagger.generate ../swagger.json
+  Swagger file configuration must be defined in the project config, eg:
 
-      mix phx.swagger.generate ../swagger.json --router MyApp.Router
+      config :your_app, :phoenix_swagger,
+        swagger_files: %{
+          "priv/static/swagger.json" => [router: YourAppWeb.Router, endpoint: YourAppWeb.Endpoint]
+          # ... additional swagger files can be added here
+        }
   """
 
   @default_title "<enter your title>"
   @default_version "0.0.1"
 
-  defp app_path do
-    Enum.at(Mix.Project.load_paths(), 0) |> String.split("_build") |> Enum.at(0)
-  end
-  defp top_level_namespace, do: Mix.Project.get().application()[:mod] |> elem(0) |> Module.split |> Enum.drop(-1) |> Module.concat
-  defp app_name, do: Mix.Project.get().project()[:app]
-  defp default_swagger_file_path, do: app_path() <> "swagger.json"
-  defp default_router_module_name, do: Module.concat(["#{top_level_namespace()}Web", :Router])
-  defp default_endpoint_module_name, do: Module.concat(["#{top_level_namespace()}Web", :Endpoint])
-  defp router_module(switches), do: switches |> Keyword.get(:router, default_router_module_name()) |> attempt_load()
-  defp endpoint_module(switches), do: switches |> Keyword.get(:endpoint, default_endpoint_module_name()) |> attempt_load()
+  defp app_name, do: Mix.Project.get!().project()[:app]
 
-  def run(args) do
+  def run(_args) do
     Mix.Task.run("compile")
     Mix.Task.reenable("phx.swagger.generate")
-    Code.append_path("#{app_path()}_build/#{Mix.env}/lib/#{app_name()}/ebin")
-    {switches, params, _unknown} = OptionParser.parse(
-      args,
-      switches: [router: :string, endpoint: :string, help: :boolean],
-      aliases: [r: :router, e: :endpoint, h: :help])
+    Code.append_path(Mix.Project.compile_path())
 
-    router = router_module(switches)
-    endpoint = endpoint_module(switches)
-    cond do
-      (Keyword.get(switches, :help)) ->
-        usage()
-      is_nil(router) ->
-        Logger.warn "Skipping app #{app_name()}, no Router configured."
-      is_nil(endpoint) ->
-        Logger.warn "Skipping app #{app_name()}, no Endpoint configured."
-      true ->
-        output_file = Enum.at(params, 0, default_swagger_file_path())
-        write_file(output_file, swagger_document(router, endpoint))
-        IO.puts "Generated #{output_file}"
-    end
+    swagger_files =
+      app_name()
+      |> Application.get_env(:phoenix_swagger, [])
+      |> Keyword.get(:swagger_files, %{})
+
+    Enum.each(swagger_files, fn {output_file, config} ->
+      router = attempt_load(config[:router])
+      endpoint = attempt_load(config[:endpoint])
+      write_file(output_file, swagger_document(router, endpoint))
+      IO.puts "#{app_name()}: generated #{output_file}"
+    end)
   end
-
-  defp usage do
-    IO.puts """
-    Usage: mix phx.swagger.generate FILE --router ROUTER --endpoint ENDPOINT
-
-    With no FILE, default swagger file #{default_swagger_file_path()}
-    With no ROUTER, defaults to #{default_router_module_name()}
-    With no ENDPOINT, defaults to #{default_endpoint_module_name()}
-    """
-  end
-
 
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
@@ -77,7 +54,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp attempt_load(module_name) do
-    case module_name |> List.wrap() |> Module.concat() |> Code.ensure_loaded() do
+    case Code.ensure_loaded(module_name) do
       {:module, result} -> result
       _ -> nil
     end
@@ -174,6 +151,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     Map.merge(value1, value2)
   end
 
+  defp collect_host(swagger_map, nil), do: swagger_map
   defp collect_host(swagger_map, endpoint) do
     endpoint_config = Application.get_env(app_name(), endpoint)
 
