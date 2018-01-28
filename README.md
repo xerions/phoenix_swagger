@@ -7,7 +7,7 @@ validates the requests.
 
 ## Installation
 
-`PhoenixSwagger` provides `phx.swagger.generate` mix task for the swagger-ui `json`
+`PhoenixSwagger` provides a mix compiler and mix task `phx.swagger.generate` for the swagger-ui `json`
 file generation that contains swagger specification that describes API of the `phoenix`
 application.
 
@@ -27,6 +27,17 @@ end
 ```
 
 `ex_json_schema` is an optional dependency of `phoenix_swagger` required only for schema validation plug and test helper.
+
+Add `:phoenix_swagger` to the list of compilers to automatically update the swagger files each time the app is compiled:
+
+```elixir
+def project do
+[
+  ...
+  compilers: [:phoenix, :gettext, :phoenix_swagger] ++ Mix.compilers,
+  ...
+end
+```
 
 Now you can use `phoenix_swagger` to generate `swagger-ui` file for you application.
 
@@ -388,3 +399,26 @@ Run the server with `mix phoenix.server` and browse to `localhost:4000/api/swagg
 Swagger-ui should be shown with your swagger spec loaded.
 
 See the `examples/simple` project for a runnable example with swagger-ui.
+
+## Live Reload
+
+Live reloading can be use to automatically regenerate the swagger files and reload the swagger-ui when controller files change.
+To enable live reloading:
+
+ - Ensure `phoenix_swagger` is added as a compiler in your `mix.exs` file
+ - Add the path to the swagger json files and controllers to the endpoint `live_reload` config
+ - Add the `reloadable_compilers` configuration to the endpoint config, including the `:phoenix_swagger` compiler
+
+```elixir
+config :your_app, YourApp.Endpoint,
+  live_reload: [
+    patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg|json)$},
+      ~r{priv/gettext/.*(po)$},
+      ~r{lib/your_app_web/views/.*(ex)$},
+      ~r{lib/your_app_web/controllers/.*(ex)$},
+      ~r{lib/your_app_web/templates/.*(eex)$}
+    ]
+  ],
+  reloadable_compilers: [:gettext, :phoenix, :elixir, :phoenix_swagger]
+```
