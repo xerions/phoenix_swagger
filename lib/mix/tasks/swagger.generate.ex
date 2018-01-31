@@ -108,7 +108,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     |> Enum.reduce(swagger_map, &merge_paths/2)
   end
 
-  defp find_swagger_path_function(route = %{opts: action, path: path}) when is_atom(action) do
+  defp find_swagger_path_function(route = %{opts: action, path: path, verb: verb}) when is_atom(action) do
     controller = find_controller(route)
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
@@ -117,7 +117,8 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
         %{
           controller: controller,
           swagger_fun: swagger_fun,
-          path: format_path(path)
+          path: format_path(path),
+          verb: verb
         }
       true ->
         Logger.warn "Warning: #{controller} module didn't load."
@@ -135,11 +136,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp controller_function_exported?(%{controller: controller, swagger_fun: fun}) do
-    function_exported?(controller, fun, 0)
+    function_exported?(controller, fun, 1)
   end
 
-  defp get_swagger_path(%{controller: controller, swagger_fun: fun}) do
-    apply(controller, fun, [])
+  defp get_swagger_path(route = %{controller: controller, swagger_fun: fun}) do
+    apply(controller, fun, [route])
   end
 
   defp merge_paths(path, swagger_map) do

@@ -12,6 +12,30 @@
     }
   ```
 
+  * The HTTP verb and path can now be inferred from the phoenix router:
+
+  ```elixir
+  swagger_path :show do
+    get "/api/users/{id}
+    description "Gets a user by ID"
+    response 200, "OK", Schema.ref(User)
+  end
+  ```
+  Can now be written without the `get`:
+  ```elixir
+  swagger_path :show do
+    description "Gets a user by ID"
+    response 200, "OK", Schema.ref(User)
+  end
+  ```
+  Note that if your controller contains a `delete/2` function (such as when using the `resources` convention), then calling `delete/2` from `PhoenixSwagger.Path` will now cause a compilation error. To avoid this problem, include the full module name:
+  ```elixir
+  swagger_path(:delete) do
+    PhoenixSwagger.Path.delete "/api/users/{id}"
+    summary "Delete User"
+  end
+  ```
+
 # 0.7.1
 
   * Use the :load_from_system_env Endpoint config flag to detect dynamic host and port configuration
