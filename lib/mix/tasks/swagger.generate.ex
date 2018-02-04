@@ -41,7 +41,6 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       router = attempt_load(config[:router])
       endpoint = attempt_load(config[:endpoint])
       write_file(output_file, swagger_document(router, endpoint))
-      IO.puts "#{app_name()}: generated #{output_file}"
     end)
   end
 
@@ -50,7 +49,13 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     unless File.exists?(directory) do
       File.mkdir_p!(directory)
     end
-    File.write!(output_file, contents)
+
+    case File.read(output_file) do
+      {:ok, ^contents} -> :ok
+      _ ->
+        File.write!(output_file, contents)
+        IO.puts "#{app_name()}: generated #{output_file}"
+    end
   end
 
   defp attempt_load(module_name) do
