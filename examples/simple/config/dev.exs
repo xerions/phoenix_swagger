@@ -11,8 +11,17 @@ config :simple, SimpleWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: []
-
+  watchers: [],
+  live_reload: [
+    patterns: [
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg|json)$},
+      ~r{priv/gettext/.*(po)$},
+      ~r{lib/simple_web/views/.*(ex)$},
+      ~r{lib/simple_web/controllers/.*(ex)$},
+      ~r{lib/simple_web/templates/.*(eex)$}
+    ]
+  ],
+  reloadable_compilers: [:gettext, :phoenix, :elixir, :phoenix_swagger]
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
