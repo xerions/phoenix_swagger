@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp app_name, do: Mix.Project.get!().project()[:app]
 
   def run(_args) do
-    Mix.Task.run("compile")
+    Mix.Task.run("compile.elixir")
     Mix.Task.reenable("phx.swagger.generate")
     Code.append_path(Mix.Project.compile_path())
 
@@ -54,7 +54,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp attempt_load(module_name) do
-    case Code.ensure_loaded(module_name) do
+    case Code.ensure_compiled(module_name) do
       {:module, result} -> result
       _ -> nil
     end
@@ -113,7 +113,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
     cond do
-      Code.ensure_loaded?(controller) ->
+      Code.ensure_compiled?(controller) ->
         %{
           controller: controller,
           swagger_fun: swagger_fun,
