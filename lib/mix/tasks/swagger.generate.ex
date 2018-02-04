@@ -38,9 +38,16 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       |> Keyword.get(:swagger_files, %{})
 
     Enum.each(swagger_files, fn {output_file, config} ->
-      router = attempt_load(config[:router])
-      endpoint = attempt_load(config[:endpoint])
-      write_file(output_file, swagger_document(router, endpoint))
+      result =
+        with {:ok, router} <- attempt_load(config[:router]),
+             {:ok, endpoint} <- attempt_load(config[:endpoint]) do
+          write_file(output_file, swagger_document(router, endpoint))
+        end
+
+      case result do
+        :ok -> :ok
+        {:error, reason} -> Logger.warn("Failed to generate #{output_file}: #{reason}")
+      end
     end)
   end
 
@@ -58,10 +65,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     end
   end
 
+  defp attempt_load(nil), do: {:ok, nil}
   defp attempt_load(module_name) do
     case Code.ensure_compiled(module_name) do
-      {:module, result} -> result
-      _ -> nil
+      {:module, result} -> {:ok, result}
+      {:error, reason} -> {:error, "Failed to load module: #{module_name}: #{reason}"}
     end
   end
 
