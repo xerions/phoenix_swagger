@@ -73,6 +73,12 @@
           {
             "type": "string",
             "required": false,
+            "name": "optional-header",
+            "in": "header"
+          },
+          {
+            "type": "string",
+            "required": false,
             "name": "filter[direction_id]",
             "in": "query",
             "enum": [
@@ -80,6 +86,12 @@
               "1"
             ],
             "description": "Filter by direction of travel along the route.\n\nThe meaning of `direction_id` varies based on the route. You can programmatically get the direction names from `/routes` `/data/{index}/attributes/direction_names` or `/routes/{id}` `/data/attriutes/direction_names`.  The general pattern is as follows:\n\n| Route ID Pattern | `direction_id` | Direction Name |\n|------------------|----------------|----------------|\n| `Red` | `0` | `\"Southbound\"` |\n| `Red` | `1` | `\"Northbound\"` |\n| `Orange` | `0` | `\"Southbound\"` |\n| `Orange` | `1` | `\"Northbound\"` |\n| `Blue` | `0` | `\"Westbound\"` |\n| `Blue` | `1` | `\"Eastbound\"` |\n| `Green-*` | `0` | `\"Westbound\"` |\n| `Green-*` | `1` | `\"Eastbound\"` |\n| `*` | `0` | `\"Outbound\"` |\n| `*` | `1` | `\"Inbound\"` |\n\n\n\n\n"
+          },
+          {
+            "type": "string",
+            "required": true,
+            "name": "request-id",
+            "in": "header"
           }
         ],
         "operationId": "Api.ShapeController.index",

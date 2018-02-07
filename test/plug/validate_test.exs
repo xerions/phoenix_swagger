@@ -22,6 +22,7 @@ defmodule PhoenixSwagger.Plug.ValidateTest do
   test "required param returns error when not present" do
     conn = :get
            |> conn("/shapes?filter[route]=Red")
+           |> put_req_header("request-id", "d92578b3-d281-48a8-9e91-32b276fe6458")
            |> parse()
     assert %Conn{halted: true, resp_body: body, status: 400} = Validate.call(conn, @opts)
     assert Poison.decode!(body) == %{
@@ -35,6 +36,7 @@ defmodule PhoenixSwagger.Plug.ValidateTest do
   test "required nested param returns error when not present" do
     conn = :get
            |> conn("/shapes?api_key=SECRET")
+           |> put_req_header("request-id", "d92578b3-d281-48a8-9e91-32b276fe6458")
            |> parse()
     assert %Conn{halted: true, resp_body: body, status: 400} = Validate.call(conn, @opts)
     assert Poison.decode!(body) == %{
@@ -45,9 +47,23 @@ defmodule PhoenixSwagger.Plug.ValidateTest do
            }
   end
 
+  test "required header returns error when not present" do
+    conn = :get
+           |> conn("/shapes?filter[route]=Red")
+           |> parse()
+    assert %Conn{halted: true, resp_body: body, status: 400} = Validate.call(conn, @opts)
+    assert Poison.decode!(body) == %{
+             "error" => %{
+               "message" => "Required header request-id was not present.",
+               "path" => "#"
+             }
+           }
+  end
+
   test "does not halt when required params present" do
     conn = :get
            |> conn("/shapes?api_key=SECRET&filter[route]=Red")
+           |> put_req_header("request-id", "d92578b3-d281-48a8-9e91-32b276fe6458")
            |> parse()
     assert %Conn{halted: false} = Validate.call(conn, @opts)
   end
