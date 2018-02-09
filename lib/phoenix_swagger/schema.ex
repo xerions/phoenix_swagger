@@ -36,7 +36,9 @@ defmodule PhoenixSwagger.Schema do
     :properties,
     :additionalProperties,
     :discriminator,
-    :example]
+    :example,
+    :nullable
+  ]
 
   @doc """
   Construct a new %Schema{} struct using the schema DSL.
@@ -215,7 +217,7 @@ defmodule PhoenixSwagger.Schema do
       [do: {:__block__, _, exprs}] -> exprs
       [do: expr] -> [expr]
     end
-    
+
     body =
       exprs
       |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)
