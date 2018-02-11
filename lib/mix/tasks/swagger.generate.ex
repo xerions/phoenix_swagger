@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp app_name, do: Mix.Project.get!().project()[:app]
 
   def run(_args) do
-    Mix.Task.run("compile")
+    Mix.Task.run("compile.elixir")
     Mix.Task.reenable("phx.swagger.generate")
     Code.append_path(Mix.Project.compile_path())
 
@@ -38,10 +38,16 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       |> Keyword.get(:swagger_files, %{})
 
     Enum.each(swagger_files, fn {output_file, config} ->
-      router = attempt_load(config[:router])
-      endpoint = attempt_load(config[:endpoint])
-      write_file(output_file, swagger_document(router, endpoint))
-      IO.puts "#{app_name()}: generated #{output_file}"
+      result =
+        with {:ok, router} <- attempt_load(config[:router]),
+             {:ok, endpoint} <- attempt_load(config[:endpoint]) do
+          write_file(output_file, swagger_document(router, endpoint))
+        end
+
+      case result do
+        :ok -> :ok
+        {:error, reason} -> Logger.warn("Failed to generate #{output_file}: #{reason}")
+      end
     end)
   end
 
@@ -50,13 +56,20 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     unless File.exists?(directory) do
       File.mkdir_p!(directory)
     end
-    File.write!(output_file, contents)
+
+    case File.read(output_file) do
+      {:ok, ^contents} -> :ok
+      _ ->
+        File.write!(output_file, contents)
+        IO.puts "#{app_name()}: generated #{output_file}"
+    end
   end
 
+  defp attempt_load(nil), do: {:ok, nil}
   defp attempt_load(module_name) do
-    case Code.ensure_loaded(module_name) do
-      {:module, result} -> result
-      _ -> nil
+    case Code.ensure_compiled(module_name) do
+      {:module, result} -> {:ok, result}
+      {:error, reason} -> {:error, "Failed to load module: #{module_name}: #{reason}"}
     end
   end
 
@@ -113,7 +126,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
     cond do
-      Code.ensure_loaded?(controller) ->
+      Code.ensure_compiled?(controller) ->
         %{
           controller: controller,
           swagger_fun: swagger_fun,
