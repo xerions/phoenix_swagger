@@ -236,7 +236,7 @@ defmodule PhoenixSwagger.PathTest do
                       "phone_number" => %{
                         "description" => "specified phone",
                         "type" => "string",
-                        "nullable" => true
+                        "x-nullable" => true
                       },
                     },
                     "type" => "object"
