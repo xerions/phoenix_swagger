@@ -66,6 +66,7 @@ defmodule PhoenixSwagger.PathTest do
           properties do
             subscribe_to_mailing_list :boolean, "mailing list subscription", default: true
             send_special_offers :boolean, "special offers list subscription", default: true
+            phone_number :string, "specified phone", nullable: true
           end
         end)
       end
@@ -231,7 +232,12 @@ defmodule PhoenixSwagger.PathTest do
                         "default" => true,
                         "description" => "mailing list subscription",
                         "type" => "boolean"
-                      }
+                      },
+                      "phone_number" => %{
+                        "description" => "specified phone",
+                        "type" => "string",
+                        "x-nullable" => true
+                      },
                     },
                     "type" => "object"
                   }

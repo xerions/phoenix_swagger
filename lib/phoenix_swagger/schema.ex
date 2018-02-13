@@ -36,7 +36,9 @@ defmodule PhoenixSwagger.Schema do
     :properties,
     :additionalProperties,
     :discriminator,
-    :example]
+    :example,
+    :'x-nullable'
+  ]
 
   @doc """
   Construct a new %Schema{} struct using the schema DSL.
@@ -177,7 +179,9 @@ defmodule PhoenixSwagger.Schema do
   end
   def property(model = %Schema{type: :object}, name, type = %Schema{}, description, opts) do
     {required?, opts} = Keyword.pop(opts, :required)
+    {nullable?, opts} = Keyword.pop(opts, :nullable)
     property_schema = struct!(type, [description: type.description || description] ++ opts)
+    property_schema = if nullable?, do: %{property_schema | :'x-nullable' => true}, else: property_schema
     properties = (model.properties || %{}) |> Map.put(name, property_schema)
     model = %{model | properties: properties}
     if required?, do: required(model, name), else: model
@@ -215,7 +219,7 @@ defmodule PhoenixSwagger.Schema do
       [do: {:__block__, _, exprs}] -> exprs
       [do: expr] -> [expr]
     end
-    
+
     body =
       exprs
       |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)
