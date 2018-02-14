@@ -68,12 +68,31 @@ defmodule PhoenixSwagger.ConnValidator do
       for parameter <- schema.schema["parameters"],
           parameter["type"] != nil,
           parameter["in"] in ["query", "path"] do
-        {parameter["type"], parameter["name"], conn.params[parameter["name"]], parameter["required"]}
+        {parameter["type"], parameter["name"], get_param_value(conn.params, parameter["name"]), parameter["required"]}
       end
     validate_query_params(parameters)
   end
 
-  defp validate_body_params(path, conn), do: Validator.validate(path, conn.body_params)
+  defp get_in_nested(params = nil, _), do: params
+  defp get_in_nested(params, nil), do: params
+  defp get_in_nested(params, nested_map) when map_size(nested_map) == 1 do
+    [{key, child_nested_map}] = Map.to_list(nested_map)
+
+    get_in_nested(params[key], child_nested_map)
+  end
+
+  defp get_param_value(params, nested_name) when is_binary(nested_name) do
+    nested_map = Plug.Conn.Query.decode(nested_name)
+    get_in_nested(params, nested_map)
+  end
+
+  defp validate_body_params(path, conn) do
+    case Validator.validate(path, conn.body_params) do
+      :ok -> :ok
+      {:error, [{error, error_path} | _], _path} -> {:error, error, error_path}
+      {:error, error, error_path} ->  {:error, error, error_path}
+    end
+  end
 
   defp equal_paths?([], []), do: true
   defp equal_paths?([head | orig_path_rest], [head | req_path_rest]), do: equal_paths?(orig_path_rest, req_path_rest)
