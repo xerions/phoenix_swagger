@@ -309,7 +309,12 @@ Suppose you have following resource in your schema:
 The `phoenix_swagger` provides `PhoenixSwagger.Validator.parse_swagger_schema/1` API to load a swagger schema by
 the given path or list of paths. This API should be called during application startup to parse/load a swagger schema.
 
-After this, the `PhoenixSwagger.Validator.validate/2` can be used to validate resources.
+After this, use one of the following to validate resources:
+* the function `PhoenixSwagger.Validator.validate/2` using request path and parameters
+* the default Plug `PhoenixSwagger.Plug.Validate`
+* the function `PhoenixSwagger.ConnValidate.validate/1` using `conn`
+
+### `Validator.validate/2`
 
 For example:
 
@@ -321,10 +326,10 @@ iex(2)> Validator.validate("/history", %{"limit" => 10, "offset" => 100})
 :ok
 ```
 
-Besides `validate/2` API, the `phoenix_swagger` validator can be used via Plug to validate
-intput parameters of your controllers.
 
-Just add `PhoenixSwagger.Plug.Validate` plug to your router:
+### Default Plug
+
+To validate input parameters of your controllers with the default Plug, just add `PhoenixSwagger.Plug.Validate` to your router:
 
 ```elixir
 pipeline :api do
@@ -338,8 +343,25 @@ scope "/api", MyApp do
 end
 ```
 
+On validation errors, the default Plug returns `400` with the following body:
+```json
+{
+  "error": {
+    "path": "#/path/to/schema",
+    "message": "Expected integer, got null"
+  }
+}
+```
+
+The return code for validation errors is configurable via `:validation_failed_status` parameter.
+If `conn.private[:phoenix_swagger][:valid]` is set to `true`, the Plug will skip validation.
+
 The current minimal version of elixir should be `1.3` and in this case you must add `phoenix_swagger` application
 to the application list in your `mix.exs`.
+
+### `ConnValidator.validate/1`
+
+Use `ConnValidator.validate/1` to build your own Plugs. It accepts a `conn` and returns `:ok` on validation success. Refer to source for error cases.
 
 ## Test Response Validator
 
