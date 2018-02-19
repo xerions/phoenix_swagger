@@ -89,7 +89,7 @@ defmodule PhoenixSwagger.ConnValidator do
   defp validate_body_params(path, conn) do
     case Validator.validate(path, conn.body_params) do
       :ok -> :ok
-      {:error, [{error, error_path} | _], _path} -> {:error, error, error_path}
+      {:error, [{_error, _error_path} | _] = errors, path} -> {:error, errors, path}
       {:error, error, error_path} ->  {:error, error, error_path}
     end
   end
