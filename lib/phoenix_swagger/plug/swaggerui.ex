@@ -144,10 +144,10 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   end
 
   # Render the swagger.json file or 404 for any other file
-  get "/:name" do
+  get "/*paths" do
     spec_url = conn.assigns.spec_url
-    case conn.path_params["name"] do
-      ^spec_url -> Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
+    case conn.path_params["paths"] do
+      [^spec_url] -> Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
       _ -> Conn.send_resp(conn, 404, "not found")
     end
   end
