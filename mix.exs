@@ -4,27 +4,43 @@ defmodule PhoenixSwagger.Mixfile do
   @version "0.8.0"
 
   def project do
-    [app: :phoenix_swagger,
-     version: @version,
-     elixir: "~> 1.2",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps(),
-     description: description(),
-     package: package(),
+    [
+      app: :phoenix_swagger,
+      version: @version,
+      elixir: "~> 1.3",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      description: description(),
+      package: package(),
 
-     #Docs
-     source_url: "https://github.com/xerions/phoenix_swagger",
-     homepage_url: "https://github.com/xerions/phoenix_swagger",
-     docs: [extras: ["README.md", "docs/reusing-swagger-parameters.md"], main: "readme", source_ref: "v#{@version}"]]
+      # Docs
+      source_url: "https://github.com/xerions/phoenix_swagger",
+      homepage_url: "https://github.com/xerions/phoenix_swagger",
+      docs: [
+        extras: [
+          "README.md",
+          "docs/getting-started.md",
+          "docs/schemas.md",
+          "docs/operations.md",
+          "docs/reusing-swagger-parameters.md",
+          "docs/swagger-ui.md",
+          "docs/schema-validation.md",
+          "docs/test-helpers.md",
+          "docs/live-reloading.md",
+          "docs/json-api-helpers.md"
+        ],
+        main: "readme",
+        source_ref: "v#{@version}"
+      ]
+    ]
   end
 
   # Configuration for the OTP application
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger],
-     mod: {PhoenixSwagger, []}]
+    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}]
   end
 
   # Dependencies can be Hex packages:
@@ -38,10 +54,10 @@ defmodule PhoenixSwagger.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-        {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0"},
-        {:ex_json_schema, "~> 0.5.1", optional: :true},
-        {:plug, "~> 1.1"},
-        {:ex_doc, "~> 0.14", only: :dev, runtime: false}
+      {:poison, "~> 2.2 or ~> 3.0"},
+      {:ex_json_schema, "~> 0.5", optional: true},
+      {:plug, "~> 1.4"},
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false}
     ]
   end
 
@@ -50,8 +66,13 @@ defmodule PhoenixSwagger.Mixfile do
   end
 
   defp package do
-    [maintainers: ["Alexander Kuleshov"],
-     licenses: ["MPL 2.0"],
-     links: %{"Github" => "https://github.com/xerions/phoenix_swagger"}]
+    [
+      maintainers: ["Alexander Kuleshov"],
+      licenses: ["MPL 2.0"],
+      links: %{
+        "Github" => "https://github.com/xerions/phoenix_swagger",
+        "Slack" => "https://elixir-lang.slack.com/messages/phoenix_swagger"
+      }
+    ]
   end
 end
