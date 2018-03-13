@@ -7,7 +7,7 @@ defmodule PhoenixSwagger.Mixfile do
     [
       app: :phoenix_swagger,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.3",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -40,7 +40,7 @@ defmodule PhoenixSwagger.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger], mod: {PhoenixSwagger, []}]
+    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}]
   end
 
   # Dependencies can be Hex packages:
