@@ -152,6 +152,10 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
     end
   end
 
+  match "/*paths" do
+    Conn.send_resp(conn, 405, "method not allowed")
+  end
+
   @doc """
   Plug.init callback
 
