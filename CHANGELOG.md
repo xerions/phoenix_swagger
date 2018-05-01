@@ -1,3 +1,7 @@
+# 0.8.1
+
+  * fix for crash on non-GET requests
+
 # 0.8.0
 
   * Passing module names and output path as mix task parameters is no longer supported.
