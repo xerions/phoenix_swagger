@@ -46,6 +46,13 @@ defmodule PhoenixSwagger.ConnValidator do
       {:error, "Type mismatch. Expected Integer but got String.", "#/#{name}"}
   end
 
+  defp validate_number(name, value, parameters) do
+    {_, ""} = Float.parse(value)
+    validate_query_params(parameters)
+  rescue MatchError ->
+      {:error, "Type mismatch. Expected Number but got String.", "#/#{name}"}
+  end
+
   defp validate_query_params([]), do: :ok
   defp validate_query_params([{_type, _name, nil, false} | parameters]) do
     validate_query_params(parameters)
@@ -58,6 +65,9 @@ defmodule PhoenixSwagger.ConnValidator do
   end
   defp validate_query_params([{"integer", name, val, _} | parameters]) do
     validate_integer(name, val, parameters)
+  end
+  defp validate_query_params([{"number", name, val, _} | parameters]) do
+    validate_number(name, val, parameters)
   end
   defp validate_query_params([{"boolean", name, val, _} | parameters]) do
     validate_boolean(name, val, parameters)
