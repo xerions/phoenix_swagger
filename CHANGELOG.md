@@ -1,6 +1,7 @@
 # 0.8.1
 
   * fix for crash on non-GET requests
+  * Validate number type in query parameter
 
 # 0.8.0
 
