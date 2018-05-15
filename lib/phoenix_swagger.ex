@@ -237,6 +237,10 @@ defmodule PhoenixSwagger do
     |> Map.from_struct()
     |> to_json()
   end
+  def to_json(%{type: typ, '$ref': ref}) when is_nil(typ) and is_nil(ref), do: :null
+  def to_json(%{type: :object, properties: nil}), do: :null
+  def to_json(%{type: :object, properties: %{}=props}) when map_size(props) == 0, do: :null
+  def to_json(%{type: :array, items: %{type: typ, '$ref': ref}}) when is_nil(typ) and is_nil(ref), do: :null
   def to_json(value) when is_map(value) do
     value
     |> Enum.map(fn {k,v} -> {to_string(k), to_json(v)} end)
