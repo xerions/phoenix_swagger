@@ -81,15 +81,11 @@ defmodule PhoenixSwagger.JsonApiTest do
           },
           "type" => "object"
         },
-        "included" => %{
-          "description" => "Included resources",
-          "type" => "array",
-          "items" => %{}
-        }
       },
       "required" => ["data"],
       "type" => "object"
     }
+    assert !Map.has_key?(user_schema, "included")
   end
 
   test "produces expected user resource schema" do
