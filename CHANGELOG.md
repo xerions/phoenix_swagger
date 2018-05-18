@@ -2,6 +2,7 @@
 
   * fix for crash on non-GET requests
   * Validate number type in query parameter
+  * Serve swagger-ui from unpkg CDN
 
 # 0.8.0
 
