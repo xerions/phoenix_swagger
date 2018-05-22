@@ -84,7 +84,19 @@ defmodule PhoenixSwagger.JsonApiTest do
         "included" => %{
           "description" => "Included resources",
           "type" => "array",
-          "items" => %{}
+          "items" => %{
+            "properties" => %{
+              "id" => %{
+                "description" => "The JSON-API resource ID",
+                "type" => "string"
+              },
+              "type" => %{
+                "description" => "The JSON-API resource type",
+                "type" => "string"
+              }
+            },
+            "type" => "object"
+          }
         }
       },
       "required" => ["data"],
