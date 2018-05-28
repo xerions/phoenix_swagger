@@ -2,6 +2,7 @@
 
   * fix for crash on non-GET requests
   * Validate number type in query parameter
+  * Adds `id` and `type` properties to the `included`-items schema
 
 # 0.8.0
 
