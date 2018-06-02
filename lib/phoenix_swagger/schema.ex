@@ -135,6 +135,7 @@ defmodule PhoenixSwagger.Schema do
       }
     }
   end
+
   def array(name) when is_atom(name) do
     %Schema{
       type: :array,
@@ -711,4 +712,21 @@ defmodule PhoenixSwagger.Schema do
     |> required(property_name)
   end
 
+  @doc """
+  Sets the `x-nullable` vendor extension property for the schema.
+
+    ## Example
+
+    iex> alias PhoenixSwagger.Schema
+    ...> %Schema{type: :string} |> Schema.nullable(true)
+    %Schema{
+      type: :string,
+      'x-nullable': true
+    }
+  """
+  @spec nullable(%Schema{}, maybe_boolean) :: %Schema{}
+        when maybe_boolean: true | false | nil
+  def nullable(model = %Schema{}, value) when value in [true, false, nil] do
+    %{model | "x-nullable": value}
+  end
 end
