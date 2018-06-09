@@ -3,6 +3,9 @@
   * fix for crash on non-GET requests
   * Validate number type in query parameter
   * Adds `id` and `type` properties to the `included`-items schema
+  * Add `Schema.nullable` function to set the `x-nullable` property
+  * Add `nullable:` option to `JsonSchema.relationship` function
+  * Handle `x-nullable` schemas in `SchemaTest`
 
 # 0.8.0
 
