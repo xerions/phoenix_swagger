@@ -120,7 +120,13 @@ defmodule PhoenixSwagger.JsonApi do
         included: %Schema {
           type: :array,
           description: "Included resources",
-          items: %Schema{}
+          items: %Schema {
+            type:  :object,
+            properties: %{
+              type: %Schema{type: :string, description: "The JSON-API resource type"},
+              id: %Schema{type: :string, description: "The JSON-API resource ID"},
+            }
+          }
         }
       },
       required:  [:data]
