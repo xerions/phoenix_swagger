@@ -214,7 +214,7 @@
         "parameters": [],
         "operationId": "SimpleWeb.UserController.index",
         "description": "List all users in the database",
-        "deprecated": true
+        "deprecated": false
       }
     }
   },
