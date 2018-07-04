@@ -209,7 +209,7 @@ defmodule PhoenixSwagger.Path do
     put_in path.operation.parameters, params ++ [param]
   end
 
-   @doc """
+  @doc """
   Adds the deprecation section to the operation of a swagger `%PathObject{}`
   """
   def deprecated(path = %PathObject{}, status) do
