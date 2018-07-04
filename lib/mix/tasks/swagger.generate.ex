@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp app_name, do: Mix.Project.get!().project()[:app]
 
   def run(_args) do
-    Mix.Task.run("compile.elixir")
+    Mix.Task.run("compile")
     Mix.Task.reenable("phx.swagger.generate")
     Code.append_path(Mix.Project.compile_path())
 
