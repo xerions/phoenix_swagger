@@ -209,6 +209,13 @@ defmodule PhoenixSwagger.Path do
     put_in path.operation.parameters, params ++ [param]
   end
 
+  @doc """
+  Adds the deprecation section to the operation of a swagger `%PathObject{}`
+  """
+  def deprecated(path = %PathObject{}, status) do
+    put_in path.operation.deprecated, status
+  end
+
   defp translate_parameter_opt({:example, v}), do: {:"x-example", v}
   defp translate_parameter_opt({:items, items_schema}) when is_list(items_schema) do
      {:items, Enum.into(items_schema, %{})}
