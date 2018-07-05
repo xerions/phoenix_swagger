@@ -1,11 +1,13 @@
 # 0.8.1
 
-  * fix for crash on non-GET requests
+  * Fix for crash on non-GET requests
+  * Fix compilation error running `mix phx.swagger.generate` before `mix compile`
   * Validate number type in query parameter
-  * Adds `id` and `type` properties to the `included`-items schema
+  * Add `id` and `type` properties to the `included`-items schema
   * Add `Schema.nullable` function to set the `x-nullable` property
   * Add `nullable:` option to `JsonSchema.relationship` function
   * Handle `x-nullable` schemas in `SchemaTest`
+  * Add `deprecated` flag for operations
 
 # 0.8.0
 
