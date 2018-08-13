@@ -26,13 +26,13 @@ to the application list in your `mix.exs`.
 
 `ex_json_schema` is an optional dependency of `phoenix_swagger` required only for schema validation plug and test helper.
 
-Add `:phoenix_swagger` to the list of compilers to automatically update the swagger files each time the app is compiled:
+Append `:phoenix_swagger` to the list of compilers to automatically update the swagger files each time the app is compiled:
 
 ```elixir
 def project do
 [
   ...
-  compilers: [:phoenix, :gettext, :phoenix_swagger] ++ Mix.compilers,
+  compilers: [:phoenix, :gettext] ++ Mix.compilers ++ [:phoenix_swagger],
   ...
 end
 ```
