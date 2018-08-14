@@ -85,8 +85,7 @@ defmodule MyApp.Router do
       info: %{
         version: "1.0",
         title: "My App"
-      },
-      basePath: "/api"
+      }
     }
   end
 end
@@ -94,12 +93,14 @@ end
 
 The `version` and `title` are mandatory fields. By default the `version` will be `0.0.1`
 and the `title` will be `<enter your title>` if you do not provide `swagger_info/0`
-function. `basePath` is optional but may need to be specified if your API routes do not reside at the root location `/`.
+function.
 
 See the [Swagger Object specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#swagger-object) for details
-of other information that can be included. You can set the description of `tags` here for example:
+of other information that can be included. `basePath` is optional but may need to be specified if your API routes do not reside at the root location `/`. You can also set the description of `tags` here, for example:
+
 ```elixir
 %{
+  basePath: "/api",
   info: %{..},
   tags: [%{name: "Users", description: "Operations about Users"}]
 }
