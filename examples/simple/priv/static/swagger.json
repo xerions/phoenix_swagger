@@ -13,12 +13,21 @@
               "$ref": "#/definitions/UserResponse"
             },
             "examples": {
-              "application/json": {
+              "Joe": {
                 "data": {
                   "updated_at": "2017-02-12T13:45:23Z",
                   "name": "Joe",
                   "inserted_at": "2017-02-08T12:34:55Z",
                   "id": 3,
+                  "email": "Joe5@mail.com"
+                }
+              },
+              "Diane": {
+                "data": {
+                  "updated_at": "2018-10-04T12:34:55Z",
+                  "name": "Diane",
+                  "inserted_at": "2018-10-04T12:34:55Z",
+                  "id": 4,
                   "email": "Joe5@mail.com"
                 }
               }

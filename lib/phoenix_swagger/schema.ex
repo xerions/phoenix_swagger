@@ -37,6 +37,7 @@ defmodule PhoenixSwagger.Schema do
     :additionalProperties,
     :discriminator,
     :example,
+    :examples,
     :'x-nullable'
   ]
 
@@ -675,6 +676,35 @@ defmodule PhoenixSwagger.Schema do
   """
   def example(model = %Schema{}, example) do
     %{model | example: example}
+  end
+
+  @doc """
+  Adds multiple examples of the schema.
+
+    ## Example
+
+    iex> alias PhoenixSwagger.Schema
+    ...> %Schema{type: :object, properties: %{phone_number: %Schema{type: :string}}}
+    ...> |> Schema.examples(%{example_1: %{phone_number: "555-123-456"},example_2: %{phone_number: "555-246-0549"}})
+    %PhoenixSwagger.Schema{
+      type: :object,
+      properties: %{
+        phone_number: %PhoenixSwagger.Schema{
+          type: :string
+        }
+      },
+      examples: %{
+        example_1: %{
+          phone_number: "555-123-456"
+        },
+        example_2: %{
+          phone_number: "555-246-0549"
+        }
+      }
+    }
+  """
+  def examples(model = %Schema{}, examples) when is_map(examples) do
+    %{model | examples: examples}
   end
 
   @doc """

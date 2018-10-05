@@ -113,9 +113,16 @@ defmodule SimpleWeb.UserController do
         user: %{name: "Joe", email: "joe4@mail.com"}
       }
     end
-    response 200, "Updated Successfully", Schema.ref(:UserResponse), example: %{
-      data: %{
-        id: 3, name: "Joe", email: "Joe5@mail.com", inserted_at: "2017-02-08T12:34:55Z", updated_at: "2017-02-12T13:45:23Z"
+    response 200, "Updated Successfully", Schema.ref(:UserResponse), examples: %{
+      Joe: %{
+        data: %{
+          id: 3, name: "Joe", email: "Joe5@mail.com", inserted_at: "2017-02-08T12:34:55Z", updated_at: "2017-02-12T13:45:23Z"
+        }
+      },
+      Diane: %{
+        data: %{
+          id: 4, name: "Diane", email: "Joe5@mail.com", inserted_at: "2018-10-04T12:34:55Z", updated_at: "2018-10-04T12:34:55Z"
+        }
       }
     }
   end
