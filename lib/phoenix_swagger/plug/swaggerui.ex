@@ -131,6 +131,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   # Redirect / to /index.html
   get "/" do
     base_path = conn.request_path |> String.trim_trailing("/")
+
     conn
     |> Conn.put_resp_header("location", "#{base_path}/index.html")
     |> Conn.put_resp_content_type("text/html")
@@ -146,6 +147,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   # Render the swagger.json file or 404 for any other file
   get "/*paths" do
     spec_url = conn.assigns.spec_url
+
     case conn.path_params["paths"] do
       [^spec_url] -> Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
       _ -> Conn.send_resp(conn, 404, "not found")

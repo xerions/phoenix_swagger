@@ -41,57 +41,59 @@ defmodule PhoenixSwagger.JsonApi do
   The given `resource` should be the name of a JSON-API resource defined with the `resource/1` macro
   """
   def page(resource) do
-    %Schema {
+    %Schema{
       type: :object,
-      description: "A page of [#{resource}](##{resource |> to_string |> String.downcase}) results",
+      description:
+        "A page of [#{resource}](##{resource |> to_string |> String.downcase()}) results",
       properties: %{
-        meta: %Schema {
+        meta: %Schema{
           type: :object,
           properties: %{
-            "total-pages": %Schema {
+            "total-pages": %Schema{
               type: :integer,
               description: "The total number of pages available"
             },
-            "total-count": %Schema {
+            "total-count": %Schema{
               type: :integer,
               description: "The total number of items available"
             }
           }
         },
-        links: %Schema {
-          type:  :object,
+        links: %Schema{
+          type: :object,
           properties: %{
-            self: %Schema {
-              type:  :string,
-              description:  "Link to this page of results"
+            self: %Schema{
+              type: :string,
+              description: "Link to this page of results"
             },
-            prev: %Schema {
-              type:  :string,
-              description:  "Link to the previous page of results"
+            prev: %Schema{
+              type: :string,
+              description: "Link to the previous page of results"
             },
-            next: %Schema {
-              type:  :string,
-              description:  "Link to the next page of results"
+            next: %Schema{
+              type: :string,
+              description: "Link to the next page of results"
             },
-            last: %Schema {
-              type:  :string,
-              description:  "Link to the last page of results"
+            last: %Schema{
+              type: :string,
+              description: "Link to the last page of results"
             },
-            first: %Schema {
-              type:  :string,
-              description:  "Link to the first page of results"
+            first: %Schema{
+              type: :string,
+              description: "Link to the first page of results"
             }
           }
         },
-        data: %Schema {
-          type:  :array,
-          description:  "Content with [#{resource}](##{resource |> to_string |> String.downcase}) objects",
-          items: %Schema {
+        data: %Schema{
+          type: :array,
+          description:
+            "Content with [#{resource}](##{resource |> to_string |> String.downcase()}) objects",
+          items: %Schema{
             "$ref": "#/definitions/#{resource}"
           }
         }
       },
-      required:  [:data]
+      required: [:data]
     }
     |> PhoenixSwagger.to_json()
   end
@@ -101,35 +103,38 @@ defmodule PhoenixSwagger.JsonApi do
   The given `resource` should be the name of a JSON-API resource defined with the `resource/1` macro
   """
   def single(resource) do
-    %Schema {
+    %Schema{
       type: :object,
-      description: "A JSON-API document with a single [#{resource}](##{resource |> to_string |> String.downcase}) resource",
+      description:
+        "A JSON-API document with a single [#{resource}](##{
+          resource |> to_string |> String.downcase()
+        }) resource",
       properties: %{
-        links: %Schema {
-          type:  :object,
+        links: %Schema{
+          type: :object,
           properties: %{
-            self: %Schema {
-              type:  :string,
-              description:  "the link that generated the current response document."
+            self: %Schema{
+              type: :string,
+              description: "the link that generated the current response document."
             }
           }
         },
-        data: %Schema {
+        data: %Schema{
           "$ref": "#/definitions/#{resource}"
         },
-        included: %Schema {
+        included: %Schema{
           type: :array,
           description: "Included resources",
-          items: %Schema {
-            type:  :object,
+          items: %Schema{
+            type: :object,
             properties: %{
               type: %Schema{type: :string, description: "The JSON-API resource type"},
-              id: %Schema{type: :string, description: "The JSON-API resource ID"},
+              id: %Schema{type: :string, description: "The JSON-API resource ID"}
             }
           }
         }
       },
-      required:  [:data]
+      required: [:data]
     }
     |> PhoenixSwagger.to_json()
   end
@@ -137,34 +142,39 @@ defmodule PhoenixSwagger.JsonApi do
   @doc """
   Defines a schema for a JSON-API resource, without the enclosing top-level document.
   """
-  defmacro resource([do: {:__block__, _, exprs}]) do
-    schema = quote do
-      %Schema {
-        type: :object,
-        properties: %{
-          type: %Schema{type: :string, description: "The JSON-API resource type"},
-          id: %Schema{type: :string, description: "The JSON-API resource ID"},
-          relationships: %Schema{type: :object, properties: %{}},
-          links: %Schema{type: :object, properties: %{}},
-          attributes: %Schema{
-            type: :object,
-            properties: %{}
+  defmacro resource(do: {:__block__, _, exprs}) do
+    schema =
+      quote do
+        %Schema{
+          type: :object,
+          properties: %{
+            type: %Schema{type: :string, description: "The JSON-API resource type"},
+            id: %Schema{type: :string, description: "The JSON-API resource ID"},
+            relationships: %Schema{type: :object, properties: %{}},
+            links: %Schema{type: :object, properties: %{}},
+            attributes: %Schema{
+              type: :object,
+              properties: %{}
+            }
           }
         }
-      }
-    end
+      end
 
-    body = Enum.reduce(exprs, schema, fn expr, acc ->
-      quote do unquote(acc) |> unquote(expr) end
-    end)
+    body =
+      Enum.reduce(exprs, schema, fn expr, acc ->
+        quote do
+          unquote(acc) |> unquote(expr)
+        end
+      end)
 
     quote do
       (fn ->
-        import PhoenixSwagger.JsonApi
-        import PhoenixSwagger.Schema
-        unquote(body)
-        |> PhoenixSwagger.to_json()
-      end).()
+         import PhoenixSwagger.JsonApi
+         import PhoenixSwagger.Schema
+
+         unquote(body)
+         |> PhoenixSwagger.to_json()
+       end).()
     end
   end
 
@@ -188,18 +198,19 @@ defmodule PhoenixSwagger.JsonApi do
       |> attribute(:dateOfBirth, :string, "Date of Birth", format: "ISO-8601", required: false)
   """
   defmacro attributes(model, block) do
-    attrs = case block do
-      [do: {:__block__, _, attrs}] -> attrs
-      [do: attr] -> [attr]
-    end
+    attrs =
+      case block do
+        [do: {:__block__, _, attrs}] -> attrs
+        [do: attr] -> [attr]
+      end
 
     attrs
     |> Enum.map(fn {name, line, args} -> {:attribute, line, [name | args]} end)
     |> Enum.reduce(model, fn next, pipeline ->
-         quote do
-           unquote(pipeline) |> unquote(next)
-         end
-       end)
+      quote do
+        unquote(pipeline) |> unquote(next)
+      end
+    end)
   end
 
   @doc """
@@ -211,21 +222,24 @@ defmodule PhoenixSwagger.JsonApi do
    name of this attribute to be added to the "required" list of the attributes schema.
   """
   def attribute(model, name, type, description, opts \\ [])
+
   def attribute(model, name, type, description, opts) when is_atom(type) or is_list(type) do
     attribute(model, name, %Schema{type: type}, description, opts)
   end
+
   def attribute(model = %Schema{}, name, type = %Schema{}, description, opts) do
     {required?, opts} = Keyword.pop(opts, :required)
     attr_schema = struct!(type, [description: description] ++ opts)
     model = put_in(model.properties.attributes.properties[name], attr_schema)
 
-    required = case {model.properties.attributes.required, required?} do
-      {nil, true} -> [name]
-      {r, true} -> r ++ [name]
-      {r, _} -> r
-    end
+    required =
+      case {model.properties.attributes.required, required?} do
+        {nil, true} -> [name]
+        {r, true} -> r ++ [name]
+        {r, _} -> r
+      end
 
-    put_in model.properties.attributes.required, required
+    put_in(model.properties.attributes.required, required)
   end
 
   @doc """
