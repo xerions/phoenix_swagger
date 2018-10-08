@@ -13,7 +13,9 @@ defmodule Mix.Tasks.Compile.PhoenixSwagger do
       results when is_list(results) ->
         errors = filter_errors(results)
         if Enum.empty?(errors), do: :ok, else: :error
-      result -> result
+
+      result ->
+        result
     end
   end
 
