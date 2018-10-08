@@ -49,7 +49,7 @@ defmodule PhoenixSwagger.Validator do
   def parse_swagger_schema(specs) when is_list(specs) do
     specs
     |> Enum.map(&read_swagger_schema/1)
-    Enum.reduce(%{}, fn(schema, acc) ->
+    |> Enum.reduce(%{}, fn(schema, acc) ->
       if acc["paths"] == nil do
         Map.merge(acc, schema)
       else
@@ -113,7 +113,7 @@ defmodule PhoenixSwagger.Validator do
               %{"schema" => param_schema} ->
                 properties |> Map.put_new(name, param_schema)
             end
-          if param["required"] do
+          if param["required"] && param["in"] != "body" do
             {[name | required], properties}
           else
             {required, properties}
@@ -128,6 +128,7 @@ defmodule PhoenixSwagger.Validator do
           "parameters" => path_item["parameters"] || [],
           "definitions" => schema["definitions"] || %{}
         }
+        |> set_if_not_empty("required", required)
         |> ExJsonSchema.Schema.resolve()
         # store path concatenated with method. This allows us
         # to identify the same resources with different http methods.
@@ -137,6 +138,9 @@ defmodule PhoenixSwagger.Validator do
       end)
     end) |> List.flatten
   end
+
+  defp set_if_not_empty(m, _, []), do: m
+  defp set_if_not_empty(m, k, v), do: m |> Map.put_new(k, v)
 
   @doc false
   defp read_swagger_schema(file) do
