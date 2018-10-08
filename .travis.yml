@@ -6,6 +6,7 @@ elixir:
     - 1.4.1
     - 1.5.1
     - 1.6.1
+    - 1.7.3
 
 otp_release:
     - 18.3
@@ -20,5 +21,12 @@ matrix:
       otp_release: 20.0
     - elixir: 1.6.1
       otp_release: 18.3
+    - elixir: 1.7.3
+      otp_release: 18.3
 
-script: "mix test"
+script:
+- |
+  if [[ ${TRAVIS_ELIXIR_VERSION:2:1} -ge 7 ]]; then
+    mix format --check-formatted
+  fi
+- mix test
