@@ -90,8 +90,8 @@ defmodule PhoenixSwagger.ConnValidator do
       for parameter <- schema.schema["parameters"],
           parameter["type"] != nil,
           parameter["in"] in ["query", "path"] do
-        {parameter["type"], parameter["name"], get_param_value(conn.params, parameter["name"]),
-         parameter["required"]}
+        %{"type" => type, "name" => name, "required" => required} = parameter
+        {type, name, get_param_value(conn.params, name), required}
       end
 
     validate_query_params(parameters)
