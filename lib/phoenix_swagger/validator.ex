@@ -47,23 +47,23 @@ defmodule PhoenixSwagger.Validator do
 
   """
   def parse_swagger_schema(specs) when is_list(specs) do
-    schemas = Enum.map(specs, fn (spec) ->
-      read_swagger_schema(spec)
+    specs
+    |> Enum.map(&read_swagger_schema/1)
+    Enum.reduce(%{}, fn(schema, acc) ->
+      if acc["paths"] == nil do
+        Map.merge(acc, schema)
+      else
+        acc
+        |> Map.update!("paths", fn(paths_map) -> Map.merge(paths_map, schema["paths"]) end)
+        |> Map.update!("definitions", fn(definitions_map) -> Map.merge(definitions_map, schema["definitions"]) end)
+      end
     end)
-    schema = Enum.reduce(schemas, %{}, fn(schema, acc) ->
-      acc = if acc["paths"] == nil do
-              Map.merge(acc, schema)
-            else
-              acc = Map.update!(acc, "paths", fn(paths_map) -> Map.merge(paths_map, schema["paths"]) end)
-              Map.update!(acc, "definitions", fn(definitions_map) -> Map.merge(definitions_map, schema["definitions"]) end)
-            end
-      acc
-    end)
-    collect_schema_attrs(schema)
+    |> collect_schema_attrs()
   end
   def parse_swagger_schema(spec) do
-    schema = read_swagger_schema(spec)
-    collect_schema_attrs(schema)
+    spec
+    |> read_swagger_schema()
+    |> collect_schema_attrs()
   end
 
   @doc """
