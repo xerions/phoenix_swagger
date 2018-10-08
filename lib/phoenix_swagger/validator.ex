@@ -107,18 +107,17 @@ defmodule PhoenixSwagger.Validator do
           # Let's go through requests parameters from swagger schema
           # and collect it into json schema properties.
           properties = Enum.reduce(parameters, %{}, fn(parameter, acc) ->
-            acc = if parameter["type"] == nil do
-                    ref = String.split(parameter["schema"]["$ref"], "/") |> List.last
-                    Map.merge(acc, schema["definitions"][ref])
-                  else
-                    acc
-                  end
-            acc
+            if parameter["schema"] && parameter["schema"]["$ref"] do
+              ref = String.split(parameter["schema"]["$ref"], "/") |> List.last
+              Map.merge(acc, schema["definitions"][ref])
+            else
+              acc
+            end
           end)
           # collect request primitive parameters which do not refer to `definitions`
           # these are mostly parameters from query string
           properties = Enum.reduce(parameters, properties, fn(parameter, acc) ->
-            if parameter["type"] != nil do
+            if acc["properties"] |> is_map() && parameter["type"] != nil do
               collect_properties(acc, parameter)
             else
               acc
@@ -143,11 +142,12 @@ defmodule PhoenixSwagger.Validator do
   end
 
   @doc false
-  defp collect_properties(properties, parameter) when properties == %{} do
-    Map.put(%{}, "properties", Map.put_new(%{}, parameter["name"], %{"type" => parameter["type"]}))
+  defp collect_properties(properties, %{"name" => param_name, "type" => param_type})
+  when properties == %{} do
+    %{"properties" => %{param_name => %{"type" => param_type}}}
   end
-  defp collect_properties(properties, parameter) do
-    props = Map.put(properties["properties"], parameter["name"], %{"type" => parameter["type"]})
+  defp collect_properties(properties = %{"properties" => props}, %{"name" => param_name, "type" => param_type}) do
+    props = Map.put(props, param_name, %{"type" => param_type})
     Map.put(properties, "properties", props)
   end
 
