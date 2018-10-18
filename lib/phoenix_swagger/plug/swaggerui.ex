@@ -168,7 +168,8 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   def init(opts) do
     app = Keyword.fetch!(opts, :otp_app)
     swagger_file = Keyword.fetch!(opts, :swagger_file)
-    body = EEx.eval_string(@template, spec_url: swagger_file)
+    template = Keyword.get(opts, :template, @template)
+    body = EEx.eval_string(template, spec_url: swagger_file)
     swagger_file_path = Path.join(["priv", "static", swagger_file])
     [app: app, body: body, spec_url: swagger_file, swagger_file_path: swagger_file_path]
   end
