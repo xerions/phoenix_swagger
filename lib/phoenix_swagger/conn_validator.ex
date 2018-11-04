@@ -32,6 +32,23 @@ defmodule PhoenixSwagger.ConnValidator do
     end
   end
 
+  defp validate_array(name, values, items=%{"type"=>type}, parameters) do
+    with :ok <- String.split(values, ",")
+                |> Enum.map(&{type, name, &1, false, Map.get(items, "enum"), nil})
+                |> validate_query_params()
+    do validate_query_params(parameters)
+    else
+      error -> error
+    end
+  end
+
+  defp validate_enum(name, value, enum, parameters) do
+    cond do
+      value in enum -> validate_query_params(parameters)
+      true -> {:error, "Value #{inspect(value)} is not allowed in enum.", "#/#{name}"}
+    end
+  end
+
   defp validate_boolean(_name, value, parameters) when value in ["true", "false"] do
     validate_query_params(parameters)
   end
@@ -54,23 +71,29 @@ defmodule PhoenixSwagger.ConnValidator do
   end
 
   defp validate_query_params([]), do: :ok
-  defp validate_query_params([{_type, _name, nil, false} | parameters]) do
+  defp validate_query_params([{_type, _name, nil, false, _, _} | parameters]) do
     validate_query_params(parameters)
   end
-  defp validate_query_params([{_type, name, nil, true} | _]) do
+  defp validate_query_params([{_type, name, nil, true, _, _} | _]) do
     {:error, "Required property #{name} was not present.", "#"}
   end
-  defp validate_query_params([{"string", _name, _val, _} | parameters]) do
+  defp validate_query_params([{_type, name, val, _, enum, _} | parameters]) when not is_nil(enum) do
+    validate_enum(name, val, enum, parameters)
+  end
+  defp validate_query_params([{"string", _name, _val, _, _, _} | parameters]) do
     validate_query_params(parameters)
   end
-  defp validate_query_params([{"integer", name, val, _} | parameters]) do
+  defp validate_query_params([{"integer", name, val, _, _, _} | parameters]) do
     validate_integer(name, val, parameters)
   end
-  defp validate_query_params([{"number", name, val, _} | parameters]) do
+  defp validate_query_params([{"number", name, val, _, _, _} | parameters]) do
     validate_number(name, val, parameters)
   end
-  defp validate_query_params([{"boolean", name, val, _} | parameters]) do
+  defp validate_query_params([{"boolean", name, val, _, _, _} | parameters]) do
     validate_boolean(name, val, parameters)
+  end
+  defp validate_query_params([{"array", name, vals, _, _, items} | parameters]) do
+    validate_array(name, vals, items, parameters)
   end
   defp validate_query_params(path, conn) do
     [{_path, _basePath, schema}] = :ets.lookup(@table, path)
@@ -78,7 +101,8 @@ defmodule PhoenixSwagger.ConnValidator do
       for parameter <- schema.schema["parameters"],
           parameter["type"] != nil,
           parameter["in"] in ["query", "path"] do
-        {parameter["type"], parameter["name"], get_param_value(conn.params, parameter["name"]), parameter["required"]}
+              {parameter["type"], parameter["name"], get_param_value(conn.params, parameter["name"]),
+                           parameter["required"], parameter["enum"], parameter["items"]}
       end
     validate_query_params(parameters)
   end
