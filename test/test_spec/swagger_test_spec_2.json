@@ -50,12 +50,43 @@
                         "collectionFormat": "csv"
                     },
                     {
+                        "name": "class",
+                        "in": "query",
+                        "description": "animal class to filter by",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "mammals",
+                                "birds",
+                                "fish",
+                                "reptiles",
+                                "amphibians",
+                                "arthropods"
+                            ]
+                        },
+                        "collectionFormat": "csv"
+                    },
+                    {
                         "name": "limit",
                         "in": "query",
                         "description": "maximum number of results to return",
                         "required": false,
                         "type": "integer",
                         "format": "int32"
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Pets size to filter by",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "small",
+                            "medium",
+                            "big"
+                        ]
                     }
                 ],
                 "responses": {

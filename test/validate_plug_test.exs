@@ -54,6 +54,36 @@ defmodule ValidatePlugTest do
     assert test_conn == Validate.call(test_conn, [])
   end
 
+  test "validation successful on a valid request with array query param" do
+    test_conn = init_conn(:get, "/api/pets", %{}, %{"tags" => "cats,dogs"})
+    test_conn = Validate.call(test_conn, [])
+    assert is_nil test_conn.status
+    assert is_nil test_conn.resp_body
+    assert test_conn.private[:phoenix_swagger][:valid]
+  end
+
+  test "validation successful on a valid request with query enum param" do
+    test_conn = init_conn(:get, "/api/pets", %{}, %{"size" => "medium", "class" => "fish,birds", "tags" => "predator"})
+    test_conn = Validate.call(test_conn, [])
+    assert is_nil test_conn.status
+    assert is_nil test_conn.resp_body
+    assert test_conn.private[:phoenix_swagger][:valid]
+  end
+
+  test "validation fails if query array param elem is not allowed in enum" do
+    test_conn = init_conn(:get, "/api/pets", %{}, %{"class" => "fish,birds,cats"})
+    test_conn = Validate.call(test_conn, [])
+    assert {400, _, "{\"error\":{\"path\":\"#/class\",\"message\":\"Value \\\"cats\\\" is not allowed in enum.\"}}"}
+           = sent_resp(test_conn)
+  end
+
+  test "validation fails if query param value is not allowed in enum" do
+    test_conn = init_conn(:get, "/api/pets", %{}, %{"size" => "extra-big"})
+    test_conn = Validate.call(test_conn, [])
+    assert {400, _, "{\"error\":{\"path\":\"#/size\",\"message\":\"Value \\\"extra-big\\\" is not allowed in enum.\"}}"}
+           = sent_resp(test_conn)
+  end
+
   defp init_conn(verb, path, body_params \\ %{}, path_params \\ %{}) do
     conn(verb, path)
     |> Map.put(:body_params, body_params)
