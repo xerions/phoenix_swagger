@@ -1,13 +1,13 @@
 defmodule PhoenixSwagger.Mixfile do
   use Mix.Project
 
-  @version "0.8.1"
+  @version "0.8.2"
 
   def project do
     [
       app: :phoenix_swagger,
       version: @version,
-      elixir: "~> 1.3",
+      elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
