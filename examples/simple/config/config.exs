@@ -19,8 +19,7 @@ config :simple, SimpleWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "occcf4JQ1yY8UbMxsqJx0+wxhrQFQMvAJi+mYlaWCSJxmmrgGLyt4eZ9oFhrisRP",
   render_errors: [view: SimpleWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Simple.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Simple.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -29,4 +28,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
