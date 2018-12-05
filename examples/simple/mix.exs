@@ -4,7 +4,7 @@ defmodule Simple.Mixfile do
   def project do
     [app: :simple,
      version: "0.0.1",
-     elixir: "~> 1.2",
+     elixir: "~> 1.6",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers ++ [:phoenix_swagger],
      build_embedded: Mix.env == :prod,
