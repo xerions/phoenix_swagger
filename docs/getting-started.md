@@ -21,9 +21,6 @@ def deps do
 end
 ```
 
-The current minimal version of elixir should be `1.3` and in this case you must add `phoenix_swagger` application
-to the application list in your `mix.exs`.
-
 `ex_json_schema` is an optional dependency of `phoenix_swagger` required only for schema validation plug and test helper.
 
 Append `:phoenix_swagger` to the list of compilers to automatically update the swagger files each time the app is compiled:
