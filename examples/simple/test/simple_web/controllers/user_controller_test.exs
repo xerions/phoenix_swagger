@@ -36,7 +36,8 @@ defmodule SimpleWeb.UserControllerTest do
 
   describe "show" do
     test "shows user by ID", %{conn: conn, swagger_schema: schema} do
-      user = Repo.insert! struct(User, @create_attrs)
+      user = Repo.insert!(struct(User, @create_attrs))
+
       response =
         conn
         |> get(user_path(conn, :show, user))
@@ -44,22 +45,22 @@ defmodule SimpleWeb.UserControllerTest do
         |> json_response(200)
 
       assert response["data"] == %{
-        "id" => user.id,
-        "name" => user.name,
-        "email" => user.email
-      }
+               "id" => user.id,
+               "name" => user.name,
+               "email" => user.email
+             }
     end
 
     test "renders page not found when id is nonexistent", %{conn: conn} do
-      assert_error_sent 404, fn ->
-        get conn, user_path(conn, :show, -1)
-      end
+      assert_error_sent(404, fn ->
+        get(conn, user_path(conn, :show, -1))
+      end)
     end
   end
 
   describe "create user" do
     test "renders user when data is valid", %{conn: conn, swagger_schema: schema} do
-      conn = post conn, user_path(conn, :create), user: @create_attrs
+      conn = post(conn, user_path(conn, :create), user: @create_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn =
@@ -68,25 +69,31 @@ defmodule SimpleWeb.UserControllerTest do
         |> validate_resp_schema(schema, "UserResponse")
 
       assert json_response(conn, 200)["data"] == %{
-        "id" => id,
-        "email" => "joe@gmail.com",
-        "name" => "some name"}
+               "id" => id,
+               "email" => "joe@gmail.com",
+               "name" => "some name"
+             }
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, user_path(conn, :create), user: @invalid_attrs
+      conn = post(conn, user_path(conn, :create), user: @invalid_attrs)
+
       assert json_response(conn, 422)["error"] == %{
-        "message" => "Required property email was not present.",
-        "path" => "#/user"
-      }
+               "message" => "Required property email was not present.",
+               "path" => "#/user"
+             }
     end
   end
 
   describe "update user" do
     setup [:create_user]
 
-    test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user, swagger_schema: schema} do
-      conn = put conn, user_path(conn, :update, user), user: @update_attrs
+    test "renders user when data is valid", %{
+      conn: conn,
+      user: %User{id: id} = user,
+      swagger_schema: schema
+    } do
+      conn = put(conn, user_path(conn, :update, user), user: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn =
@@ -95,26 +102,29 @@ defmodule SimpleWeb.UserControllerTest do
         |> validate_resp_schema(schema, "UserResponse")
 
       assert json_response(conn, 200)["data"] == %{
-        "id" => id,
-        "email" => "jill@yahoo.com",
-        "name" => "some updated name"}
+               "id" => id,
+               "email" => "jill@yahoo.com",
+               "name" => "some updated name"
+             }
     end
 
     test "does not update user and renders errors when data is invalid", %{conn: conn} do
-      user = Repo.insert! %User{}
-      conn = put conn, user_path(conn, :update, user), user: @invalid_attrs
+      user = Repo.insert!(%User{})
+      conn = put(conn, user_path(conn, :update, user), user: @invalid_attrs)
+
       assert json_response(conn, 422)["error"] == %{
-        "message" => "Required property email was not present.",
-        "path" => "#/user"
-      }
+               "message" => "Required property email was not present.",
+               "path" => "#/user"
+             }
     end
 
     test "UserID path param must be an integer", %{conn: conn} do
-      conn = put conn, user_path(conn, :update, "abc"), user: @update_attrs
+      conn = put(conn, user_path(conn, :update, "abc"), user: @update_attrs)
+
       assert json_response(conn, 422)["error"] == %{
-        "message" => "Type mismatch. Expected Integer but got String.",
-        "path" => "#/id"
-      }
+               "message" => "Type mismatch. Expected Integer but got String.",
+               "path" => "#/id"
+             }
     end
   end
 
@@ -122,11 +132,12 @@ defmodule SimpleWeb.UserControllerTest do
     setup [:create_user]
 
     test "deletes chosen user", %{conn: conn, user: user} do
-      conn = delete conn, user_path(conn, :delete, user)
+      conn = delete(conn, user_path(conn, :delete, user))
       assert response(conn, 204)
-      assert_error_sent 404, fn ->
-        get conn, user_path(conn, :show, user)
-      end
+
+      assert_error_sent(404, fn ->
+        get(conn, user_path(conn, :show, user))
+      end)
     end
   end
 end

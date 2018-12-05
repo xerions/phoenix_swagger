@@ -3,10 +3,9 @@ defmodule Simple.Accounts.User do
   import Ecto.Changeset
   alias Simple.Accounts.User
 
-
   schema "users" do
-    field :email, :string
-    field :name, :string
+    field(:email, :string)
+    field(:name, :string)
 
     timestamps()
   end
