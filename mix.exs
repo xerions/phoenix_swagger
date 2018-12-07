@@ -40,7 +40,7 @@ defmodule PhoenixSwagger.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}]
+    [applications: [:logger, :plug, :poison], mod: {PhoenixSwagger, []}]
   end
 
   # Dependencies can be Hex packages:
