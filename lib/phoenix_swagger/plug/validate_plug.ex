@@ -46,7 +46,7 @@ defmodule PhoenixSwagger.Plug.Validate do
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(status, Poison.encode!(response))
+    |> send_resp(status, PhoenixSwagger.json_library().encode!(response))
     |> halt()
   end
 end

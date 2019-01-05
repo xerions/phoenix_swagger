@@ -79,7 +79,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     |> collect_host(endpoint)
     |> collect_paths(router)
     |> collect_definitions(router)
-    |> Poison.encode!(pretty: true)
+    |> PhoenixSwagger.json_library().encode!(pretty: true)
   end
 
   defp collect_info(router) do

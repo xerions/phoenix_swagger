@@ -52,7 +52,7 @@ defmodule PhoenixSwagger.SchemaTest do
     schema =
       swagger_file
       |> File.read!()
-      |> Poison.decode!()
+      |> PhoenixSwagger.json_library().decode!()
       |> Map.update("definitions", %{}, &swagger_nullable_to_json_schema/1)
       |> ExJsonSchema.Schema.resolve()
 
@@ -99,7 +99,7 @@ defmodule PhoenixSwagger.SchemaTest do
       end
   """
   def validate_resp_schema(conn, swagger_schema, model_name) do
-    response_data = conn.resp_body |> Poison.decode!
+    response_data = conn.resp_body |> PhoenixSwagger.json_library().decode!
     schema = swagger_schema.schema["definitions"][model_name]
     errors_with_list_paths = ExJsonSchema.Validator.validate(swagger_schema, schema, response_data, ["#"])
     case errors_with_list_paths do
@@ -112,7 +112,7 @@ defmodule PhoenixSwagger.SchemaTest do
           |> Enum.map(fn {msg, path} -> "At #{path}: #{msg}" end)
           |> Enum.join("\n")
 
-        response_pretty = Poison.encode!(response_data, pretty: true)
+        response_pretty = PhoenixSwagger.json_library().encode!(response_data, pretty: true)
         message = Enum.join([headline, error_details, response_pretty], "\n")
         ExUnit.Assertions.flunk message
     end

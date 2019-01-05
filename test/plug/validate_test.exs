@@ -6,7 +6,7 @@ defmodule PhoenixSwagger.Plug.ValidateTest do
   alias Plug.Conn
 
   @opts Validate.init([])
-  @parsers_opts Plug.Parsers.init(json_decoder: Poison, parsers: [:urlencoded, :json], pass: ["*/*"])
+  @parsers_opts Plug.Parsers.init(json_decoder: PhoenixSwagger.json_library(), parsers: [:urlencoded, :json], pass: ["*/*"])
   @table :validator_table
 
   setup do
@@ -24,7 +24,7 @@ defmodule PhoenixSwagger.Plug.ValidateTest do
            |> conn("/shapes?filter[route]=Red")
            |> parse()
     assert %Conn{halted: true, resp_body: body, status: 400} = Validate.call(conn, @opts)
-    assert Poison.decode!(body) == %{
+    assert PhoenixSwagger.json_library().decode!(body) == %{
              "error" => %{
                "message" => "Required property api_key was not present.",
                "path" => "#"
@@ -37,7 +37,7 @@ defmodule PhoenixSwagger.Plug.ValidateTest do
            |> conn("/shapes?api_key=SECRET")
            |> parse()
     assert %Conn{halted: true, resp_body: body, status: 400} = Validate.call(conn, @opts)
-    assert Poison.decode!(body) == %{
+    assert PhoenixSwagger.json_library().decode!(body) == %{
              "error" => %{
                "message" => "Required property filter[route] was not present.",
                "path" => "#"
