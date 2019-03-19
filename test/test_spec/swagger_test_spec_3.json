@@ -1,0 +1,18 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/pets/cats": {
+      "get": {
+        "summary": "",
+        "responses": {},
+        "parameters": [],
+        "description": ""
+      }
+    }
+  },
+  "info": {
+    "version": "1.0",
+    "title": "Simple App"
+  },
+  "definitions": {}
+}

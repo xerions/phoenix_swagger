@@ -18,7 +18,10 @@ defmodule PhoenixSwagger.ConnValidator do
   end
 
   defp find_matching_path(conn) do
-    found = Enum.find(:ets.tab2list(@table), fn({path, base_path, _}) ->
+    found =
+      :ets.tab2list(@table)
+      |> Enum.sort()
+      |> Enum.find(fn({path, base_path, _}) ->
       base_path_segments = String.split(base_path || "", "/") |> tl
       path_segments = String.split(path, "/") |> tl
       path_info_without_base = remove_base_path(conn.path_info, base_path_segments)
