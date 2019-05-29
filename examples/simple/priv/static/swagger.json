@@ -124,6 +124,49 @@
         "description": "Delete a user by ID"
       }
     },
+    "/api/users/test": {
+      "get": {
+        "tags": [
+          "UserSocket"
+        ],
+        "summary": "Test function",
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/UsersResponse"
+            },
+            "examples": {
+              "application/json": {
+                "data": [
+                  {
+                    "updated_at": "2017-02-12T13:45:23Z",
+                    "name": "Joe",
+                    "inserted_at": "2017-02-08T12:34:55Z",
+                    "id": 1,
+                    "email": "Joe6@mail.com"
+                  },
+                  {
+                    "updated_at": "2017-02-15T23:15:43Z",
+                    "name": "Jack",
+                    "inserted_at": "2017-02-04T11:24:45Z",
+                    "id": 2,
+                    "email": "Jack7@mail.com"
+                  }
+                ]
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "operationId": "SimpleWeb.UserSocket.test",
+        "description": "List tests in db",
+        "deprecated": false
+      }
+    },
     "/api/users": {
       "post": {
         "tags": [
@@ -297,6 +340,28 @@
         "email": "joe@gmail.com"
       },
       "description": "A user of the app"
+    },
+    "Error": {
+      "type": "object",
+      "title": "Error",
+      "required": [
+        "msg"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Success bool"
+        },
+        "msg": {
+          "type": "string",
+          "description": "Error response"
+        }
+      },
+      "example": {
+        "success": false,
+        "msg": "User ID missing"
+      },
+      "description": "An error response"
     }
   }
 }

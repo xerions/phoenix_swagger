@@ -1,5 +1,6 @@
 defmodule SimpleWeb.UserSocket do
   use Phoenix.Socket
+  use PhoenixSwagger
 
   ## Channels
   # channel "room:*", Simple.RoomChannel
@@ -34,4 +35,33 @@ defmodule SimpleWeb.UserSocket do
   #
   # Returning `nil` makes this socket anonymous.
   def id(_socket), do: nil
+
+  swagger_path(:test) do
+    get("/api/users/test")
+    summary("Test function")
+    description("List tests in db")
+    produces("application/json")
+    deprecated(false)
+
+    response(200, "OK", Schema.ref(:UsersResponse),
+      example: %{
+        data: [
+          %{
+            id: 1,
+            name: "Joe",
+            email: "Joe6@mail.com",
+            inserted_at: "2017-02-08T12:34:55Z",
+            updated_at: "2017-02-12T13:45:23Z"
+          },
+          %{
+            id: 2,
+            name: "Jack",
+            email: "Jack7@mail.com",
+            inserted_at: "2017-02-04T11:24:45Z",
+            updated_at: "2017-02-15T23:15:43Z"
+          }
+        ]
+      }
+    )
+  end
 end
