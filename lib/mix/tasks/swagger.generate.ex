@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Phx.Swagger.Generate do
   use Mix.Task
   require Logger
-  alias Helpers.MiscHelpers, as: Helpers
+  alias PhoenixSwagger.Helpers, as: Helpers
 
   @recursive true
 
@@ -130,7 +130,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       Code.ensure_compiled?(controller) ->
         %{
           controller: controller,
-          path: path |> format_path,
+          path: format_path(path),
           swagger_fun: swagger_fun,
           verb: verb
         }

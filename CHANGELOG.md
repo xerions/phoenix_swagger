@@ -8,6 +8,7 @@
   * Add `nullable:` option to `JsonSchema.relationship` function
   * Handle `x-nullable` schemas in `SchemaTest`
   * Add `deprecated` flag for operations
+  * Add `add_module/2` function to add path and schema definitions not in controllers.
 
 # 0.8.0
 

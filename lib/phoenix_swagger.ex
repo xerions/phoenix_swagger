@@ -3,7 +3,7 @@ defmodule PhoenixSwagger do
   use Application
   alias PhoenixSwagger.Path
   alias PhoenixSwagger.Path.PathObject
-  alias Helpers.MiscHelpers, as: Helpers
+  alias PhoenixSwagger.Helpers, as: Helpers
 
   @moduledoc """
   The PhoenixSwagger module provides macros for defining swagger operations and schemas.
@@ -218,62 +218,50 @@ defmodule PhoenixSwagger do
         |> add_module(SimpleWeb.UserSocket)
 
     """
-    def add_module(struct, module) do
+    def add_module(swagger_map, module) do
       functions = module.__info__(:functions)
 
-      paths = get_paths(functions, struct, module)
+      swagger_map
+      |> get_paths(module, functions)
+      |> get_schemas(module, functions)
+    end
 
+    defp get_schemas(swagger_map, module, functions) do
       Enum.map(functions, fn {action, _arg} -> build_schemas(action, module) end)
       |> Enum.filter(&!is_nil(&1))
-      |> Enum.reduce(swagger_map(paths), &Helpers.merge_definitions/2)
+      |> Enum.reduce(Helpers.swagger_map(swagger_map), &Helpers.merge_definitions/2)
     end
-
-    def build_schemas(function, module) do
+    defp build_schemas(function, module) do
       if is_schema?(function), do: apply(module, function, [])
     end
-
     defp is_schema?(function) do
       function
       |> Atom.to_string
       |> String.contains?("swagger_definitions")
     end
 
-    defp get_paths(functions, struct, module) do
+    defp get_paths(swagger_map, module, functions) do
       Enum.map(functions, fn {action, _arg} -> build_path(action, module) end)
       |> Enum.filter(&!is_nil(&1))
-      |> Enum.reduce(swagger_map(struct), &Helpers.merge_paths/2)
+      |> Enum.reduce(Helpers.swagger_map(swagger_map), &Helpers.merge_paths/2)
     end
-
-    def swagger_map(swagger_map) do
-      Map.update(swagger_map, :definitions, %{}, &(&1))
-      |> Map.update(:paths, %{}, &(&1))
-    end
-
-    defp build_path(function, module) do #room for improvement here for sure, comments?
-      case is_path?(function) do
-        {true, action} ->
-          apply(module, function, extract_args(action))
-        {false, _action} ->
-          nil
+    defp build_path(function, module) do
+      if is_path?(function) do
+        action =
+          function
+          |> get_action
+        apply(module, function, Helpers.extract_args(action))
       end
     end
-
-    defp is_path?(function) do #room for improvement here for sure, comments?
-      funct_string =
-        function
-        |> Atom.to_string
-
-      contains =
-        funct_string
-        |> String.contains?("swagger_path")
-
-      {contains, String.replace(funct_string, "swagger_path_", "")}
+    defp is_path?(function) do
+      function
+      |> Atom.to_string
+      |> String.contains?("swagger_path")
     end
-
-    defp extract_args(action) do
-      [
-        %{verb: action |> String.to_atom, path: ""}
-      ]
+    defp get_action(function) do
+      function
+      |> Atom.to_string
+      |> String.replace("swagger_path_", "")
     end
 
   @doc false
