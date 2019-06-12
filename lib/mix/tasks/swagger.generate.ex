@@ -122,6 +122,18 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp find_swagger_path_function(route = %{opts: action, path: path, verb: verb}) when is_atom(action) do
+    generate_swagger_path_function(route, action, path, verb)
+  end
+  # In Phoenix >= 1.4.7 the `opts` key was renamed to `plug_opts`
+  defp find_swagger_path_function(route = %{plug_opts: action, path: path, verb: verb}) when is_atom(action) do
+    generate_swagger_path_function(route, action, path, verb)
+  end
+  defp find_swagger_path_function(_route) do
+    # action not an atom usually means route to a plug which isn't a Phoenix controller
+    nil
+  end
+
+  defp generate_swagger_path_function(route, action, path, verb) do
     controller = find_controller(route)
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
@@ -137,12 +149,8 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
         Logger.warn "Warning: #{controller} module didn't load."
         nil
     end
-  end
-  defp find_swagger_path_function(_route) do
-    # action not an atom usually means route to a plug which isn't a Phoenix controller
-    nil
-  end
 
+  end
 
   defp format_path(path) do
     Regex.replace(~r/:([^\/]+)/, path, "{\\1}")
