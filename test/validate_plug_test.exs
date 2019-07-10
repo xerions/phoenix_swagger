@@ -10,7 +10,7 @@ defmodule ValidatePlugTest do
   @table :validator_table
 
   setup do
-    schema = Validator.parse_swagger_schema(["test/test_spec/swagger_test_spec.json", "test/test_spec/swagger_test_spec_2.json"])
+    schema = Validator.parse_swagger_schema(["test/test_spec/swagger_test_spec.json", "test/test_spec/swagger_test_spec_2.json", "test/test_spec/swagger_test_spec_3.json"])
     on_exit fn ->
       :ets.delete_all_objects(@table)
     end
@@ -82,6 +82,14 @@ defmodule ValidatePlugTest do
     test_conn = Validate.call(test_conn, [])
     assert {400, _, "{\"error\":{\"path\":\"#/size\",\"message\":\"Value \\\"extra-big\\\" is not allowed in enum.\"}}"}
            = sent_resp(test_conn)
+  end
+
+  test "validation matches specific route before templated route" do
+    test_conn = init_conn(:get, "/api/pets/cats", %{}, %{})
+    test_conn = Validate.call(test_conn, [])
+    assert is_nil test_conn.status
+    assert is_nil test_conn.resp_body
+    assert test_conn.private[:phoenix_swagger][:valid]
   end
 
   defp init_conn(verb, path, body_params \\ %{}, path_params \\ %{}) do
