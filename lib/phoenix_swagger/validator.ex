@@ -153,7 +153,7 @@ defmodule PhoenixSwagger.Validator do
 
   @doc false
   defp read_swagger_schema(file) do
-    schema = File.read(file) |> elem(1) |> Poison.decode() |> elem(1)
+    schema = File.read(file) |> elem(1) |> PhoenixSwagger.json_library().decode() |> elem(1)
     # get rid from all keys besides 'paths' and 'definitions' as we
     # need only in these fields for validation
     Enum.reduce(schema, %{}, fn(map, acc) ->

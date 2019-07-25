@@ -73,15 +73,23 @@ defmodule ValidatePlugTest do
   test "validation fails if query array param elem is not allowed in enum" do
     test_conn = init_conn(:get, "/api/pets", %{}, %{"class" => "fish,birds,cats"})
     test_conn = Validate.call(test_conn, [])
-    assert {400, _, "{\"error\":{\"path\":\"#/class\",\"message\":\"Value \\\"cats\\\" is not allowed in enum.\"}}"}
-           = sent_resp(test_conn)
+    {400, _, body} = sent_resp(test_conn)
+    expected_body = [
+      ~S({"error":{"path":"#/class","message":"Value \"cats\" is not allowed in enum."}}),
+      ~S({"error":{"message":"Value \"cats\" is not allowed in enum.","path":"#/class"}})
+    ]
+    assert Enum.member?(expected_body, body)
   end
 
   test "validation fails if query param value is not allowed in enum" do
     test_conn = init_conn(:get, "/api/pets", %{}, %{"size" => "extra-big"})
     test_conn = Validate.call(test_conn, [])
-    assert {400, _, "{\"error\":{\"path\":\"#/size\",\"message\":\"Value \\\"extra-big\\\" is not allowed in enum.\"}}"}
-           = sent_resp(test_conn)
+    {400, _, body} = sent_resp(test_conn)
+    expected_body = [
+      ~S({"error":{"path":"#/size","message":"Value \"extra-big\" is not allowed in enum."}}),
+      ~S({"error":{"message":"Value \"extra-big\" is not allowed in enum.","path":"#/size"}})
+    ]
+    assert Enum.member?(expected_body, body)
   end
 
   test "validation matches specific route before templated route" do

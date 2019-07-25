@@ -230,6 +230,13 @@ defmodule PhoenixSwagger do
   end
   def ensure_verb_and_path(path, _route), do: path
 
+  @doc """
+  Use JSON library from phoenix configuration
+  """
+  def json_library do
+    Application.get_env(:phoenix_swagger, :json_library, Poison)
+  end
+
   @doc false
   # Converts a Schema struct to regular map, removing nils
   def to_json(value = %{__struct__: _}) do
