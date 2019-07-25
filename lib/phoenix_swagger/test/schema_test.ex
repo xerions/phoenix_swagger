@@ -99,16 +99,15 @@ defmodule PhoenixSwagger.SchemaTest do
       end
   """
   def validate_resp_schema(conn, swagger_schema, model_name) do
-    response_data = conn.resp_body |> PhoenixSwagger.json_library().decode!
-    schema = swagger_schema.schema["definitions"][model_name]
-    errors_with_list_paths = ExJsonSchema.Validator.validate(swagger_schema, schema, response_data, ["#"])
-    case errors_with_list_paths do
-      [] -> conn
-      errors ->
+    response_data = conn.resp_body |> PhoenixSwagger.json_library().decode!()
+    fragment = ExJsonSchema.Schema.get_fragment!(swagger_schema, "#/definitions/#{model_name}")
+    result = ExJsonSchema.Validator.validate_fragment(swagger_schema, fragment, response_data)
+    case result do
+      :ok -> conn
+      {:error, errors} ->
         headline = "Response JSON does not conform to swagger schema from #/definitions/#{model_name}."
         error_details =
           errors
-          |> Enum.map(fn {msg, path} -> {msg, Enum.join(path, "/")} end)
           |> Enum.map(fn {msg, path} -> "At #{path}: #{msg}" end)
           |> Enum.join("\n")
 
