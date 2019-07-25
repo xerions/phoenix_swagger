@@ -166,7 +166,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
         if accept_json?(conn) do
           conn
           |> Conn.put_resp_content_type("application/json")
-          Conn.send_resp(conn, 404, Poison.encode!(%{"Error": "not found"}))
+          |> Conn.send_resp(404, PhoenixSwagger.json_library().encode!(%{"Error": "not found"}))
           |> halt
         else
           Conn.send_resp(conn, 404, "not found")
