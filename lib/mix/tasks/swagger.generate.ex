@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   @default_title "<enter your title>"
   @default_version "0.0.1"
 
-  defp app_name, do: Mix.Project.get!().project()[:app]
+  defp app_name(), do: Mix.Project.get!().project()[:app]
 
   def run(_args) do
     Mix.Task.run("compile")
@@ -36,6 +36,17 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       app_name()
       |> Application.get_env(:phoenix_swagger, [])
       |> Keyword.get(:swagger_files, %{})
+
+    if (Enum.empty?(swagger_files) && !Mix.Task.recursing?()) do
+      Logger.warn("""
+        No swagger configuration found. Ensure phoenix_swagger is configured, eg:
+
+        config #{inspect(app_name())}, :phoenix_swagger,
+          swagger_files: %{
+            ...
+          }
+        """)
+    end
 
     Enum.each(swagger_files, fn {output_file, config} ->
       result =
