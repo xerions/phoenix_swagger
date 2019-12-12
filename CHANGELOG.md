@@ -1,3 +1,11 @@
+# 0.8.2
+
+  * Add support for Phoenix ~> 1.4.9
+  * Ability to configure json library e.g. config `:phoenix_swagger, json_library: Jason`
+  * Improvements in SwagerUI Plug
+  * Update dependencies
+  * Bug fixes
+
 # 0.8.1
 
   * Fix for crash on non-GET requests
