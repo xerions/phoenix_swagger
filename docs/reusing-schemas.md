@@ -91,8 +91,8 @@ Our ProjectsController and BooksControllers have now identical `Error` schema de
 
 ## Extracting schemas into a module for reuse
 
-We can easily extract common schemas into an ordinary elixir module. This module has to implement `PhoenixSwagger`
-behaviour which understands `phoenix_swagger` macros for defining schemas.
+We can easily extract common schemas into an ordinary elixir module. 
+We make the phoenix_swagger macro DSL available with `use PhoenixSwagger`.
 
 ```elixir
 defmodule CommonSchemas do
