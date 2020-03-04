@@ -234,7 +234,7 @@ defmodule PhoenixSwagger do
   Use JSON library from phoenix configuration
   """
   def json_library do
-    Application.get_env(:phoenix_swagger, :json_library, Poison)
+    Application.get_env(:phoenix_swagger, :json_library, Jason)
   end
 
   @doc false
