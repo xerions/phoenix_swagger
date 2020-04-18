@@ -59,6 +59,11 @@ config :my_app, :phoenix_swagger,
   }
 ```
 
+Also you can configure json library to use:
+
+```
+config :phoenix_swagger, json_library: Jason
+```
 ## Router
 
 The outline of the swagger document should be returned from a `swagger_info/0` function
