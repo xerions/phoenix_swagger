@@ -1,5 +1,4 @@
 defmodule PhoenixSwagger do
-
   use Application
   alias PhoenixSwagger.Path
   alias PhoenixSwagger.Path.PathObject
@@ -48,7 +47,7 @@ defmodule PhoenixSwagger do
       # worker(Test.Worker, [arg1, arg2, arg3]),
     ]
 
-    :ets.new(@table, [:public,:named_table])
+    :ets.new(@table, [:public, :named_table])
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
@@ -123,89 +122,103 @@ defmodule PhoenixSwagger do
       }
   """
   defmacro swagger_schema(block) do
-    exprs = case block do
-      [do: {:__block__, _, exprs}] -> exprs
-      [do: expr] -> [expr]
-    end
+    exprs =
+      case block do
+        [do: {:__block__, _, exprs}] -> exprs
+        [do: expr] -> [expr]
+      end
 
-    acc = quote do %Schema{type: :object} end
-    body = Enum.reduce(exprs, acc, fn expr, acc ->
-      quote do unquote(acc) |> unquote(expr) end
-    end)
+    acc =
+      quote do
+        %Schema{type: :object}
+      end
+
+    body =
+      Enum.reduce(exprs, acc, fn expr, acc ->
+        quote do
+          unquote(acc) |> unquote(expr)
+        end
+      end)
 
     # Immediately invoked anonymous function for locally scoped import
     quote do
       (fn ->
-        import PhoenixSwagger.Schema
-        alias PhoenixSwagger.Schema
-        unquote(body)
-        |> PhoenixSwagger.to_json()
-      end).()
+         import PhoenixSwagger.Schema
+         alias PhoenixSwagger.Schema
+
+         unquote(body)
+         |> PhoenixSwagger.to_json()
+       end).()
     end
   end
 
   @doc """
-    Swagger operations (aka "paths") are defined inside a `swagger_path` block.
+  Swagger operations (aka "paths") are defined inside a `swagger_path` block.
 
-    Within the do-end block, the DSL provided by the `PhoenixSwagger.Path` module can be used.
-    The DSL is any chain of functions with first argument being a `PhoenixSwagger.Path.PathObject` struct.
+  Within the do-end block, the DSL provided by the `PhoenixSwagger.Path` module can be used.
+  The DSL is any chain of functions with first argument being a `PhoenixSwagger.Path.PathObject` struct.
 
-    The verb and path can be set explicitly using the `get`, `put`, `post`, `patch`, `delete` functions, or
-    inferred from the phoenix router automatically.
+  The verb and path can be set explicitly using the `get`, `put`, `post`, `patch`, `delete` functions, or
+  inferred from the phoenix router automatically.
 
-    Swagger `tags` will default to match the module name with trailing `Controller` removed.
-    Eg operations defined in module MyApp.UserController will have `tags: ["User"]`.
+  Swagger `tags` will default to match the module name with trailing `Controller` removed.
+  Eg operations defined in module MyApp.UserController will have `tags: ["User"]`.
 
-    Swagger `operationId` will default to the fully qualified action function name.
-    Eg `index` action in `MyApp.UserController` will have `operationId: "MyApp.UserController.index"`.
+  Swagger `operationId` will default to the fully qualified action function name.
+  Eg `index` action in `MyApp.UserController` will have `operationId: "MyApp.UserController.index"`.
 
-    ## Example
+  ## Example
 
-        defmodule ExampleController do
-          use ExampleApp.Web, :controller
-          use PhoenixSwagger
+      defmodule ExampleController do
+        use ExampleApp.Web, :controller
+        use PhoenixSwagger
 
-          swagger_path :index do
-            get "/users"
-            summary "Get users"
-            description "Get users, filtering by account ID"
-            parameter :query, :id, :integer, "account id", required: true
-            response 200, "Description", :Users
-            tag "users"
-          end
-
-          def index(conn, _params) do
-            posts = Repo.all(Post)
-            render(conn, "index.json", posts: posts)
-          end
+        swagger_path :index do
+          get "/users"
+          summary "Get users"
+          description "Get users, filtering by account ID"
+          parameter :query, :id, :integer, "account id", required: true
+          response 200, "Description", :Users
+          tag "users"
         end
-    """
-    defmacro swagger_path(action, [do: {:__block__, _, [first_expr | exprs]}]) do
-      fun_name = "swagger_path_#{action}" |> String.to_atom
-      body = Enum.reduce(exprs, first_expr, fn expr, acc ->
-              quote do unquote(acc) |> unquote(expr) end
-             end)
 
-      quote do
-        def unquote(fun_name)(route) do
-          import PhoenixSwagger.Path
-
-          %PhoenixSwagger.Path.PathObject{}
-          |> unquote(body)
-          |> PhoenixSwagger.ensure_operation_id(__MODULE__, unquote(action))
-          |> PhoenixSwagger.ensure_tag(__MODULE__)
-          |> PhoenixSwagger.ensure_verb_and_path(route)
-          |> PhoenixSwagger.Path.nest()
-          |> PhoenixSwagger.to_json()
+        def index(conn, _params) do
+          posts = Repo.all(Post)
+          render(conn, "index.json", posts: posts)
         end
       end
+  """
+  defmacro swagger_path(action, do: {:__block__, _, [first_expr | exprs]}) do
+    fun_name = "swagger_path_#{action}" |> String.to_atom()
+
+    body =
+      Enum.reduce(exprs, first_expr, fn expr, acc ->
+        quote do
+          unquote(acc) |> unquote(expr)
+        end
+      end)
+
+    quote do
+      def unquote(fun_name)(route) do
+        import PhoenixSwagger.Path
+
+        %PhoenixSwagger.Path.PathObject{}
+        |> unquote(body)
+        |> PhoenixSwagger.ensure_operation_id(__MODULE__, unquote(action))
+        |> PhoenixSwagger.ensure_tag(__MODULE__)
+        |> PhoenixSwagger.ensure_verb_and_path(route)
+        |> PhoenixSwagger.Path.nest()
+        |> PhoenixSwagger.to_json()
+      end
     end
+  end
 
   @doc false
   # Add a default operationId based on model name and action if required
   def ensure_operation_id(path = %PathObject{operation: %{operationId: ""}}, module, action) do
     Path.operation_id(path, String.replace_prefix("#{module}.#{action}", "Elixir.", ""))
   end
+
   def ensure_operation_id(path, _module, _action), do: path
 
   @doc false
@@ -221,6 +234,7 @@ defmodule PhoenixSwagger do
 
     put_in(path.operation.tags, tags)
   end
+
   def ensure_tag(path, _module), do: path
 
   @doc false
@@ -228,6 +242,7 @@ defmodule PhoenixSwagger do
   def ensure_verb_and_path(path = %PathObject{verb: nil, path: nil}, route) do
     %{path | verb: route.verb, path: route.path}
   end
+
   def ensure_verb_and_path(path, _route), do: path
 
   @doc """
@@ -244,19 +259,42 @@ defmodule PhoenixSwagger do
     |> Map.from_struct()
     |> to_json()
   end
+
   def to_json(value) when is_map(value) do
     value
-    |> Enum.map(fn {k,v} -> {to_string(k), to_json(v)} end)
-    |> Enum.filter(fn {_, :null} -> false; _ -> true end)
+    |> Enum.map(fn {k, v} -> {to_string(k), to_json(v)} end)
+    |> Enum.filter(fn
+      {_, :null} -> false
+      _ -> true
+    end)
     |> Enum.into(%{})
   end
+
   def to_json(value) when is_list(value) do
     Enum.map(value, &to_json/1)
   end
-  def to_json(nil) do :null end
-  def to_json(:null) do :null end
-  def to_json(true) do true end
-  def to_json(false) do false end
-  def to_json(value) when is_atom(value) do to_string(value) end
-  def to_json(value) do value end
+
+  def to_json(nil) do
+    :null
+  end
+
+  def to_json(:null) do
+    :null
+  end
+
+  def to_json(true) do
+    true
+  end
+
+  def to_json(false) do
+    false
+  end
+
+  def to_json(value) when is_atom(value) do
+    to_string(value)
+  end
+
+  def to_json(value) do
+    value
+  end
 end

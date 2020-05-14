@@ -10,7 +10,7 @@ defmodule PhoenixSwagger.Schema do
   @basic_types [:null, :boolean, :integer, :number, :string, :array, :object]
 
   defstruct [
-    :'$ref',
+    :"$ref",
     :format,
     :title,
     :description,
@@ -37,7 +37,7 @@ defmodule PhoenixSwagger.Schema do
     :additionalProperties,
     :discriminator,
     :example,
-    :'x-nullable'
+    :"x-nullable"
   ]
 
   @doc """
@@ -73,21 +73,24 @@ defmodule PhoenixSwagger.Schema do
       }
   """
   defmacro new(block) do
-    exprs = case block do
-       [do: {:__block__, _, exprs}] -> exprs
-       [do: expr] -> [expr]
-    end
+    exprs =
+      case block do
+        [do: {:__block__, _, exprs}] -> exprs
+        [do: expr] -> [expr]
+      end
 
     body =
       Enum.reduce(exprs, Macro.escape(%Schema{type: :object}), fn expr, acc ->
-         quote do unquote(acc) |> unquote(expr) end
+        quote do
+          unquote(acc) |> unquote(expr)
+        end
       end)
 
     quote do
       (fn ->
-        import PhoenixSwagger.Schema
-        unquote(body)
-      end).()
+         import PhoenixSwagger.Schema
+         unquote(body)
+       end).()
     end
   end
 
@@ -104,10 +107,11 @@ defmodule PhoenixSwagger.Schema do
       %PhoenixSwagger.Schema{"$ref": "../common/Error.json"}
   """
   def ref(name) when is_atom(name) do
-    %Schema{'$ref': "#/definitions/#{name}"}
+    %Schema{"$ref": "#/definitions/#{name}"}
   end
+
   def ref(path) when is_binary(path) do
-    %Schema{'$ref': path}
+    %Schema{"$ref": path}
   end
 
   @doc """
@@ -175,14 +179,20 @@ defmodule PhoenixSwagger.Schema do
       }
   """
   def property(model, name, type_or_schema, description \\ nil, opts \\ [])
-  def property(model = %Schema{type: :object}, name, type, description, opts) when is_atom(type) or is_list(type) do
+
+  def property(model = %Schema{type: :object}, name, type, description, opts)
+      when is_atom(type) or is_list(type) do
     property(model, name, %Schema{type: type}, description, opts)
   end
+
   def property(model = %Schema{type: :object}, name, type = %Schema{}, description, opts) do
     {required?, opts} = Keyword.pop(opts, :required)
     {nullable?, opts} = Keyword.pop(opts, :nullable)
     property_schema = struct!(type, [description: type.description || description] ++ opts)
-    property_schema = if nullable?, do: %{property_schema | :'x-nullable' => true}, else: property_schema
+
+    property_schema =
+      if nullable?, do: %{property_schema | :"x-nullable" => true}, else: property_schema
+
     properties = (model.properties || %{}) |> Map.put(name, property_schema)
     model = %{model | properties: properties}
     if required?, do: required(model, name), else: model
@@ -216,23 +226,26 @@ defmodule PhoenixSwagger.Schema do
       }
   """
   defmacro properties(model, block) do
-    exprs = case block do
-      [do: {:__block__, _, exprs}] -> exprs
-      [do: expr] -> [expr]
-    end
+    exprs =
+      case block do
+        [do: {:__block__, _, exprs}] -> exprs
+        [do: expr] -> [expr]
+      end
 
     body =
       exprs
       |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)
       |> Enum.reduce(model, fn expr, acc ->
-           quote do unquote(acc) |> unquote(expr) end
-         end)
+        quote do
+          unquote(acc) |> unquote(expr)
+        end
+      end)
 
     quote do
       (fn ->
-        import PhoenixSwagger.Schema
-        unquote(body)
-      end).()
+         import PhoenixSwagger.Schema
+         unquote(body)
+       end).()
     end
   end
 
@@ -544,7 +557,8 @@ defmodule PhoenixSwagger.Schema do
         items: [%PhoenixSwagger.Schema{type: :string}, %PhoenixSwagger.Schema{type: :number}]
       }
   """
-  def items(model = %Schema{type: :array}, item_schema) when is_map(item_schema) or is_list(item_schema) do
+  def items(model = %Schema{type: :array}, item_schema)
+      when is_map(item_schema) or is_list(item_schema) do
     %{model | items: item_schema}
   end
 
@@ -651,6 +665,7 @@ defmodule PhoenixSwagger.Schema do
   def required(model = %Schema{type: :object}, name) when is_atom(name) or is_binary(name) do
     required(model, [name])
   end
+
   def required(model = %Schema{type: :object}, names) when is_list(names) do
     %{model | required: names ++ (model.required || [])}
   end

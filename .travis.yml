@@ -9,4 +9,6 @@ otp_release:
     - 19.0
     - 20.0
 
-script: "mix test"
+script: |
+  mix format --check-formatted
+  mix test

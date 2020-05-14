@@ -102,10 +102,15 @@ defmodule PhoenixSwagger.SchemaTest do
     response_data = conn.resp_body |> PhoenixSwagger.json_library().decode!()
     fragment = ExJsonSchema.Schema.get_fragment!(swagger_schema, "#/definitions/#{model_name}")
     result = ExJsonSchema.Validator.validate_fragment(swagger_schema, fragment, response_data)
+
     case result do
-      :ok -> conn
+      :ok ->
+        conn
+
       {:error, errors} ->
-        headline = "Response JSON does not conform to swagger schema from #/definitions/#{model_name}."
+        headline =
+          "Response JSON does not conform to swagger schema from #/definitions/#{model_name}."
+
         error_details =
           errors
           |> Enum.map(fn {msg, path} -> "At #{path}: #{msg}" end)
@@ -113,7 +118,7 @@ defmodule PhoenixSwagger.SchemaTest do
 
         response_pretty = PhoenixSwagger.json_library().encode!(response_data, pretty: true)
         message = Enum.join([headline, error_details, response_pretty], "\n")
-        ExUnit.Assertions.flunk message
+        ExUnit.Assertions.flunk(message)
     end
   end
 end

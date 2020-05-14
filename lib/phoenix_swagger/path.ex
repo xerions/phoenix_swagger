@@ -51,7 +51,8 @@ defmodule PhoenixSwagger.Path do
       minItems: nil,
       uniqueItems: nil,
       enum: nil,
-      multipleOf: nil)
+      multipleOf: nil
+    )
   end
 
   defmodule ResponseObject do
@@ -79,7 +80,8 @@ defmodule PhoenixSwagger.Path do
       parameters: [],
       responses: %{},
       deprecated: nil,
-      security: nil)
+      security: nil
+    )
   end
 
   defmodule PathObject do
@@ -117,49 +119,49 @@ defmodule PhoenixSwagger.Path do
   Adds the summary section to the operation of a swagger `%PathObject{}`
   """
   def summary(path = %PathObject{}, summary) do
-    put_in path.operation.summary, summary
+    put_in(path.operation.summary, summary)
   end
 
   @doc """
   Adds the description section to the operation of a swagger `%PathObject{}`
   """
   def description(path = %PathObject{}, description) do
-    put_in path.operation.description, description
+    put_in(path.operation.description, description)
   end
 
   @doc """
   Adds a mime-type to the consumes list of the operation of a swagger `%PathObject{}`
   """
   def consumes(path = %PathObject{}, mimetype) do
-    put_in path.operation.consumes, (path.operation.consumes || []) ++ [mimetype]
+    put_in(path.operation.consumes, (path.operation.consumes || []) ++ [mimetype])
   end
 
   @doc """
   Adds a mime-type to the produces list of the operation of a swagger `%PathObject{}`
   """
   def produces(path = %PathObject{}, mimetype) do
-    put_in path.operation.produces, (path.operation.produces || []) ++ [mimetype]
+    put_in(path.operation.produces, (path.operation.produces || []) ++ [mimetype])
   end
 
   @doc """
   Adds a tag to the operation of a swagger `%PathObject{}`
   """
   def tag(path = %PathObject{}, tag) do
-    put_in path.operation.tags, path.operation.tags ++ [tag]
+    put_in(path.operation.tags, path.operation.tags ++ [tag])
   end
 
   @doc """
   Adds the operationId section to the operation of a swagger `%PathObject{}`
   """
   def operation_id(path = %PathObject{}, id) do
-    put_in path.operation.operationId, id
+    put_in(path.operation.operationId, id)
   end
 
   @doc """
   Adds the security section to the operation of a swagger `%PathObject{}`
   """
   def security(path = %PathObject{}, security) do
-    put_in path.operation.security, security
+    put_in(path.operation.security, security)
   end
 
   @doc """
@@ -178,16 +180,19 @@ defmodule PhoenixSwagger.Path do
       end
   """
   defmacro parameters(path, block) do
-    exprs = case block do
-      [do: {:__block__, _, exprs}] -> exprs
-      [do: expr] -> [expr]
-    end
+    exprs =
+      case block do
+        [do: {:__block__, _, exprs}] -> exprs
+        [do: expr] -> [expr]
+      end
 
     exprs
     |> Enum.map(fn {name, line, args} -> {:parameter, line, [name | args]} end)
     |> Enum.reduce(path, fn expr, acc ->
-         quote do unquote(acc) |> unquote(expr) end
-       end)
+      quote do
+        unquote(acc) |> unquote(expr)
+      end
+    end)
   end
 
   @doc """
@@ -199,27 +204,32 @@ defmodule PhoenixSwagger.Path do
       in: location,
       description: description
     }
-    param = case location do
-      :body -> %{param | schema: type}
-      :path -> %{param | type: type, required: true}
-      _ -> %{param | type: type}
-    end
+
+    param =
+      case location do
+        :body -> %{param | schema: type}
+        :path -> %{param | type: type, required: true}
+        _ -> %{param | type: type}
+      end
+
     param = Map.merge(param, opts |> Enum.into(%{}, &translate_parameter_opt/1))
     params = path.operation.parameters
-    put_in path.operation.parameters, params ++ [param]
+    put_in(path.operation.parameters, params ++ [param])
   end
 
   @doc """
   Adds the deprecation section to the operation of a swagger `%PathObject{}`
   """
   def deprecated(path = %PathObject{}, status) do
-    put_in path.operation.deprecated, status
+    put_in(path.operation.deprecated, status)
   end
 
   defp translate_parameter_opt({:example, v}), do: {:"x-example", v}
+
   defp translate_parameter_opt({:items, items_schema}) when is_list(items_schema) do
-     {:items, Enum.into(items_schema, %{})}
+    {:items, Enum.into(items_schema, %{})}
   end
+
   defp translate_parameter_opt({k, v}), do: {k, v}
 
   @doc """
@@ -242,11 +252,16 @@ defmodule PhoenixSwagger.Path do
       response 200, "OK"
   """
   def paging(path = %PathObject{}, opts \\ [size: "page_size", number: "page"]) do
-    Enum.reduce opts, path, fn
-      {:size, size}, path -> parameter(path, size, :query, :integer, "Number of elements per page", minimum: 1)
-      {:number, number}, path -> parameter(path, number, :query, :integer, "Number of the page", minimum: 1)
-      {:offset, offset}, path -> parameter(path, offset, :query, :integer, "Offset of first element in the page")
-    end
+    Enum.reduce(opts, path, fn
+      {:size, size}, path ->
+        parameter(path, size, :query, :integer, "Number of elements per page", minimum: 1)
+
+      {:number, number}, path ->
+        parameter(path, number, :query, :integer, "Number of the page", minimum: 1)
+
+      {:offset, offset}, path ->
+        parameter(path, offset, :query, :integer, "Offset of first element in the page")
+    end)
   end
 
   @doc """
@@ -254,7 +269,7 @@ defmodule PhoenixSwagger.Path do
   """
   def response(path = %PathObject{}, status, description) do
     resp = %ResponseObject{description: description}
-    put_in path.operation.responses[to_string(status)], resp
+    put_in(path.operation.responses[to_string(status)], resp)
   end
 
   @doc """
@@ -276,13 +291,15 @@ defmodule PhoenixSwagger.Path do
       response 200, "Success", :User, example: %{id: 1, name: "Joe"}
   """
   def response(path, status, description, schema, opts \\ [])
-  def response(path = %PathObject{}, status, description, schema, opts) when is_atom(schema)  do
+
+  def response(path = %PathObject{}, status, description, schema, opts) when is_atom(schema) do
     response(path, status, description, Schema.ref(schema), opts)
   end
+
   def response(path = %PathObject{}, status, description, schema = %{}, opts) do
     opts = expand_response_example(path, opts)
     resp = struct(ResponseObject, [description: description, schema: schema] ++ opts)
-    put_in path.operation.responses[status |> to_string], resp
+    put_in(path.operation.responses[status |> to_string], resp)
   end
 
   def expand_response_example(%PathObject{operation: %{produces: [mimetype | _]}}, opts) do
@@ -291,6 +308,7 @@ defmodule PhoenixSwagger.Path do
       opt -> opt
     end)
   end
+
   def expand_response_example(%PathObject{}, opts), do: opts
 
   @doc """

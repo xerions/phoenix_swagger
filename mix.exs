@@ -59,7 +59,7 @@ defmodule PhoenixSwagger.Mixfile do
       {:ex_json_schema, "~> 0.6", optional: true},
       {:plug, "~> 1.4"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
+      {:dialyxir, "~> 0.5", only: :dev, runtime: false}
     ]
   end
 
@@ -74,7 +74,8 @@ defmodule PhoenixSwagger.Mixfile do
       links: %{
         "Github" => "https://github.com/xerions/phoenix_swagger",
         "Slack" => "https://elixir-lang.slack.com/messages/phoenix_swagger"
-      }
+      },
+      files: ~w(lib mix.exs .formatter.exs README.md CHANGELOG.md config)
     ]
   end
 end

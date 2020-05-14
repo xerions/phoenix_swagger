@@ -37,15 +37,15 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       |> Application.get_env(:phoenix_swagger, [])
       |> Keyword.get(:swagger_files, %{})
 
-    if (Enum.empty?(swagger_files) && !Mix.Task.recursing?()) do
+    if Enum.empty?(swagger_files) && !Mix.Task.recursing?() do
       Logger.warn("""
-        No swagger configuration found. Ensure phoenix_swagger is configured, eg:
+      No swagger configuration found. Ensure phoenix_swagger is configured, eg:
 
-        config #{inspect(app_name())}, :phoenix_swagger,
-          swagger_files: %{
-            ...
-          }
-        """)
+      config #{inspect(app_name())}, :phoenix_swagger,
+        swagger_files: %{
+          ...
+        }
+      """)
     end
 
     Enum.each(swagger_files, fn {output_file, config} ->
@@ -64,19 +64,23 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
   defp write_file(output_file, contents) do
     directory = Path.dirname(output_file)
+
     unless File.exists?(directory) do
       File.mkdir_p!(directory)
     end
 
     case File.read(output_file) do
-      {:ok, ^contents} -> :ok
+      {:ok, ^contents} ->
+        :ok
+
       _ ->
         File.write!(output_file, contents)
-        IO.puts "#{app_name()}: generated #{output_file}"
+        IO.puts("#{app_name()}: generated #{output_file}")
     end
   end
 
   defp attempt_load(nil), do: {:ok, nil}
+
   defp attempt_load(module_name) do
     case Code.ensure_compiled(module_name) do
       {:module, result} -> {:ok, result}
@@ -100,10 +104,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
       function_exported?(Mix.Project.get(), :swagger_info, 0) ->
         info =
-          Mix.Project.get.swagger_info()
+          Mix.Project.get().swagger_info()
           |> Keyword.put_new(:title, @default_title)
           |> Keyword.put_new(:version, @default_version)
           |> Enum.into(%{})
+
         %{default_swagger_info() | info: info}
 
       true ->
@@ -116,7 +121,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       swagger: "2.0",
       info: %{
         title: @default_title,
-        version: @default_version,
+        version: @default_version
       },
       paths: %{},
       definitions: %{}
@@ -126,19 +131,23 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   defp collect_paths(swagger_map, router) do
     router.__routes__()
     |> Enum.map(&find_swagger_path_function/1)
-    |> Enum.filter(&!is_nil(&1))
+    |> Enum.filter(&(!is_nil(&1)))
     |> Enum.filter(&controller_function_exported?/1)
     |> Enum.map(&get_swagger_path/1)
     |> Enum.reduce(swagger_map, &merge_paths/2)
   end
 
-  defp find_swagger_path_function(route = %{opts: action, path: path, verb: verb}) when is_atom(action) do
+  defp find_swagger_path_function(route = %{opts: action, path: path, verb: verb})
+       when is_atom(action) do
     generate_swagger_path_function(route, action, path, verb)
   end
+
   # In Phoenix >= 1.4.7 the `opts` key was renamed to `plug_opts`
-  defp find_swagger_path_function(route = %{plug_opts: action, path: path, verb: verb}) when is_atom(action) do
+  defp find_swagger_path_function(route = %{plug_opts: action, path: path, verb: verb})
+       when is_atom(action) do
     generate_swagger_path_function(route, action, path, verb)
   end
+
   defp find_swagger_path_function(_route) do
     # action not an atom usually means route to a plug which isn't a Phoenix controller
     nil
@@ -156,11 +165,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
           path: format_path(path),
           verb: verb
         }
+
       true ->
-        Logger.warn "Warning: #{controller} module didn't load."
+        Logger.warn("Warning: #{controller} module didn't load.")
         nil
     end
-
   end
 
   defp format_path(path) do
@@ -185,6 +194,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp collect_host(swagger_map, nil), do: swagger_map
+
   defp collect_host(swagger_map, endpoint) do
     endpoint_config = Application.get_env(app_name(), endpoint)
 
@@ -201,15 +211,17 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     port = Keyword.get(url, :port, 4000)
 
     swagger_map =
-      if (!load_from_system_env) and is_binary(host) and (is_integer(port) or is_binary(port)) do
+      if !load_from_system_env and is_binary(host) and (is_integer(port) or is_binary(port)) do
         Map.put_new(swagger_map, :host, "#{host}:#{port}")
       else
-        swagger_map # host / port may be {:system, "ENV_VAR"} tuples or loaded in Endpoint.init callback
+        # host / port may be {:system, "ENV_VAR"} tuples or loaded in Endpoint.init callback
+        swagger_map
       end
 
     case endpoint_config[:https] do
       nil ->
         swagger_map
+
       _ ->
         Map.put_new(swagger_map, :schemes, ["https", "http"])
     end
@@ -225,7 +237,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
   end
 
   defp find_controller(route_map) do
-    Module.concat([:Elixir | Module.split(route_map.plug)])
+    Module.concat([:"Elixir" | Module.split(route_map.plug)])
   end
 
   defp merge_definitions(definitions, swagger_map = %{definitions: existing}) do
