@@ -106,7 +106,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
     const swagger_url = new URL(window.location);
     swagger_url.pathname = swagger_url.pathname.replace("index.html", "<%= spec_url %>");
     swagger_url.hash = "";
-    const validator_url = <%= validator_url %>
+    const config_url = <%= config_url %>
     const ui = SwaggerUIBundle({
       url: swagger_url.href,
       dom_id: '#swagger-ui',
@@ -132,7 +132,7 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
         SwaggerUIBundle.plugins.DownloadUrl
       ],
       layout: "StandaloneLayout",
-      ...(validator_url !== undefined && {validatorUrl: validator_url})
+      ...(config_url !== undefined && {configUrl: config_url})
     })
 
     window.ui = ui
@@ -187,14 +187,14 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
 
    - `otp_app` (required) The name of the app has is hosting the swagger file
    - `swagger_file` (required) The name of the file, eg "swagger.json"
-   - `validator_url` (optional) Custom url for swagger file validation. Set to `nil` to disable validation.
+   - `config_url` (optional) Populates the `configUrl` Swagger UI parameter. A URL to fetch an external configuration document from.
 
   """
   def init(opts) do
     app = Keyword.fetch!(opts, :otp_app)
     swagger_file = Keyword.fetch!(opts, :swagger_file)
-    validator_url = format_validator_url(opts)
-    body = EEx.eval_string(@template, spec_url: swagger_file, validator_url: validator_url)
+    config_url = format_config_url(opts)
+    body = EEx.eval_string(@template, spec_url: swagger_file, config_url: config_url)
     swagger_file_path = Path.join(["priv", "static", swagger_file])
     [app: app, body: body, spec_url: swagger_file, swagger_file_path: swagger_file_path]
   end
@@ -217,10 +217,10 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
     end
   end
 
-  defp format_validator_url(opts) do
-    case Keyword.fetch(opts, :validator_url) do
+  defp format_config_url(opts) do
+    case Keyword.fetch(opts, :config_url) do
       :error -> :undefined
-      {:ok, nil} -> :null
+      {:ok, nil} -> :undefined
       {:ok, url} -> "\"#{url}\""
     end
   end
