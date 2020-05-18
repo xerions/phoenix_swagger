@@ -3,6 +3,7 @@ defmodule PhoenixSwagger do
   use Application
   alias PhoenixSwagger.Path
   alias PhoenixSwagger.Path.PathObject
+  alias PhoenixSwagger.Helpers, as: Helpers
 
   @moduledoc """
   The PhoenixSwagger module provides macros for defining swagger operations and schemas.
@@ -199,6 +200,68 @@ defmodule PhoenixSwagger do
           |> PhoenixSwagger.to_json()
         end
       end
+    end
+
+    @doc """
+      Sometimes swagger paths and schema definitions defined in non-controller modules need
+      to be generated in the `swagger.json` output file. The `add_module/2` function
+      may be used to ensure their successful addition.
+
+      ## Example
+
+        %{
+          info: %{
+            version: "1.0",
+            title: "Simple App"
+          }
+        }
+        |> add_module(SimpleWeb.UserSocket)
+
+    """
+    def add_module(swagger_map, module) do
+      functions = module.__info__(:functions)
+
+      swagger_map
+      |> get_paths(module, functions)
+      |> get_schemas(module, functions)
+    end
+
+    defp get_schemas(swagger_map, module, functions) do
+      Enum.map(functions, fn {action, _arg} -> build_schemas(action, module) end)
+      |> Enum.filter(&!is_nil(&1))
+      |> Enum.reduce(Helpers.swagger_map(swagger_map), &Helpers.merge_definitions/2)
+    end
+    defp build_schemas(function, module) do
+      if is_schema?(function), do: apply(module, function, [])
+    end
+    defp is_schema?(function) do
+      function
+      |> Atom.to_string
+      |> String.contains?("swagger_definitions")
+    end
+
+    defp get_paths(swagger_map, module, functions) do
+      Enum.map(functions, fn {action, _arg} -> build_path(action, module) end)
+      |> Enum.filter(&!is_nil(&1))
+      |> Enum.reduce(Helpers.swagger_map(swagger_map), &Helpers.merge_paths/2)
+    end
+    defp build_path(function, module) do
+      if is_path?(function) do
+        action =
+          function
+          |> get_action
+        apply(module, function, Helpers.extract_args(action))
+      end
+    end
+    defp is_path?(function) do
+      function
+      |> Atom.to_string
+      |> String.contains?("swagger_path")
+    end
+    defp get_action(function) do
+      function
+      |> Atom.to_string
+      |> String.replace("swagger_path_", "")
     end
 
   @doc false

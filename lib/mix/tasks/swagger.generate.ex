@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Phx.Swagger.Generate do
   use Mix.Task
   require Logger
+  alias PhoenixSwagger.Helpers, as: Helpers
 
   @recursive true
 
@@ -129,7 +130,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     |> Enum.filter(&!is_nil(&1))
     |> Enum.filter(&controller_function_exported?/1)
     |> Enum.map(&get_swagger_path/1)
-    |> Enum.reduce(swagger_map, &merge_paths/2)
+    |> Enum.reduce(swagger_map, &Helpers.merge_paths/2)
   end
 
   defp find_swagger_path_function(route = %{opts: action, path: path, verb: verb}) when is_atom(action) do
@@ -152,15 +153,14 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       Code.ensure_compiled?(controller) ->
         %{
           controller: controller,
-          swagger_fun: swagger_fun,
           path: format_path(path),
+          swagger_fun: swagger_fun,
           verb: verb
         }
       true ->
         Logger.warn "Warning: #{controller} module didn't load."
         nil
     end
-
   end
 
   defp format_path(path) do
@@ -173,15 +173,6 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
   defp get_swagger_path(route = %{controller: controller, swagger_fun: fun}) do
     apply(controller, fun, [route])
-  end
-
-  defp merge_paths(path, swagger_map) do
-    paths = Map.merge(swagger_map.paths, path, &merge_conflicts/3)
-    %{swagger_map | paths: paths}
-  end
-
-  defp merge_conflicts(_key, value1, value2) do
-    Map.merge(value1, value2)
   end
 
   defp collect_host(swagger_map, nil), do: swagger_map
@@ -221,14 +212,11 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     |> Enum.uniq()
     |> Enum.filter(&function_exported?(&1, :swagger_definitions, 0))
     |> Enum.map(&apply(&1, :swagger_definitions, []))
-    |> Enum.reduce(swagger_map, &merge_definitions/2)
+    |> Enum.reduce(swagger_map, &Helpers.merge_definitions/2)
   end
 
   defp find_controller(route_map) do
     Module.concat([:Elixir | Module.split(route_map.plug)])
   end
 
-  defp merge_definitions(definitions, swagger_map = %{definitions: existing}) do
-    %{swagger_map | definitions: Map.merge(existing, definitions)}
-  end
 end

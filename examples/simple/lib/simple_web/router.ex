@@ -1,5 +1,6 @@
 defmodule SimpleWeb.Router do
   use SimpleWeb, :router
+  import PhoenixSwagger
   alias PhoenixSwagger.Plug.Validate
 
   pipeline :api do
@@ -23,5 +24,8 @@ defmodule SimpleWeb.Router do
         title: "Simple App"
       }
     }
+    |> add_module(SimpleWeb.Helpers.CommonSchemas)
+    |> add_module(SimpleWeb.UserSocket)
+
   end
 end
