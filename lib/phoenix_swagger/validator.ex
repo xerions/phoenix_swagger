@@ -47,23 +47,23 @@ defmodule PhoenixSwagger.Validator do
 
   """
   def parse_swagger_schema(specs) when is_list(specs) do
-    schemas = Enum.map(specs, fn (spec) ->
-      read_swagger_schema(spec)
+    specs
+    |> Enum.map(&read_swagger_schema/1)
+    |> Enum.reduce(%{}, fn(schema, acc) ->
+      if acc["paths"] == nil do
+        Map.merge(acc, schema)
+      else
+        acc
+        |> Map.update!("paths", fn(paths_map) -> Map.merge(paths_map, schema["paths"]) end)
+        |> Map.update!("definitions", fn(definitions_map) -> Map.merge(definitions_map, schema["definitions"]) end)
+      end
     end)
-    schema = Enum.reduce(schemas, %{}, fn(schema, acc) ->
-      acc = if acc["paths"] == nil do
-              Map.merge(acc, schema)
-            else
-              acc = Map.update!(acc, "paths", fn(paths_map) -> Map.merge(paths_map, schema["paths"]) end)
-              Map.update!(acc, "definitions", fn(definitions_map) -> Map.merge(definitions_map, schema["definitions"]) end)
-            end
-      acc
-    end)
-    collect_schema_attrs(schema)
+    |> collect_schema_attrs()
   end
   def parse_swagger_schema(spec) do
-    schema = read_swagger_schema(spec)
-    collect_schema_attrs(schema)
+    spec
+    |> read_swagger_schema()
+    |> collect_schema_attrs()
   end
 
   @doc """
@@ -97,59 +97,50 @@ defmodule PhoenixSwagger.Validator do
   @doc false
   defp collect_schema_attrs(schema) do
     Enum.map(schema["paths"], fn({path, data}) ->
-      Enum.map(Map.keys(data), fn(method) ->
-        parameters = data[method]["parameters"]
-        # we may have a request without parameters, so nothing to validate
-        # in this case
-        if parameters == nil do
-          []
-        else
+      data
+      |> Enum.map(fn {method, path_item} ->
+        {required, properties} =
+        (path_item["parameters"] || [])
+        |> Enum.reduce({[], %{}}, fn param = %{"name" => name}, {required, properties} ->
           # Let's go through requests parameters from swagger schema
           # and collect it into json schema properties.
-          properties = Enum.reduce(parameters, %{}, fn(parameter, acc) ->
-            acc = if parameter["type"] == nil do
-                    ref = String.split(parameter["schema"]["$ref"], "/") |> List.last
-                    Map.merge(acc, schema["definitions"][ref])
-                  else
-                    acc
-                  end
-            acc
-          end)
-          # collect request primitive parameters which do not refer to `definitions`
-          # these are mostly parameters from query string
-          properties = Enum.reduce(parameters, properties, fn(parameter, acc) ->
-            if parameter["type"] != nil do
-              collect_properties(acc, parameter)
-            else
-              acc
+          properties =
+            case param do
+              %{"type" => type} ->
+                properties |> Map.put_new(name, %{"type" => type})
+              %{"schema" => %{"$ref" => "#/definitions/"<>ref}} ->
+                properties |> Map.put_new(name, schema["definitions"][ref])
+              %{"schema" => param_schema} ->
+                properties |> Map.put_new(name, param_schema)
             end
-          end)
-          # actually all requests which have parameters are objects
-          properties = if properties["type"] == nil do
-                         Map.put_new(properties, "type", "object")
-                       else
-                         properties
-                       end
-          # store path concatenated with method. This allows us
-          # to identify the same resources with different http methods.
-          path = "/" <> method <> path
-          schema_object = Map.merge(%{"parameters" => parameters, "type" => "object", "definitions" => schema["definitions"]}, properties)
-          resolved_schema = ExJsonSchema.Schema.resolve(schema_object)
-          :ets.insert(@table, {path, schema["basePath"], resolved_schema})
-          {path, resolved_schema}
-        end
+          if param["required"] && param["in"] != "body" do
+            {[name | required], properties}
+          else
+            {required, properties}
+          end
+        end)
+
+        # actually all requests which have parameters are objects
+        resolved_schema = %{
+          "type" => "object",
+          "required" => required,
+          "properties" => properties,
+          "parameters" => path_item["parameters"] || [],
+          "definitions" => schema["definitions"] || %{}
+        }
+        |> set_if_not_empty("required", required)
+        |> ExJsonSchema.Schema.resolve()
+        # store path concatenated with method. This allows us
+        # to identify the same resources with different http methods.
+        key = "/" <> method <> path
+        :ets.insert(@table, {key, schema["basePath"], resolved_schema})
+        {key, resolved_schema}
       end)
     end) |> List.flatten
   end
 
-  @doc false
-  defp collect_properties(properties, parameter) when properties == %{} do
-    Map.put(%{}, "properties", Map.put_new(%{}, parameter["name"], %{"type" => parameter["type"]}))
-  end
-  defp collect_properties(properties, parameter) do
-    props = Map.put(properties["properties"], parameter["name"], %{"type" => parameter["type"]})
-    Map.put(properties, "properties", props)
-  end
+  defp set_if_not_empty(m, _, []), do: m
+  defp set_if_not_empty(m, k, v), do: m |> Map.put_new(k, v)
 
   @doc false
   defp read_swagger_schema(file) do
