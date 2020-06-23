@@ -1,3 +1,10 @@
+# 0.8.3
+
+  * allow swagger ui validator url to be customized
+  * validatorUrl replaced with configUrl
+  * warning messages fixed for Elixir 1.10
+  * plug, ex_json_schema and poison are updated to the latests versions
+
 # 0.8.2
 
   * Add support for Phoenix ~> 1.4.9
