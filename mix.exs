@@ -57,7 +57,7 @@ defmodule PhoenixSwagger.Mixfile do
       {:poison, "~> 2.2 or ~> 3.0 or ~> 4.0.1", optional: true},
       {:jason, "~> 1.0", optional: true},
       {:ex_json_schema, "~> 0.7.1", optional: true},
-      {:plug, "~> 1.4"},
+      {:plug, "~> 1.10"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:dialyxir, "~> 0.5", only: :dev, runtime: false},
     ]
