@@ -1,19 +1,22 @@
 use Mix.Config
 
+# Configure your database
+#
+# The MIX_TEST_PARTITION environment variable can be used
+# to provide built-in test partitioning in CI environment.
+# Run `mix help test` for more information.
+config :simple, Simple.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "simple_test#{System.get_env("MIX_TEST_PARTITION")}",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :simple, SimpleWeb.Endpoint,
-  http: [port: 4001],
+  http: [port: 4002],
   server: false
 
 # Print only warnings and errors during test
 config :logger, level: :warn
-
-# Configure your database
-config :simple, Simple.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "simple_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox

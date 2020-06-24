@@ -1,23 +1,27 @@
 defmodule Simple.Application do
-  use Application
-  import Supervisor.Spec, only: [supervisor: 2]
-
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
+  # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
+  @moduledoc false
+
+  use Application
+
   def start(_type, _args) do
     PhoenixSwagger.Validator.parse_swagger_schema("priv/static/swagger.json")
 
-    # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository
-      supervisor(Simple.Repo, []),
-      # Start the endpoint when the application starts
-      supervisor(SimpleWeb.Endpoint, [])
-      # Start your own worker by calling: Simple.Worker.start_link(arg1, arg2, arg3)
-      # worker(Simple.Worker, [arg1, arg2, arg3]),
+      Simple.Repo,
+      # Start the Telemetry supervisor
+      SimpleWeb.Telemetry,
+      # Start the PubSub system
+      {Phoenix.PubSub, name: Simple.PubSub},
+      # Start the Endpoint (http/https)
+      SimpleWeb.Endpoint
+      # Start a worker by calling: Simple.Worker.start_link(arg)
+      # {Simple.Worker, arg}
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
+    # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Simple.Supervisor]
     Supervisor.start_link(children, opts)
