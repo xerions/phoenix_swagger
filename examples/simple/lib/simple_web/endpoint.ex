@@ -1,63 +1,46 @@
 defmodule SimpleWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :simple
 
-  socket("/socket", SimpleWeb.UserSocket)
+  # The session will be stored in the cookie and signed,
+  # this means its contents can be read but not tampered with.
+  # Set :encryption_salt if you would also like to encrypt it.
+  @session_options [
+    store: :cookie,
+    key: "_simple_key",
+    signing_salt: "haXSk3c4"
+  ]
+
+  socket "/socket", SimpleWeb.UserSocket,
+    websocket: true,
+    longpoll: false
 
   # Serve at "/" the static files from "priv/static" directory.
   #
-  # You should set gzip to true if you are running phoenix.digest
+  # You should set gzip to true if you are running phx.digest
   # when deploying your static files in production.
-  plug(Plug.Static,
+  plug Plug.Static,
     at: "/",
     from: :simple,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
-  )
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
-    socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
-    plug(Phoenix.LiveReloader)
-    plug(Phoenix.CodeReloader)
+    plug Phoenix.CodeReloader
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :simple
   end
 
-  plug(Plug.RequestId)
-  plug(Plug.Logger)
+  plug Plug.RequestId
+  plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
-  plug(Plug.Parsers,
+  plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
-  )
+    json_decoder: Phoenix.json_library()
 
-  plug(Plug.MethodOverride)
-  plug(Plug.Head)
-
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
-  plug(Plug.Session,
-    store: :cookie,
-    key: "_simple_key",
-    signing_salt: "gRYIcmz4"
-  )
-
-  plug(SimpleWeb.Router)
-
-  def init(_key, config) do
-    if config[:load_from_system_env] do
-      port = System.get_env("PORT") || 4000
-      host = System.get_env("HOST") || "localhost"
-
-      config =
-        config
-        |> Keyword.put(:http, port: port)
-        |> Keyword.put(:url, host: host, port: port)
-
-      {:ok, config}
-    else
-      {:ok, config}
-    end
-  end
+  plug Plug.MethodOverride
+  plug Plug.Head
+  plug Plug.Session, @session_options
+  plug SimpleWeb.Router
 end
