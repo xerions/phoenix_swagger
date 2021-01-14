@@ -40,7 +40,7 @@ defmodule PhoenixSwagger.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}]
+    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}, extra_applications: [:ex_json_schema]]
   end
 
   # Dependencies can be Hex packages:
@@ -57,9 +57,9 @@ defmodule PhoenixSwagger.Mixfile do
       {:poison, "~> 2.2 or ~> 3.0", optional: true},
       {:jason, "~> 1.0", optional: true},
       {:ex_json_schema, "~> 0.7.1", optional: true},
-      {:plug, "~> 1.10"},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
+      {:plug, "~> 1.11"},
+      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0", only: :dev, runtime: false},
     ]
   end
 
