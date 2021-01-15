@@ -1,9 +1,10 @@
 # 0.8.3
 
+  * fix broken param parsing caused from Plug 1.11.0
   * allow swagger ui validator url to be customized
   * validatorUrl replaced with configUrl
-  * warning messages fixed for Elixir 1.10
-  * plug, ex_json_schema are updated to the latests versions
+  * warning messages fixed for Elixir 1.11
+  * dialyxir, plug, ex_json_schema and other dependencies are updated to the latests versions
 
 # 0.8.2
 
