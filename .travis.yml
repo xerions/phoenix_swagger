@@ -1,12 +1,13 @@
 dist: trusty
 language: elixir
 
-elixir:
-    - 1.6.1
-    - 1.7.4
-
-otp_release:
-    - 19.0
-    - 20.0
+jobs:
+  include:
+    - elixir: '1.9.0'
+      otp_release: '21.0'
+    - elixir: '1.10.0'
+      otp_release: '22.0'
+    - elixir: '1.11.0'
+      otp_release: '23.0'
 
 script: "mix test"

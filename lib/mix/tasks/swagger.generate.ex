@@ -148,19 +148,19 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     controller = find_controller(route)
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
-    cond do
-      Code.ensure_compiled?(controller) ->
+    loaded? = Code.ensure_compiled(controller)
+    case loaded? do
+      {:module, _} ->
         %{
           controller: controller,
           swagger_fun: swagger_fun,
           path: format_path(path),
           verb: verb
         }
-      true ->
+      _ ->
         Logger.warn "Warning: #{controller} module didn't load."
         nil
     end
-
   end
 
   defp format_path(path) do
