@@ -13,6 +13,10 @@ defmodule PhoenixSwagger.Mixfile do
       deps: deps(),
       description: description(),
       package: package(),
+      xref: [exclude: [
+        ExJsonSchema.Schema,
+        ExJsonSchema.Validator
+      ]],
 
       # Docs
       source_url: "https://github.com/xerions/phoenix_swagger",
@@ -40,7 +44,7 @@ defmodule PhoenixSwagger.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}, extra_applications: [:ex_json_schema]]
+    [applications: [:logger, :plug], mod: {PhoenixSwagger, []}]
   end
 
   # Dependencies can be Hex packages:
