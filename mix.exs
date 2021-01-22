@@ -1,18 +1,22 @@
 defmodule PhoenixSwagger.Mixfile do
   use Mix.Project
 
-  @version "0.8.2"
+  @version "0.8.3"
 
   def project do
     [
       app: :phoenix_swagger,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.8",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
       package: package(),
+      xref: [exclude: [
+        ExJsonSchema.Schema,
+        ExJsonSchema.Validator
+      ]],
 
       # Docs
       source_url: "https://github.com/xerions/phoenix_swagger",
@@ -56,10 +60,10 @@ defmodule PhoenixSwagger.Mixfile do
     [
       {:poison, "~> 2.2 or ~> 3.0", optional: true},
       {:jason, "~> 1.0", optional: true},
-      {:ex_json_schema, "~> 0.6", optional: true},
-      {:plug, "~> 1.4"},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:dialyxir, "~> 0.5", only: :dev, runtime: false}
+      {:ex_json_schema, "~> 0.7.1", optional: true},
+      {:plug, "~> 1.11"},
+      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0.0", only: :dev, runtime: false}
     ]
   end
 

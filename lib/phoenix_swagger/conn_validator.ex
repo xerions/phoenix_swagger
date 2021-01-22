@@ -128,6 +128,7 @@ defmodule PhoenixSwagger.ConnValidator do
 
   defp get_in_nested(params = nil, _), do: params
   defp get_in_nested(params, nil), do: params
+  defp get_in_nested(params, ""), do: params
 
   defp get_in_nested(params, nested_map) when map_size(nested_map) == 1 do
     [{key, child_nested_map}] = Map.to_list(nested_map)
