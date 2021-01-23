@@ -162,13 +162,16 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
   # Render the swagger.json file or 404 for any other file
   get "/*paths" do
     spec_url = conn.assigns.spec_url
+
     case conn.path_params["paths"] do
-      [^spec_url] -> Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
+      [^spec_url] ->
+        Conn.send_file(conn, 200, conn.assigns.swagger_file_path)
+
       _ ->
         if accept_json?(conn) do
           conn
           |> Conn.put_resp_content_type("application/json")
-          |> Conn.send_resp(404, PhoenixSwagger.json_library().encode!(%{"Error": "not found"}))
+          |> Conn.send_resp(404, PhoenixSwagger.json_library().encode!(%{Error: "not found"}))
           |> halt
         else
           Conn.send_resp(conn, 404, "not found")

@@ -10,4 +10,6 @@ jobs:
     - elixir: '1.11.0'
       otp_release: '23.0'
 
-script: "mix test"
+script: |
+  mix format --check-formatted
+  mix test
