@@ -209,12 +209,20 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     url = Keyword.get(endpoint_config, :url)
     host = Keyword.get(url, :host, "localhost")
     port = Keyword.get(url, :port, 4000)
+    scheme = Keyword.get(url, :scheme, "http")
 
     swagger_map =
       if !load_from_system_env and is_binary(host) and (is_integer(port) or is_binary(port)) do
         Map.put_new(swagger_map, :host, "#{host}:#{port}")
       else
         # host / port may be {:system, "ENV_VAR"} tuples or loaded in Endpoint.init callback
+        swagger_map
+      end
+
+    swagger_map =
+      if scheme == "https" do
+        Map.put_new(swagger_map, :schemes, ["https", "http"])
+      else
         swagger_map
       end
 
