@@ -1,8 +1,8 @@
 defmodule PhoenixSwagger.Plug.SwaggerUI do
   @moduledoc """
-  Swagger UI in a plug
+  Swagger UI in a plug.
 
-  Usage:
+  ## Examples
 
   Generate a swagger file and place it in your applications `priv/static` dir:
 

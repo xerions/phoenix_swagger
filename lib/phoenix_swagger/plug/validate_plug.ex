@@ -1,11 +1,13 @@
 defmodule PhoenixSwagger.Plug.Validate do
   @moduledoc """
-  A plug to automatically validate all requests in a given scope. Please make
-  sure to:
+  A plug to automatically validate all requests in a given scope.
 
-  * load Swagger specs at appliction start with
-    `PhoenixSwagger.Validator.parse_swagger_schema/1`
-  * set `conn.private.phoenix_swagger.valid` to `true` to skip validation
+  Please make sure to:
+
+    * load Swagger specs at appliction start with
+      `PhoenixSwagger.Validator.parse_swagger_schema/1`
+    * set `conn.private.phoenix_swagger.valid` to `true` to skip validation
+
   """
   import Plug.Conn
   alias PhoenixSwagger.ConnValidator
@@ -15,7 +17,7 @@ defmodule PhoenixSwagger.Plug.Validate do
 
   Options:
 
-   - `:validation_failed_status` the response status to set when parameter validation fails, defaults to 400.
+    * `:validation_failed_status` the response status to set when parameter validation fails, defaults to 400.
   """
   def init(opts), do: opts
 

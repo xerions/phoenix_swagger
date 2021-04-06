@@ -1,4 +1,11 @@
-# PhoenixSwagger [![Build Status](https://travis-ci.org/xerions/phoenix_swagger.svg?branch=master)](https://travis-ci.org/xerions/phoenix_swagger)
+# PhoenixSwagger
+
+[![Build Status](https://travis-ci.org/xerions/phoenix_swagger.svg?branch=master)](https://travis-ci.org/xerions/phoenix_swagger)
+[![Module Version](https://img.shields.io/hexpm/v/phoenix_swagger.svg)](https://hex.pm/packages/phoenix_swagger)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/phoenix_swagger/)
+[![Total Download](https://img.shields.io/hexpm/dt/phoenix_swagger.svg)](https://hex.pm/packages/phoenix_swagger)
+[![License](https://img.shields.io/hexpm/l/phoenix_swagger.svg)](https://github.com/xerions/phoenix_swagger/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/xerions/phoenix_swagger.svg)](https://github.com/xerions/phoenix_swagger/commits/master)
 
 `PhoenixSwagger` is the library that provides [swagger](http://swagger.io/) integration
 to the [phoenix](http://www.phoenixframework.org/) web framework.
@@ -14,7 +21,7 @@ Follow the [getting started guide](https://hexdocs.pm/phoenix_swagger/getting-st
 
 # Guides
 
-See the [full documentation on hexdocs.pm](https://hexdocs.pm/phoenix_swagger) or browse the [docs](./docs) directory.
+See the [full documentation on hexdocs.pm](https://hexdocs.pm/phoenix_swagger) or browse the [guides](https://github.com/xerions/phoenix_swagger/guides) directory.
 
 # Contributing
 
