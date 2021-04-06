@@ -5,7 +5,7 @@ file generation that contains swagger specification that describes API of the `p
 application.
 
 You just need to add the swagger DSL to your controllers and then run this one mix task
-to generate the json files.
+to generate the JSON files.
 
 ## Installation
 
@@ -59,7 +59,7 @@ config :my_app, :phoenix_swagger,
   }
 ```
 
-Also you can configure json library to use:
+Also you can configure JSON library to use:
 
 ```
 config :phoenix_swagger, json_library: Jason
@@ -130,7 +130,7 @@ config :my_app, MyApp.Web.Endpoint,
 ## Generate Swagger File
 
 Once you have a minimal configuration and `swagger_info` function in the router, run the `phx.swagger.generate`
-mix task for the `swagger` json file generation into directory with `phoenix` application:
+mix task for the `swagger` JSON file generation into directory with `phoenix` application:
 
 ```
 mix phx.swagger.generate

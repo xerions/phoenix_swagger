@@ -20,13 +20,12 @@ mix phx.swagger.generate
 Add a swagger scope to your router, and forward all requests to SwaggerUI
 
 ```elixir
-    scope "/api/swagger" do
-      forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json"
-    end
+scope "/api/swagger" do
+  forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :myapp, swagger_file: "swagger.json"
+end
 ```
 
 Run the server with `mix phx.server` and browse to `localhost:4000/api/swagger`,
 Swagger-ui should be shown with your swagger spec loaded.
 
 See the [examples/simple](https://github.com/xerions/phoenix_swagger/tree/master/examples/simple) project for a runnable example with swagger-ui.
-
