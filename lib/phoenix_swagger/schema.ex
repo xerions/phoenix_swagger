@@ -234,7 +234,14 @@ defmodule PhoenixSwagger.Schema do
 
     body =
       exprs
-      |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)
+      |> Enum.map(fn
+        {:"-", line, [{first, _, _}, {second, _, args}]= _bad_args} ->
+          name = :"#{first}-#{second}"
+          {:property, line, [name| args]}
+
+        {name, line, args} ->
+          {:property, line, [name | args]}
+      end)
       |> Enum.reduce(model, fn expr, acc ->
         quote do
           unquote(acc) |> unquote(expr)
