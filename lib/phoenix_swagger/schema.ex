@@ -234,7 +234,13 @@ defmodule PhoenixSwagger.Schema do
 
     body =
       exprs
-      |> Enum.map(fn {name, line, args} -> {:property, line, [name | args]} end)
+      |> Enum.map(fn
+        {:-, line, _args} = ast ->
+          {:property, line, [get_dash_name(ast) | get_args(ast)]}
+
+        {name, line, args} ->
+          {:property, line, [name | args]}
+      end)
       |> Enum.reduce(model, fn expr, acc ->
         quote do
           unquote(acc) |> unquote(expr)
@@ -248,6 +254,16 @@ defmodule PhoenixSwagger.Schema do
        end).()
     end
   end
+
+  defp get_dash_name({:-, _line, [first, second]}),
+       do: get_dash_name(first) <> "-" <> get_dash_name(second)
+
+  defp get_dash_name({atom_name, _, _}), do: to_string(atom_name)
+
+  defp get_args({:-, _line, [_first, second]}), do: get_args(second)
+  defp get_args({_, _line, args}), do: args
+
+
 
   @doc """
   Sets the format of a Schema with type: :string
