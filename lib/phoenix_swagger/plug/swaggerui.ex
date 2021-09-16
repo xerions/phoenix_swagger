@@ -107,7 +107,8 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
     swagger_url.pathname = swagger_url.pathname.replace("index.html", "<%= spec_url %>");
     swagger_url.hash = "";
     const config_url = <%= config_url %>
-    const ui = SwaggerUIBundle({
+
+    const configObject = {
       url: swagger_url.href,
       dom_id: '#swagger-ui',
       deepLinking: true,
@@ -133,7 +134,13 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
       ],
       layout: "StandaloneLayout",
       ...(config_url !== undefined && {configUrl: config_url})
-    })
+    }
+
+    <%= for {key, value} <- config_object do %>
+      configObject["<%= key %>"] = "<%= value %>"
+    <% end %>
+
+    const ui = SwaggerUIBundle(configObject)
 
     window.ui = ui
   }
@@ -190,15 +197,25 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
 
    - `otp_app` (required) The name of the app has is hosting the swagger file
    - `swagger_file` (required) The name of the file, eg "swagger.json"
+   - `config_object` (optional) These values are injected into the config object passed to SwaggerUI.
    - `config_url` (optional) Populates the `configUrl` Swagger UI parameter. A URL to fetch an external configuration document from.
 
   """
   def init(opts) do
     app = Keyword.fetch!(opts, :otp_app)
     swagger_file = Keyword.fetch!(opts, :swagger_file)
+    config_object = Keyword.get(opts, :config_object, %{})
     config_url = format_config_url(opts)
-    body = EEx.eval_string(@template, spec_url: swagger_file, config_url: config_url)
+
+    body =
+      EEx.eval_string(@template,
+        config_object: config_object,
+        config_url: config_url,
+        spec_url: swagger_file
+      )
+
     swagger_file_path = Path.join(["priv", "static", swagger_file])
+
     [app: app, body: body, spec_url: swagger_file, swagger_file_path: swagger_file_path]
   end
 
