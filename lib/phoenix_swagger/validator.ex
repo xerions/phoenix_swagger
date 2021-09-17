@@ -25,7 +25,7 @@ defmodule PhoenixSwagger.Validator do
   @table :validator_table
 
   @doc """
-  The `parse_swagger_schema/1` takes path or list of paths to a swagger schema(s), 
+  The `parse_swagger_schema/1` takes path or list of paths to a swagger schema(s),
   parses it/them into ex_json_schema format and store to the `validator_table` ets
   table.
 
@@ -165,6 +165,9 @@ defmodule PhoenixSwagger.Validator do
               properties
             )
 
+          schema_object = schema_object
+            |> Map.update("definitions", %{}, &swagger_nullable_to_json_schema/1)
+
           resolved_schema = ExJsonSchema.Schema.resolve(schema_object)
           :ets.insert(@table, {path, schema["basePath"], resolved_schema})
           {path, resolved_schema}
@@ -173,6 +176,27 @@ defmodule PhoenixSwagger.Validator do
     end)
     |> List.flatten()
   end
+
+  # Swagger 2.0 and JSON-Schema differ in the treatment of nulls.
+  # When the "x-nullable" vendor extension is present in the swagger,
+  # convert the type to an array including "null"
+  defp swagger_nullable_to_json_schema(schema = %{"type" => type, "x-nullable" => true})
+       when is_binary(type) do
+    schema = %{schema | "type" => [type, "null"]}
+    swagger_nullable_to_json_schema(schema)
+  end
+
+  defp swagger_nullable_to_json_schema(schema) when is_map(schema) do
+    for {k, v} <- schema,
+        into: %{},
+        do: {k, swagger_nullable_to_json_schema(v)}
+  end
+
+  defp swagger_nullable_to_json_schema(schema) when is_list(schema) do
+    for v <- schema, do: swagger_nullable_to_json_schema(v)
+  end
+
+  defp swagger_nullable_to_json_schema(other), do: other
 
   @doc false
   defp collect_properties(properties, parameter) when properties == %{} do
