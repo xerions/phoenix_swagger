@@ -248,6 +248,10 @@
                 },
                 "tag": {
                     "type": "string"
+                },
+                "nickname" : {
+                  "type": "string",
+                  "x-nullable": true
                 }
             }
         },

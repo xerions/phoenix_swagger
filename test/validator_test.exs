@@ -108,6 +108,11 @@ defmodule ValidatorTest do
     assert {:error, "Required property tag was not present.", "#/pet"} =
              Validator.validate("/post/pets", %{"id" => 1, "pet" => %{"name" => "pet_name"}})
 
+    # assert {:error, "Type mismatch. Expected String but got Null.", "#/pet/nickname"} =
+    #          Validator.validate("/post/pets", %{"id" => 1, "pet" => %{"name" => "pet_name", "tag" => "pet_tag", "nickname" => nil}})
+    assert :ok =
+      Validator.validate("/post/pets", %{"id" => 1, "pet" => %{"name" => "pet_name", "tag" => "pet_tag", "nickname" => nil}})
+
     assert :ok =
              Validator.validate("/post/pets", %{
                "id" => 1,
