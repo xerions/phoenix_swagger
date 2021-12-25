@@ -25,11 +25,11 @@ defmodule PhoenixSwagger.Validator do
   @table :validator_table
 
   @doc """
-  The `parse_swagger_schema/1` takes path or list of paths to a swagger schema(s), 
+  The `parse_swagger_schema/1` takes path or list of paths to a swagger schema(s),
   parses it/them into ex_json_schema format and store to the `validator_table` ets
   table.
 
-  Usage:
+  ## Examples
 
       iex(1)> parse_swagger_schema("my_json_spec.json")
       [{"/person",  %{'__struct__' => 'Elixir.ExJsonSchema.Schema.Root',
@@ -83,10 +83,11 @@ defmodule PhoenixSwagger.Validator do
   Returns `:ok` in a case when parameters are valid for the
   given resource or:
 
-    * {:error, :resource_not_exists} in a case when path is not
-      exists in the validator table;
-    * {:error, error_message, path} in a case when at least
-      one  parameter is not valid for the given resource.
+    * `{:error, :resource_not_exists}` in a case when path is not
+      exists in the validator table
+
+    * `{:error, error_message, path}` in a case when at least
+      one  parameter is not valid for the given resource
   """
   def validate(path, params) do
     case :ets.lookup(@table, path) do

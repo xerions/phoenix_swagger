@@ -4,7 +4,9 @@ defmodule PhoenixSwagger.ConnValidator do
   @table :validator_table
 
   @doc """
-  Validate a request. Feel free to use it in your own Plugs. Returns:
+  Validate a request.
+
+  Feel free to use it in your own Plugs. Returns:
   * `{:ok, conn}` on success
   * `{:error, :no_matching_path}` if the request path could not be mapped to a schema
   * `{:error, message, path}` if the request was mapped but failed validation

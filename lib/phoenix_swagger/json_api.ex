@@ -3,6 +3,7 @@ defmodule PhoenixSwagger.JsonApi do
   This module defines a DSL for defining swagger definitions in a JSON-API conformant format.
 
   ## Examples
+
       use PhoenixSwagger
 
       def swagger_definitions do
@@ -31,6 +32,7 @@ defmodule PhoenixSwagger.JsonApi do
         paging size: "page[size]", number: "page[number]"
         response 200, "OK", Schema.ref(:Users)
       end
+
   """
 
   alias PhoenixSwagger.Schema
@@ -38,6 +40,7 @@ defmodule PhoenixSwagger.JsonApi do
 
   @doc """
   Defines a schema for a top level json-api document with an array of resources as primary data.
+
   The given `resource` should be the name of a JSON-API resource defined with the `resource/1` macro
   """
   def page(resource) do
@@ -100,6 +103,7 @@ defmodule PhoenixSwagger.JsonApi do
 
   @doc """
   Defines a schema for a top level json-api document with a single primary data resource.
+
   The given `resource` should be the name of a JSON-API resource defined with the `resource/1` macro
   """
   def single(resource) do
@@ -180,10 +184,11 @@ defmodule PhoenixSwagger.JsonApi do
 
   @doc """
   Defines a block of attributes for a JSON-API resource.
+
   Within this block, each function call will be translated into a
   call to the `PhoenixSwagger.JsonApi.attribute` function.
 
-  ## Example
+  ## Examples
 
       description("A User")
       attributes do
@@ -191,11 +196,12 @@ defmodule PhoenixSwagger.JsonApi do
         dateOfBirth :string, "Date of Birth", format: "ISO-8601", required: false
       end
 
-  translates to:
+  Translates to:
 
       description("A User")
       |> attribute(:name, :string, "Full name of the user", required: true)
       |> attribute(:dateOfBirth, :string, "Date of Birth", format: "ISO-8601", required: false)
+
   """
   defmacro attributes(model, block) do
     attrs =
@@ -218,6 +224,7 @@ defmodule PhoenixSwagger.JsonApi do
 
   Name, type and description are accepted as positional arguments, but any other
   schema properties can be set through the trailing keyword arguments list.
+
   As a convenience, required: true can be passed in the keyword args, causing the
    name of this attribute to be added to the "required" list of the attributes schema.
   """
@@ -243,7 +250,7 @@ defmodule PhoenixSwagger.JsonApi do
   end
 
   @doc """
-  Defines a link with name and description
+  Defines a link with name and description.
   """
   def link(model = %Schema{}, name, description) do
     put_in(
@@ -253,9 +260,11 @@ defmodule PhoenixSwagger.JsonApi do
   end
 
   @doc """
-  Defines a relationship
+  Defines a relationship.
+
   Optionally can pass `type: :has_many` or `type: :has_one` to determine
   whether to structure the relationship as an object or array.
+
   Defaults to `:has_one`
   """
   @spec relationship(%Schema{}, name :: atom, [option]) :: %Schema{}
