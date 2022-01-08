@@ -187,6 +187,15 @@ defmodule PhoenixSwagger.Validator do
     swagger_nullable_to_json_schema(schema)
   end
 
+  defp swagger_nullable_to_json_schema(schema = %{"$ref" => ref, "x-nullable" => true})
+       when is_binary(ref) do
+    schema = schema
+      |> Map.drop(["$ref", "x-nullable"])
+      |> Map.put("oneOf", [%{"type" => "null"}, %{"$ref" => ref}])
+
+    swagger_nullable_to_json_schema(schema)
+  end
+
   defp swagger_nullable_to_json_schema(schema) when is_map(schema) do
     for {k, v} <- schema,
         into: %{},

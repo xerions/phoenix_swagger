@@ -249,9 +249,27 @@
                 "tag": {
                     "type": "string"
                 },
+                "full_name": {
+                    "$ref": "#/definitions/FullName",
+                    "x-nullable": true
+                },
                 "nickname" : {
                   "type": "string",
                   "x-nullable": true
+                }
+            }
+        },
+        "FullName": {
+            "type": "object",
+            "required": [
+                "first_name", "last_name"
+            ],
+            "properties": {
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
                 }
             }
         },
