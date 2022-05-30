@@ -3,6 +3,19 @@
 PhoenixSwagger also includes a testing helper module `PhoenixSwagger.SchemaTest` to conveniently assert that responses
 from Phoenix controller actions conform to your swagger schema.
 
+In order to validate the swagger schema, the properties options must be required true in swagger definitions:
+
+```elixir
+  properties do
+    id(:integer, "User ID")
+    name(:string, "User name", required: true)
+    email(:string, "Email address", format: :email, required: true)
+    inserted_at(:string, "Creation timestamp", format: :datetime)
+    updated_at(:string, "Update timestamp", format: :datetime)
+  end
+```
+
+
 In your controller test files add the `PhoenixSwagger.SchemaTest` mixin with the path to your swagger spec:
 
 ```elixir
