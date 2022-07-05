@@ -14,10 +14,12 @@ defmodule PhoenixSwagger.Mixfile do
       deps: deps(),
       package: package(),
       docs: docs(),
-      xref: [exclude: [
-        ExJsonSchema.Schema,
-        ExJsonSchema.Validator
-      ]]
+      xref: [
+        exclude: [
+          ExJsonSchema.Schema,
+          ExJsonSchema.Validator
+        ]
+      ]
     ]
   end
 
@@ -31,8 +33,8 @@ defmodule PhoenixSwagger.Mixfile do
   defp deps do
     [
       {:poison, "~> 2.2 or ~> 3.0", optional: true},
-      {:jason, "~> 1.0", optional: true},
-      {:ex_json_schema, "~> 0.7.1", optional: true},
+      {:jason, "~> 1.3", optional: true},
+      {:ex_json_schema, "~> 0.9.0", optional: true},
       {:plug, "~> 1.11"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0", only: :dev, runtime: false}
@@ -41,8 +43,9 @@ defmodule PhoenixSwagger.Mixfile do
 
   defp package do
     [
-      description: "PhoenixSwagger is the library that provides swagger "
-        <> "integration to the phoenix web framework.",
+      description:
+        "PhoenixSwagger is the library that provides swagger " <>
+          "integration to the phoenix web framework.",
       maintainers: ["Alexander Kuleshov"],
       licenses: ["MPL-2.0"],
       links: %{
@@ -58,7 +61,7 @@ defmodule PhoenixSwagger.Mixfile do
     [
       extras: [
         "CHANGELOG.md",
-        {:"LICENSE", [title: "License"]},
+        {:LICENSE, [title: "License"]},
         {:"README.md", [title: "Overview"]},
         "guides/getting-started.md",
         "guides/schemas.md",
