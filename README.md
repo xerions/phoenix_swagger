@@ -21,7 +21,7 @@ Follow the [getting started guide](https://hexdocs.pm/phoenix_swagger/getting-st
 
 # Guides
 
-See the [full documentation on hexdocs.pm](https://hexdocs.pm/phoenix_swagger) or browse the [guides](https://github.com/xerions/phoenix_swagger/guides) directory.
+See the [full documentation on hexdocs.pm](https://hexdocs.pm/phoenix_swagger) or browse the [guides](https://github.com/xerions/phoenix_swagger/tree/master/guides) directory.
 
 # Contributing
 
