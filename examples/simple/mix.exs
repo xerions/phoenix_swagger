@@ -7,7 +7,7 @@ defmodule Simple.MixProject do
       version: "0.1.0",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix] ++ Mix.compilers(),
+      compilers:  Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -33,16 +33,17 @@ defmodule Simple.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.3"},
-      {:phoenix_ecto, "~> 4.1"},
-      {:ecto_sql, "~> 3.4"},
+      {:phoenix, "~> 1.7.2"},
+      {:phoenix_ecto, "~> 4.4.1"},
+      {:ecto_sql, "~>   3.10.1 "},
       {:postgrex, ">= 0.0.0"},
-      {:telemetry_metrics, "~> 0.4"},
-      {:telemetry_poller, "~> 0.4"},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
-      {:ex_json_schema, "~> 0.7"},
-      {:phoenix_swagger, path: "../../"}
+      {:telemetry_metrics, "~> 0.6.1"},
+      {:telemetry_poller, "~> 1.0.0"},
+      {:jason, "~> 1.4.0"},
+      {:plug_cowboy, "~> 2.6.1"},
+      {:ex_json_schema, "~> 0.9.2"},
+      {:phoenix_swagger, path: "../../"},
+      {:phoenix_view, "~> 2.0"}
     ]
   end
 
