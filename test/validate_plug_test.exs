@@ -44,7 +44,7 @@ defmodule ValidatePlugTest do
   end
 
   test "validation fails on an invalid path" do
-    test_conn = init_conn(:get, "foo", %{foo: :bar})
+    test_conn = init_conn(:get, "/foo", %{foo: :bar})
     test_conn = Validate.call(test_conn, [])
     assert {404, _, _} = sent_resp(test_conn)
   end
@@ -56,7 +56,7 @@ defmodule ValidatePlugTest do
   end
 
   test "validation skipped if valid flag is already set" do
-    test_conn = init_conn(:get, "foo", %{foo: :bar})
+    test_conn = init_conn(:get, "/foo", %{foo: :bar})
     test_conn = Conn.put_private(test_conn, :phoenix_swagger, %{valid: true})
     assert test_conn == Validate.call(test_conn, [])
   end
