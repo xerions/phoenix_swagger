@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
       |> Keyword.get(:swagger_files, %{})
 
     if Enum.empty?(swagger_files) && !Mix.Task.recursing?() do
-      Logger.warn("""
+      Logger.warning("""
       No swagger configuration found. Ensure phoenix_swagger is configured, eg:
 
       config #{inspect(app_name())}, :phoenix_swagger,
@@ -57,7 +57,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
       case result do
         :ok -> :ok
-        {:error, reason} -> Logger.warn("Failed to generate #{output_file}: #{reason}")
+        {:error, reason} -> Logger.warning("Failed to generate #{output_file}: #{reason}")
       end
     end)
   end
@@ -75,7 +75,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
 
       _ ->
         File.write!(output_file, contents)
-        IO.puts("#{app_name()}: generated #{output_file}")
+        Logger.info("#{app_name()}: generated #{output_file}")
     end
   end
 
@@ -158,6 +158,7 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
     swagger_fun = "swagger_path_#{action}" |> String.to_atom()
 
     loaded? = Code.ensure_compiled(controller)
+
     case loaded? do
       {:module, _} ->
         %{
@@ -166,8 +167,9 @@ defmodule Mix.Tasks.Phx.Swagger.Generate do
           path: format_path(path),
           verb: verb
         }
+
       _ ->
-        Logger.warn("Warning: #{controller} module didn't load.")
+        Logger.warning("Warning: #{controller} module didn't load.")
         nil
     end
   end
