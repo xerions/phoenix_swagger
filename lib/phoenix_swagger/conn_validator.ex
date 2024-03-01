@@ -55,12 +55,12 @@ defmodule PhoenixSwagger.ConnValidator do
     end
   end
 
-  defp validate_boolean(_name, value, parameters) when value in ["true", "false"] do
+  defp validate_boolean(_name, value, parameters) when value in [true, false, "true", "false"] do
     validate_query_params(parameters)
   end
 
   defp validate_boolean(name, _value, _parameters) do
-    {:error, "Type mismatch. Expected Boolean but got String.", "#/#{name}"}
+    {:error, "Type mismatch. Expected Boolean but got something else.", "#/#{name}"}
   end
 
   defp validate_integer(name, value, parameters) do
