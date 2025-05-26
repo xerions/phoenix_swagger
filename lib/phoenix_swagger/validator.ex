@@ -93,7 +93,6 @@ defmodule PhoenixSwagger.Validator do
     case :ets.lookup(@table, path) do
       [] ->
         {:error, :resource_not_exists}
-
       [{_, _, schema}] ->
         case ExJsonSchema.Validator.validate(schema, params) do
           :ok ->

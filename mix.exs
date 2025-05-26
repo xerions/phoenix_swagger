@@ -8,7 +8,7 @@ defmodule PhoenixSwagger.Mixfile do
     [
       app: :phoenix_swagger,
       version: @version,
-      elixir: "~> 1.8",
+      elixir: "~> 1.16",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -23,17 +23,22 @@ defmodule PhoenixSwagger.Mixfile do
 
   def application do
     [
-      applications: [:logger, :plug],
+      extra_applications: extra_applications(Mix.env()) ++ [:logger],
       mod: {PhoenixSwagger, []}
     ]
   end
 
+  defp extra_applications(:test) do
+    [:jason, :ex_json_schema]
+  end
+  defp extra_applications(_), do: []
+
   defp deps do
     [
-      {:poison, "~> 2.2 or ~> 3.0 or ~> 4.0 or ~> 5.0", optional: true},
-      {:jason, "~> 1.0", optional: true},
+      {:poison, "~> 6.0.0", optional: true},
+      {:jason, "~> 1.4.4", optional: true},
       {:ex_json_schema, "~> 0.9.1", optional: true},
-      {:plug, "~> 1.11"},
+      {:plug, "~> 1.14.2"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false}
     ]
