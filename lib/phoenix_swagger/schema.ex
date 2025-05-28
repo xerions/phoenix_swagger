@@ -624,8 +624,8 @@ defmodule PhoenixSwagger.Schema do
       ...> |> Schema.all_of([Schema.ref("#definitions/Contact"), Schema.ref("#definitions/CreditHistory")])
       %PhoenixSwagger.Schema{
         allOf: [
-          %PhoenixSwagger.Schema{'$ref': "#definitions/Contact"},
-          %PhoenixSwagger.Schema{'$ref': "#definitions/CreditHistory"},
+          %PhoenixSwagger.Schema{"$ref": "#definitions/Contact"},
+          %PhoenixSwagger.Schema{"$ref": "#definitions/CreditHistory"},
         ]
       }
 
@@ -794,7 +794,7 @@ defmodule PhoenixSwagger.Schema do
       ...> %Schema{type: :string} |> Schema.nullable(true)
       %Schema{
         type: :string,
-        'x-nullable': true
+        "x-nullable": true
       }
 
   """
