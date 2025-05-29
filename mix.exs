@@ -55,7 +55,7 @@ defmodule PhoenixSwagger.Mixfile do
         "GitHub" => @source_url,
         "Slack" => "https://elixir-lang.slack.com/messages/phoenix_swagger"
       },
-      files: ~w(lib mix.exs .formatter.exs README.md CHANGELOG.md LICENSE config)
+      files: ~w(lib mix.exs .formatter.exs README.md CHANGELOG.md LICENSE config priv)
     ]
   end
 
