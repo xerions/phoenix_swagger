@@ -1,11 +1,24 @@
 # Changelog
 
+## v0.8.4 - 2025-05-29
+
+  * swagger-ui-dist updated to 5.2.0.
+  * Fix validation of boolean properties. Thanks to @charl3sj
+  * Allow nullable `$ref`. Thanks to @ericsullivan
+  * Nullable fields validated correctly. Thanks to @ericsullivan
+  * Add support SwaggerUI config object injection. Thanks to @heroinbob
+  * Add support to have property names with `-` symbol. Thanks to @fahadnaeemkhan
+  * Documentation improvements. Thanks to @kianmeng and @leticiapenha
+  * Use Elixir formatter. Thanks to @naps62
+  * Remove ex_json_schema from startup. Thanks to @lukaszsamson
+  * Update dependencies and phoenix_swagger itself for Elixir >= 1.16.0
+
 ## v0.8.3 - 2021-01-15
 
-  * fix broken param parsing caused from Plug 1.11.0
-  * allow swagger ui validator url to be customized
-  * validatorUrl replaced with configUrl
-  * warning messages fixed for Elixir 1.11
+  * Fix broken param parsing caused from Plug 1.11.0
+  * Allow swagger ui validator url to be customized
+  * `validatorUrl` replaced with `configUrl`
+  * Warning messages fixed for Elixir 1.11
   * dialyxir, plug, ex_json_schema and other dependencies are updated to the latests versions
 
 ## v0.8.2 - 2019-12-12
