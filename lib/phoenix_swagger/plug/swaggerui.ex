@@ -44,7 +44,23 @@ defmodule PhoenixSwagger.Plug.SwaggerUI do
       <div id="swagger-ui"></div>
       <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
       <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
-      <script src="./swagger-initializer.js" charset="UTF-8"> </script>
+      <script charset="UTF-8">
+        window.onload = function() {
+          window.ui = SwaggerUIBundle({
+            url: "<%= spec_url %>",
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            plugins: [
+              SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+          });
+        };
+      </script>
     </body>
   </html>
   """
